@@ -17,7 +17,7 @@ a live dashboard with alerts, camera priority, sampling interval, and measured A
 
 ## Layout (create as you go; owner in brackets)
 - `rsu/` [Mac 1] `frame_automation.py` (P1), `vlm.py` (P1), `decision_engine.py` (P2), `semantic_sender.py` + `frame_sender.py` (P3), `main.py`
-- `tcc/` [Mac 2] `pc2_receiver.py`, `camera_state.py` (P3), `dashboard/` (P4)
+- `tcc/` [Mac 2] `pc2_receiver.py`, `camera_state.py` (P3), `meaning_process.py` (OpenAI summaries, see api-contract), `dashboard/` (P4)
 - `shared/schemas.py` (P3, contract) · `evaluation/` (fixed-rate baseline, metrics) · `tests/`
 - `assets/demo_clips/` local only, never commit videos
 

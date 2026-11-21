@@ -26,13 +26,18 @@ flowchart TB
   subgraph TCC["Mac 2 · TCC"]
     RX["pc2_receiver.py<br/>FastAPI"] --> ST["Camera state<br/>(in memory)"]
     ST --> UI["Monitoring dashboard<br/>status · 2 s/1 s · alerts · metrics"]
+    ST -- "event changes" --> MP["meaning_process.py<br/>OpenAI → natural-language summary"]
+    RX -. "JPEG arrives later" .-> MP
+    MP --> UI
   end
   SS -- "Pipeline 1 · JSON" --> RX
   FS -. "Pipeline 2 · JPEG" .-> RX
   style DE fill:#FAECE7,stroke:#D85A30
+  style MP fill:#EEEDFE,stroke:#534AB7
 ```
 
 - The adaptive loop (`decision_engine` → `frame_automation`) runs on Mac 1 only.
+- `meaning_process` (Mac 2) turns JSON into an operator-readable summary with OpenAI first, then refines it when the matching JPEG arrives. It runs async and never delays the dashboard.
 - Pipeline 2 never blocks inference (bounded queue, drop stale previews).
 - Each sample → 1×4 softmax scores + camera metadata (location from `rsu/cameras.json`) sent as JSON.
 - Payload fields and endpoints: [docs/api-contract.md](docs/api-contract.md).
