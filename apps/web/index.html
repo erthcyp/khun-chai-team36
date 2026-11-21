@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>TCC Dashboard</title>
+<style>
+  :root { --bg:#0f1115; --card:#181b22; --muted:#8a90a0; --fg:#e8eaf0;
+          --normal:#3fb37f; --cong:#e0a526; --acc:#e5484d; --inv:#7c7f8a; }
+  * { box-sizing:border-box } body { margin:0; font:14px/1.45 system-ui, sans-serif; background:var(--bg); color:var(--fg) }
+  header { padding:14px 20px; border-bottom:1px solid #262a33; display:flex; justify-content:space-between }
+  main { display:grid; grid-template-columns: 1fr 1.3fr; gap:16px; padding:16px 20px }
+  .card { background:var(--card); border-radius:10px; padding:14px }
+  h2 { margin:0 0 10px; font-size:13px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted) }
+  .rsu { display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #262a33 }
+  .pill { padding:2px 10px; border-radius:99px; font-weight:600; font-size:12px }
+  .normal_flow{background:var(--normal)} .congestion{background:var(--cong);color:#111} .accident{background:var(--acc)} .invalid_scene{background:var(--inv)}
+  .bar { display:flex; height:8px; border-radius:4px; overflow:hidden; margin-top:6px; width:220px }
+  .ev { padding:6px 0; border-bottom:1px solid #22262e; font-family:ui-monospace, monospace; font-size:12px }
+  .plan { border-left:3px solid var(--acc); padding:8px 12px; margin-bottom:10px; background:#1e2129; border-radius:6px }
+  .muted { color:var(--muted) } ul { margin:6px 0 0 18px; padding:0 }
+</style>
+</head>
+<body>
+<header><strong>Traffic Control Center</strong><span class="muted" id="conn">connecting…</span></header>
+<main>
+  <section class="card"><h2>Roadside units</h2><div id="rsus"></div>
+    <h2 style="margin-top:18px">Semantic payload stream (16 B each)</h2><div id="events"></div></section>
+  <section class="card"><h2>Agent response plans</h2><div id="plans" class="muted">No incidents yet.</div></section>
+</main>
+<script>
+const COLORS = {normal_flow:'var(--normal)', congestion:'var(--cong)', accident:'var(--acc)', invalid_scene:'var(--inv)'};
+const rsus = {}; const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function bar(v){ return `<div class="bar">${Object.entries(v).map(([k,x])=>`<div style="width:${x*100}%;background:${COLORS[k]}"></div>`).join('')}</div>`; }
+function renderRsus(){
+  document.getElementById('rsus').innerHTML = Object.entries(rsus).map(([id,e]) =>
+    `<div class="rsu"><div><strong>${esc(id)}</strong>${bar(e.vector)}</div>
+     <span class="pill ${esc(e.state)}">${esc(e.state.replace('_',' '))} ${(e.confidence*100).toFixed(0)}%</span></div>`).join('');
+}
+function addEvent(e){
+  rsus[e.rsu_id] = e; renderRsus();
+  const el = document.getElementById('events');
+  el.insertAdjacentHTML('afterbegin', `<div class="ev">#${e.seq} ${esc(e.rsu_id)} → ${esc(e.state)} ${(e.confidence*100).toFixed(1)}% · cpv=${esc(e.cpv)} · ${e.payload_bytes}B</div>`);
+  while (el.children.length > 25) el.lastChild.remove();
+}
+function addPlan(d){
+  const p = d.plan, box = document.getElementById('plans');
+  if (box.classList.contains('muted')) { box.classList.remove('muted'); box.innerHTML=''; }
+  box.insertAdjacentHTML('afterbegin', `<div class="plan">
+    <div><span class="pill ${p.severity==='high'||p.severity==='critical'?'accident':'congestion'}">${esc(p.severity)}</span>
+    <strong> ${esc(d.rsu_id)}</strong> <span class="muted">#${d.seq} · ${esc(p.source)}${p.needs_human_approval?' · needs approval':''}</span></div>
+    <div style="margin-top:6px">${esc(p.summary)}</div>
+    <ul>${p.actions.map(a=>`<li><code>${esc(a.type)}</code> ${esc(a.detail)}</li>`).join('')}</ul>
+    ${p.public_alert_th?`<div class="muted" style="margin-top:6px">📢 ${esc(p.public_alert_th)} / ${esc(p.public_alert_en)}</div>`:''}</div>`);
+}
+fetch('/api/events?limit=25').then(r=>r.json()).then(list=>list.forEach(addEvent));
+(function connect(){
+  const ws = new WebSocket(`${location.protocol==='https:'?'wss':'ws'}://${location.host}/ws`);
+  ws.onopen = () => document.getElementById('conn').textContent = 'live';
+  ws.onclose = () => { document.getElementById('conn').textContent = 'reconnecting…'; setTimeout(connect, 1500); };
+  ws.onmessage = m => { const msg = JSON.parse(m.data); msg.type==='event' ? addEvent(msg.data) : addPlan(msg.data); };
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,7 @@
+# Real VLM inference at the RSU (heavy; install only on the machine running the RSU)
+-r requirements.txt
+torch
+open_clip_torch>=2.30
+pillow
+sentence-transformers  # offline APE prompt selection (all-MiniLM-L6-v2)
+scikit-learn           # K-means for prompt diversity

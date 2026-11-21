@@ -1,11 +1,30 @@
-# Single entry point for humans and Codex. Replace the TODO lines once the stack is chosen.
-.PHONY: install dev check
+# Single entry point for humans and Codex.
+.PHONY: install install-clip dev tcc rsu rsu-clip check
+
+PY ?= python3
+export PYTHONPATH := $(CURDIR)
 
 install:
-	@echo "TODO: install deps, e.g. (cd apps/web && npm ci) && (cd apps/api && pip install -r requirements.txt)"
+	$(PY) -m pip install -r requirements.txt
 
+install-clip:
+	$(PY) -m pip install -r requirements-clip.txt
+
+tcc:
+	$(PY) -m uvicorn apps.tcc.main:app --reload --port $${API_PORT:-8000}
+
+rsu:
+	$(PY) -m apps.rsu.main --mock --rsu-id $${RSU_ID:-RSU-01}
+
+rsu-clip:
+	$(PY) -m apps.rsu.main --images $${IMAGES:-data/samples}
+
+# TCC + two mock RSUs; open http://localhost:8000
 dev:
-	@echo "TODO: run web + api, e.g. npx concurrently 'make -C apps/web dev' 'make -C apps/api dev'"
+	@trap 'kill 0' INT; \
+	$(MAKE) tcc & sleep 2; \
+	RSU_ID=RSU-01 $(MAKE) rsu & RSU_ID=RSU-02 $(MAKE) rsu & wait
 
 check:
-	@echo "TODO: lint + tests, e.g. (cd apps/web && npm run lint) && (cd apps/api && pytest -q)"
+	$(PY) -m ruff check semcom apps tests
+	$(PY) -m pytest -q

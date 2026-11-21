@@ -1,5 +1,5 @@
 # AGENTS.md — apps/web
-- Frontend only. Talk to the backend strictly via the endpoints in `/docs/api.md`.
-- Read the API base URL from env (e.g. `VITE_API_URL` / `NEXT_PUBLIC_API_URL`), never hard-code.
-- If the backend isn't ready, mock responses that match `/docs/api.md` exactly.
-- TODO: framework, styling lib, component conventions.
+- Single `index.html`, served by the TCC at `/`. No build step unless the team agrees (keeps the demo setup trivial).
+- Data sources only: `GET /api/events`, `GET /api/rsus`, `WS /ws` (messages `{type:"event"|"plan", data}`) — see `/docs/api.md`.
+- Escape all server strings before inserting into HTML (use the existing `esc()`), agent output included.
+- Ideas worth doing: map of RSUs, payload-size counter (16 B vs raw image), approve/reject buttons for plans that need human approval.

@@ -1,35 +1,36 @@
 # AGENTS.md — instructions for Codex (and any coding agent)
 
-Codex reads this file automatically. Keep it short and accurate; update it when the stack changes.
-Sub-folders may have their own AGENTS.md (e.g. `apps/web/AGENTS.md`); the closest one wins.
+Codex reads this file automatically. Sub-folders have their own AGENTS.md; the closest one wins.
 
 ## Project
-- **Name:** TODO
-- **One-liner:** TODO — what problem, for whom
-- **Hackathon track:** TODO (Autonomous & Adaptive AI / AI-Native Products & Operations / Deep Domain AI)
-- **Demo deadline:** TODO (today, before 21:00)
+- **What:** RSU-edge traffic-state inference with VLMs → 16-byte semantic vector → Traffic Control Center (TCC) → OpenAI agent that drafts an incident response plan → live dashboard.
+- **Based on:** our paper "Adaptive Prompt Ensemble for VLM-Based Traffic State Inference in RSU Semantic Communication Systems" (APE + CPV). The hackathon adds the TCC response agent (paper's future work) and the product demo.
+- **Tracks:** Deep Domain AI (ITS / traffic) + Autonomous & Adaptive AI (CPV self-checks uncertain predictions; agent escalates to humans when unsure).
+- **Classes (fixed order, never change):** `normal_flow, congestion, accident, invalid_scene`.
 
 ## Repo layout
-- `apps/web/` — frontend (TODO: framework)
-- `apps/api/` — backend / agent logic (TODO: framework)
-- `docs/` — problem statement, architecture, pitch notes
-- `scripts/` — dev helpers
+- `semcom/` — shared: `payload.py` (16-byte codec), `cpv.py` (Algorithm 1). Pure numpy. **Contract code — change only with team agreement.**
+- `apps/rsu/` — edge sender. `engine.py` has `MockEngine` (no ML) and `ClipEngine` (open_clip, APE Eq. 5–6, CPV partners).
+- `apps/tcc/` — FastAPI receiver (`main.py`) + response agent (`agent.py`, OpenAI Responses API with JSON schema + rule fallback).
+- `apps/web/` — single-file dashboard served by the TCC at `/` (no build step).
+- `prompts/ape_prompts.json` — APE prompts per class.
+- `tests/` — pytest.
 
-## Commands (keep these working — Codex runs them to verify its work)
-- Install: `make install`
-- Run locally: `make dev`
-- Lint + test: `make check`   ← run this before finishing any task
+## Commands
+- Install: `make install` (light) / `make install-clip` (real VLMs)
+- Run demo: `make dev` → TCC + 2 mock RSUs, open http://localhost:8000
+- Lint + test: `make check` ← must pass before finishing any task
 
 ## Rules for agents
-1. **Stay in your lane.** Only edit files inside the area named in the task (e.g. `apps/api/`). If you must touch shared files (`AGENTS.md`, `Makefile`, `.env.example`, API contracts in `docs/api.md`), say so explicitly in the PR description.
-2. **Small diffs.** One feature per branch/PR. No drive-by refactors or reformatting of files you didn't need to change.
-3. **Never commit secrets.** Read keys from env vars only; add new vars to `.env.example` with a dummy value.
-4. **API contract first.** If you change a request/response shape, update `docs/api.md` in the same PR.
-5. **Demo > perfection.** Prefer the simplest thing that works end-to-end. Hard-code/mock rather than block; mark it with `// TODO(hack):`.
-6. **Run `make check`** before finishing. If something can't pass, explain why in the PR.
-7. Write PR descriptions with: what changed, how to test, screenshots if UI.
+1. **Stay in your lane.** Only edit files in the area named in the task. Shared files (`semcom/`, `AGENTS.md`, `Makefile`, `docs/api.md`, `.env.example`) → call it out in the PR description.
+2. **The payload stays 16 bytes.** Metadata goes in HTTP headers, never into the payload. This is the paper's core claim.
+3. **Small diffs**, one feature per PR, no drive-by refactors.
+4. **Never commit secrets.** Keys from env only; add new vars to `.env.example`.
+5. **The demo must never crash.** Every external call (OpenAI, model download, network) needs a timeout and a fallback. Mock mode must keep working.
+6. **Agent safety:** `dispatch_rescue` always requires human approval; low confidence or CPV-changed labels → `needs_human_approval=true`.
+7. Add/adjust a test in `tests/` for logic changes. Run `make check`.
+8. PR description: what changed, how to test, screenshot if UI.
 
 ## Conventions
-- Branches: `<name>/<short-feature>` e.g. `nerdeye/agent-loop`
-- Commits: imperative, short (`add retry to tool calls`)
-- Language in code & comments: English
+- Python 3.11+, type hints, `ruff` (config in `ruff.toml`).
+- Branches `<name>/<feature>`; imperative commit messages; English in code.
