@@ -9,7 +9,7 @@
     ? Math.max(500, Math.min(60000, requestedInterval)) : 1000;
   const mockMode = params.get("mock") === "1";
   const apiBase = (params.get("api") || "").replace(/\/$/, "");
-  const state = { cameras: [], alerts: [], metrics: null, connected: false, updatedAt: null, selectedCameraId: null };
+  const state = { cameras: [], alerts: [], connected: false, updatedAt: null, selectedCameraId: null };
   const $ = (id) => document.getElementById(id);
   let summaryLanguage = "th";
   try { if (localStorage.getItem("roadsense-summary-language") === "en") summaryLanguage = "en"; } catch (_) {}
@@ -224,7 +224,7 @@
     const foot = document.createElement("div");
     foot.className = "camera-card-foot";
     const stateLabel = document.createElement("span");
-    stateLabel.className = `camera-state-label ${waiting ? "waiting" : isVerify ? "verify" : isAlert || isInvalid ? "alert" : ""}`;
+    stateLabel.className = `camera-state-label ${waiting ? "waiting" : isVerify ? "verify" : online && isInvalid ? "invalid" : isAlert || isInvalid ? "alert" : ""}`;
     stateLabel.innerHTML = `<span class="badge-dot"></span>${escapeHtml(waiting ? "รอข้อมูลจาก RSU" : !online ? stateNames.offline : stateNames[status] || stateNames.normal)}`;
     const updated = document.createElement("span");
     updated.textContent = timestamp ? `อัปเดต ${thaiTime(timestamp)}` : "ยังไม่ได้รับข้อมูล";
@@ -311,9 +311,9 @@
   function updateCardText(card, view) {
     const draft = makeCamera(view.camera, view.variant, view.displayed?.picture);
     const preview = card.querySelector(".camera-preview");
-    preview.classList.toggle("accident-unseen",
-      view.variant === "wall-camera-card" && unseenAccidents.has(view.camera.camera_id));
     card.className = draft.className;
+    card.classList.toggle("accident-unseen",
+      view.variant === "wall-camera-card" && unseenAccidents.has(view.camera.camera_id));
     card.firstElementChild.replaceWith(draft.firstElementChild);
     for (const selector of [".snapshot-chip", ".snapshot-age"]) {
       preview.querySelector(selector).textContent = draft.querySelector(selector).textContent;
@@ -386,9 +386,6 @@
     $("online-count").textContent = `${activeCount} กล้องออนไลน์`;
     const hasAlert = state.alerts.some(openAlert);
     $("overall-state").textContent = hasAlert ? "มีเหตุการณ์ที่ต้องตรวจสอบ" : received.length ? "เฝ้าระวังตามปกติ" : "รอข้อมูลจาก RSU";
-    $("metric-context").textContent = received.length
-      ? `${mockMode ? "รอบจำลอง" : "ข้อมูลจริง"} · ${received.length} กล้อง`
-      : `${mockMode ? "รอบจำลอง" : "ข้อมูลจริง"} · รอข้อมูล`;
     renderCameraWall(cameras, received.length);
     renderCameraDetail(cameras);
 
@@ -448,20 +445,6 @@
     }));
   }
 
-  function renderMetrics() {
-    const metrics = state.metrics || {};
-    const used = number(first(metrics, ["local_inference_count", "inference_count", "local_calls", "ai_calls"]));
-    const baseline = number(first(metrics, ["baseline_inference_count", "baseline_count", "fixed_rate_calls"]));
-    let reduction = number(first(metrics, ["reduction_pct", "measured_reduction_pct", "ai_call_reduction_pct", "calls_saved_pct"]));
-    if (reduction === null && used !== null && baseline > 0) reduction = (1 - used / baseline) * 100;
-    $("adaptive-count").textContent = used === null ? "—" : used.toLocaleString("th-TH");
-    $("baseline-count").textContent = baseline === null ? "—" : baseline.toLocaleString("th-TH");
-    $("reduction-percent").textContent = reduction === null ? "—" : `${Math.max(0, reduction).toFixed(reduction % 1 ? 1 : 0)}%`;
-    const scale = Math.max(used || 0, baseline || 0);
-    $("adaptive-bar").style.width = scale > 0 && used !== null ? `${Math.max(3, used / scale * 100)}%` : "0%";
-    $("baseline-bar").style.width = scale > 0 && baseline !== null ? `${Math.max(3, baseline / scale * 100)}%` : "0%";
-  }
-
   async function poll() {
     if (mockMode) {
       state.connected = true;
@@ -474,21 +457,18 @@
         { camera_id: "CAM_06", location: { label: "พื้นที่จำลอง CAM_06" }, predicted_class: "normal_flow", natural_language_description: "ตัวอย่างจำลอง: ภาพจาก CAM 06 อยู่ในสถานะปกติ ยังไม่พบเหตุที่ต้องแจ้งเตือน", verification_state: "normal", sampling_interval_sec: 2, priority: "low", captured_at: new Date(Date.now() - 4300).toISOString(), online: true }
       ]);
       state.alerts = [];
-      state.metrics = { local_inference_count: 40, baseline_inference_count: 80, reduction_pct: 50 };
       state.updatedAt = new Date();
       render();
       return;
     }
-    const [health, cameras, alerts, metrics] = await Promise.allSettled([
-      json("/health"), json("/api/v1/cameras"), json("/api/v1/alerts"), json("/api/v1/metrics")
+    const [health, cameras, alerts] = await Promise.allSettled([
+      json("/health"), json("/api/v1/cameras"), json("/api/v1/alerts")
     ]);
     const healthOk = health.status === "fulfilled";
     const camerasOk = cameras.status === "fulfilled";
     const alertsOk = alerts.status === "fulfilled";
-    const metricsOk = metrics.status === "fulfilled";
     if (camerasOk) state.cameras = normalizeCameras(records(cameras.value, ["cameras", "items", "data"]));
     if (alertsOk) state.alerts = records(alerts.value, ["alerts", "events", "items", "data"]);
-    if (metricsOk) state.metrics = metrics.value?.metrics || metrics.value;
     state.connected = healthOk && camerasOk && state.cameras.some(isOnline);
     if (state.connected) state.updatedAt = new Date();
     render();
@@ -503,7 +483,6 @@
     $("updated-at").textContent = state.updatedAt ? `อัปเดต ${thaiTime(state.updatedAt)}` : "ยังไม่ได้รับข้อมูล";
     renderCameras();
     renderAlerts();
-    renderMetrics();
   }
 
   initTheme();
@@ -529,7 +508,7 @@
     state.selectedCameraId = button.dataset.openCamera;
     $("camera-detail").showModal();
     unseenAccidents.delete(state.selectedCameraId);
-    button.closest(".camera-preview").classList.remove("accident-unseen");
+    button.closest(".wall-camera-card").classList.remove("accident-unseen");
     renderCameraDetail(displayCameras(normalizeCameras(state.cameras)));
   });
   $("camera-detail").addEventListener("close", () => {
