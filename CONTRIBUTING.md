@@ -12,14 +12,14 @@ Goal: several people + several Codex agents working at once **without merge hell
 ## 1. Ownership (avoid conflicts)
 Each person owns an area. Codex tasks you start must stay inside your area (see AGENTS.md rule 1).
 
-4 people, 4 lanes:
+4 people, 4 lanes. Team: @erthcyp (lead), @fongctw, @kantheedeth, @Bhuchi — fill in owners for lanes 1–3:
 
 | # | Area | Owner | Folders | First tasks |
 |---|---|---|---|---|
 | 1 | RSU / VLM | TODO | `apps/rsu/`, `prompts/` | Load the real 120 APE prompts, run `ClipEngine` on sample images from the paper dataset, pick demo frames |
 | 2 | TCC + agent | TODO | `apps/tcc/` | Real OpenAI key, tune agent prompt, add operator approve/reject endpoint |
 | 3 | Dashboard | TODO | `apps/web/` | Map/grid of RSUs, payload-size counter, approve/reject buttons |
-| 4 | Integration + pitch (lead) | Bhuchi | `Makefile`, `.github/`, `docs/`, `README.md`, `semcom/` | Merge PRs, keep `main` green, demo script, backup video, slides |
+| 4 | Integration + pitch (lead) | Chaiyapat (@erthcyp) | `Makefile`, `.github/`, `docs/`, `README.md`, `semcom/` | Merge PRs, keep `main` green, demo script, backup video, slides |
 
 Shared contracts: `docs/api.md` and `semcom/`. Change only via PR + tell the group.
 

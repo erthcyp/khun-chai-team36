@@ -25,9 +25,9 @@ Real VLMs at the RSU: `make install-clip`, put images in `data/samples/`, `make 
 - [Architecture](docs/architecture.md) · [Contracts](docs/api.md) · [Pitch](docs/pitch.md) · [Codex log](docs/codex-log.md)
 
 ## Team — khun-chai (TEAM36)
-| Name | Role |
-|---|---|
-| Bhuchi Kumprakob | TODO |
-| Chaiyapat Anantarasuchart | TODO |
-| Chaitawat Boonkitticharoen | TODO |
-| Kanteeded Limkangwalmongkol | TODO |
+| Name | GitHub | Role |
+|---|---|---|
+| Chaiyapat Anantarasuchart | [@erthcyp](https://github.com/erthcyp) | Lead · integration + pitch |
+| Chaitawat Boonkitticharoen | [@fongctw](https://github.com/fongctw) | TODO |
+| Kanteeded Limkangwalmongkol | [@kantheedeth](https://github.com/kantheedeth) | TODO |
+| Bhuchi Kumprakob | [@Bhuchi](https://github.com/Bhuchi) | TODO |
