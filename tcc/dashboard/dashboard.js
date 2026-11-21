@@ -77,7 +77,8 @@
     return first(camera, ["predicted_class", "prediction", "final_class", "classification"]);
   }
   function naturalLanguage(camera) {
-    const value = first(camera, [
+    const value = first(camera?.meaning, ["summary_th"]) ?? first(camera, [
+      "summary_th",
       "natural_language_description", "natural_language", "description_th",
       "explanation_th", "human_readable_text", "description", "explanation", "summary"
     ]);
@@ -203,7 +204,29 @@
     const coordinateLine = document.createElement("div");
     coordinateLine.className = "location-coordinates";
     coordinateLine.textContent = lat !== null && lon !== null ? `${lat.toFixed(4)}, ${lon.toFixed(4)}` : "";
-    wrapper.append(head, preview, intervalLabel, foot, coordinateLine);
+    const explanation = naturalLanguage(camera);
+    const description = document.createElement("section");
+    description.className = `ai-description-panel${explanation ? "" : " is-waiting"}`;
+    description.setAttribute("aria-label", `คำอธิบายภาษาธรรมชาติของ ${cameraId}`);
+    const descriptionHeading = document.createElement("div");
+    descriptionHeading.className = "ai-description-heading";
+    const headingCopy = document.createElement("div");
+    const eyebrow = document.createElement("span");
+    eyebrow.className = "eyebrow";
+    eyebrow.textContent = "คำอธิบายภาษาธรรมชาติ";
+    const heading = document.createElement("h3");
+    heading.textContent = "AI อธิบายภาพ";
+    headingCopy.append(eyebrow, heading);
+    const source = document.createElement("span");
+    source.className = "description-source";
+    const meaningSource = camera.meaning?.source || camera.source;
+    source.textContent = mockMode ? "ตัวอย่างจำลอง" : meaningSource === "fallback"
+      ? "ข้อความสำรอง" : meaningSource === "json+image" ? "AI + ภาพ" : explanation ? "จาก RSU" : "รอข้อมูล";
+    descriptionHeading.append(headingCopy, source);
+    const descriptionText = document.createElement("p");
+    descriptionText.textContent = explanation || "ยังไม่มีคำอธิบายสำหรับกล้องนี้";
+    description.append(descriptionHeading, descriptionText);
+    wrapper.append(head, preview, intervalLabel, foot, coordinateLine, description);
     return wrapper;
   }
 
@@ -249,20 +272,10 @@
       : Object.assign(document.createElement("div"), { className: "empty-camera", textContent: "รอข้อมูลกล้องเพิ่มเติม" }));
     $("primary-camera-title").textContent = primary ? primary.camera_id.replace("_", " ") : "CAM_01";
     const primaryRoot = $("primary-camera");
-    const descriptionPanel = primaryRoot.querySelector(".ai-description-panel");
     primaryRoot.replaceChildren(primary ? makeCamera(primary, "primary-camera-card") : Object.assign(document.createElement("div"), {
       className: "empty-camera primary-empty",
       textContent: state.connected ? "รอข้อมูลจาก CAM_01" : "ยังไม่ได้รับข้อมูลจาก TCC"
     }));
-    (primary ? primaryRoot.firstElementChild : primaryRoot).append(descriptionPanel);
-    const explanation = naturalLanguage(primary);
-    $("ai-description-text").textContent = explanation || (mockMode
-      ? "กำลังรอข้อความคำอธิบายภาษาธรรมชาติจาก RSU"
-      : "ยังไม่มีคำอธิบายจาก RSU");
-    $("description-source").textContent = explanation
-      ? `${mockMode ? "ตัวอย่างจำลอง · " : "จาก "}${primary.camera_id.replace("_", " ")}`
-      : mockMode ? "ตัวอย่างจำลอง" : "รอข้อมูล";
-    $("ai-description-text").closest(".ai-description-panel").classList.toggle("is-waiting", !explanation);
 
     const activeCount = cameras.filter(isOnline).length;
     $("online-count").textContent = `${activeCount} กล้องออนไลน์`;

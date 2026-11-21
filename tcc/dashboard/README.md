@@ -1,6 +1,6 @@
 # RoadSense TCC dashboard
 
-Responsive Thai-language TCC dashboard inspired by the supplied control-room reference. CAM_01–CAM_06 are available through the center camera selector; the selected camera becomes the primary feed, while another available camera appears alongside it. The primary camera card contains a natural-language explanation supplied by the RSU, or a waiting state until one arrives. Alerts stay in a right column on wide layouts. “แสดงกล้องทั้งหมด” replaces the main layout with an in-page 6-camera wall; it does not request browser fullscreen. The page also shows a measured adaptive-versus-fixed model-call comparison. The theme toggle switches between dark and light palettes and remembers the selection in the browser.
+Responsive Thai-language TCC dashboard inspired by the supplied control-room reference. CAM_01–CAM_06 are available through the center camera selector; the selected camera becomes the primary feed, while another available camera appears alongside it. Every camera card contains its own natural-language explanation from the TCC meaning processor, or a waiting state until one arrives. Alerts stay in a right column on wide layouts. “แสดงกล้องทั้งหมด” replaces the main layout with an in-page 6-camera wall; it does not request browser fullscreen. The page also shows a measured adaptive-versus-fixed model-call comparison. The theme toggle switches between dark and light palettes and remembers the selection in the browser.
 
 ## Run
 
@@ -12,6 +12,8 @@ python3 -m uvicorn tcc.pc2_receiver:app --host 0.0.0.0 --port 8010
 ```
 
 Open `http://localhost:8010/dashboard/` on Mac 2. Set the RSU sender's `TCC_URL` to `http://<Mac-2-LAN-IP>:8010`. The receiver accepts semantic JSON and JPEG snapshots on the endpoints in `docs/api-contract.md`, keeps the latest state per camera in memory, and serves the dashboard from the same origin. Restarting it clears the in-memory data.
+
+The receiver uses `tcc/meaning_process.py` from `main`: it publishes camera state immediately and attaches `summary_th`, `summary_en`, `suggested_action`, `source`, `model`, and `generated_at` when the asynchronous meaning result arrives. Set `roadsense_meaning` (or `OPENAI_API_KEY`) in the receiver process to enable image-backed OpenAI summaries. Without a key or matching JPEG, the meaning processor returns its labeled local fallback. The dashboard displays `summary_th` inside each camera card.
 
 For frontend-only preview, from the repository root:
 

@@ -9,10 +9,11 @@ import math
 from pathlib import Path
 import re
 
-from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile
+from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
+from .meaning_process import MeaningProcessor
 
 
 CLASS_ORDER = ["normal_flow", "congestion", "accident", "invalid_scene"]
@@ -51,6 +52,10 @@ class ReceiverState:
         self.last_captured: dict[str, datetime] = {}
         self.snapshots: dict[str, tuple[int, bytes]] = {}
         self.alerts: dict[str, dict] = {}
+        self.meaning_keys: dict[str, tuple] = {}
+        self.meaning = MeaningProcessor()
+        self.meaning_tasks: set[asyncio.Task] = set()
+        self.subscribers: set[WebSocket] = set()
         self.semantic_count = 0
         self.semantic_bytes = 0
         self.snapshot_count = 0
@@ -66,6 +71,35 @@ app.add_middleware(
     allow_headers=["Content-Type"],
 )
 app.mount("/dashboard", StaticFiles(directory=Path(__file__).parent / "dashboard", html=True), name="dashboard")
+
+
+def meaning_key(payload: dict) -> tuple:
+    alert = payload.get("alert")
+    level = alert.get("level") if isinstance(alert, dict) else None
+    return (payload.get("predicted_class"), payload.get("verification_state"),
+            level, payload.get("event_id"))
+
+
+async def broadcast(receiver: ReceiverState, message: dict) -> None:
+    for subscriber in tuple(receiver.subscribers):
+        try:
+            await subscriber.send_json(message)
+        except (RuntimeError, WebSocketDisconnect):
+            receiver.subscribers.discard(subscriber)
+
+
+async def publish_meaning(receiver: ReceiverState, payload: dict, key: tuple) -> None:
+    result = await receiver.meaning.on_semantic(payload)
+    if result is None:
+        return
+    camera_id = payload["camera_id"]
+    async with receiver.lock:
+        if receiver.meaning_keys.get(camera_id) != key:
+            return
+        receiver.cameras[camera_id].update(result)
+        if camera_id in receiver.alerts:
+            receiver.alerts[camera_id].update(result)
+    await broadcast(receiver, {"type": "meaning", "data": {"camera_id": camera_id, **result}})
 
 
 @app.get("/")
@@ -111,20 +145,36 @@ async def receive_semantic(request: Request) -> dict:
         if timestamp < receiver.last_captured.get(camera_id, datetime.min.replace(tzinfo=timezone.utc)):
             return {"accepted": False, "reason": "stale", "camera_id": camera_id}
         receiver.last_captured[camera_id] = timestamp
+        key = meaning_key(payload)
+        previous = receiver.cameras.get(camera_id, {})
         camera = dict(payload)
         camera["online"] = True
         camera["received_at"] = datetime.now(timezone.utc).isoformat()
+        if receiver.meaning_keys.get(camera_id) == key:
+            for field in ("summary_th", "summary_en", "suggested_action", "source",
+                          "model", "generated_at", "fallback_reason"):
+                if field in previous:
+                    camera[field] = previous[field]
         if camera_id in receiver.snapshots:
             camera["latest_snapshot_url"] = f"/api/v1/snapshots/{camera_id}"
         receiver.cameras[camera_id] = camera
+        receiver.meaning_keys[camera_id] = key
         alert = payload.get("alert")
         if isinstance(alert, dict):
             receiver.alerts[camera_id] = {
                 **alert, "camera_id": camera_id, "location": payload.get("location"),
                 "captured_at": payload["captured_at"], "frame_id": frame_id,
             }
+            for field in ("summary_th", "summary_en", "suggested_action", "source",
+                          "model", "generated_at", "fallback_reason"):
+                if field in camera:
+                    receiver.alerts[camera_id][field] = camera[field]
         elif alert is None:
             receiver.alerts.pop(camera_id, None)
+    await broadcast(receiver, {"type": "semantic", "data": camera})
+    task = asyncio.create_task(publish_meaning(receiver, payload, key))
+    receiver.meaning_tasks.add(task)
+    task.add_done_callback(receiver.meaning_tasks.discard)
     return {"accepted": True, "camera_id": camera_id, "frame_id": frame_id}
 
 
@@ -158,6 +208,7 @@ async def receive_snapshot(request: Request, meta: str = Form(...), file: Upload
         receiver.snapshots[camera_id] = (sequence, jpeg)
         if camera_id in receiver.cameras:
             receiver.cameras[camera_id]["latest_snapshot_url"] = f"/api/v1/snapshots/{camera_id}"
+    await receiver.meaning.on_snapshot(metadata, jpeg)
     return {"accepted": True, "camera_id": camera_id, "frame_id": frame_id}
 
 
@@ -199,3 +250,15 @@ async def get_metrics(request: Request) -> dict:
                 "semantic_bytes": receiver.semantic_bytes,
                 "received_snapshot_count": receiver.snapshot_count,
                 "jpeg_bytes": receiver.jpeg_bytes}
+
+
+@app.websocket("/ws")
+async def websocket_updates(websocket: WebSocket) -> None:
+    await websocket.accept()
+    receiver: ReceiverState = websocket.app.state.receiver
+    receiver.subscribers.add(websocket)
+    try:
+        while True:
+            await websocket.receive_text()
+    except WebSocketDisconnect:
+        receiver.subscribers.discard(websocket)
