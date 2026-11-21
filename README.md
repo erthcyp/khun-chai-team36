@@ -42,7 +42,55 @@ flowchart TB
 - An early scaffold made before hacking started is kept only in tag `pre-event-scaffold` and is **not** part of the submission.
 
 ## Run
-TODO (fill in as modules land).
+
+The OpenCV frame sampler is available; VLM inference, decisions, and transport
+still need to be connected as their modules land.
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements-frame.txt
+python -m rsu.frame_automation --video CAM_01=assets/demo_clips/traffic.mp4
+```
+
+This prints frame metadata as JSON, in real time, **every 1 second by default**.
+Override with `--interval-sec 2` for the planned normal monitoring rate. Repeat
+`--video CAM_02=assets/demo_clips/another.mp4` for independent camera feeds.
+Optional `--output-dir /tmp/roadsense-frames` saves sampled JPEGs for inspection;
+`--no-realtime` extracts offline as fast as decoding permits. Clips stop at EOF
+(or decode failure); Ctrl-C releases the video handles. Video files stay local.
+The CLI only extracts frames and does not classify them or send predictions.
+
+For the RSU automation loop, use one `FrameSampler` per camera:
+
+```python
+from rsu.frame_automation import FrameSampler
+
+with FrameSampler("assets/demo_clips/traffic.mp4", "CAM_01", interval_sec=1) as camera:
+    for sample in camera.samples():
+        # Pass sample.frame_bgr (OpenCV BGR ndarray) to the VLM wrapper.
+        # Feed the real prediction to the decision engine, then apply its
+        # sampling interval using camera.set_interval(decision_interval_sec).
+        print(sample.metadata())
+```
+
+Use `camera.read_due()` in a shared multi-camera scheduler; it returns `None`
+when a camera is not due or finished (`camera.exhausted`). Each sample carries
+`camera_id`, `frame_id`, `video_timestamp_sec`, ISO UTC `captured_at`, and the
+active interval. Convert BGR to RGB in the model wrapper if its preprocessing
+expects RGB. Rate hysteresis belongs in the decision engine on Mac 1.
+
+Sampling follows video timestamps (frame index/FPS fallback) with one source
+frame of timing precision. Local clips need valid FPS metadata. The sampler
+skips stale frames if the consumer falls behind; model speed still determines
+end-to-end inference throughput. JPEG disk output is a smoke-test option,
+separate from the planned asynchronous network preview sender.
+
+Run the frame extraction tests, including generated-video decoding and real-time pacing:
+
+```bash
+python -m unittest discover -s tests -v
+```
 
 ## Team — khun-chai (TEAM36)
 | Name | GitHub | Role |

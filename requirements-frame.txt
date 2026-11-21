@@ -1,0 +1,2 @@
+# Frame extraction only; install alongside the model dependencies when available.
+opencv-python-headless>=4.10,<5
