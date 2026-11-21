@@ -116,11 +116,18 @@ included, so a short run may show a cold-start effect. Remove `--max-frames` to
 process until the clip ends. Ctrl-C also prints a summary of completed predictions.
 Paths containing spaces should be enclosed in straight quotes.
 
+- `--video PATH`: repeat this option to select up to six different clips. Each
+  path becomes one stream in the supplied order; the stream count is inferred.
 - `--preview`: play the video in an OpenCV window while VLM inference runs in a
   worker. Press Q, Esc, or close the window to stop; an in-flight prediction
-  finishes before exit. The overlay shows the latest class, score, AI frame
+  finishes before exit. A separate header shows the latest class, score, AI frame
   timestamp and inference time. It updates for every prediction even when
   `--only-class` filters terminal output. Preview requires real-time mode.
+- `--streams 6`: run six independent local copies of the selected clip using one
+  shared VLM. Each completed prediction is printed immediately as a JSON line
+  with unique `stream_id` and `frame_id` fields. `--max-frames` applies per stream.
+  These local test stream IDs are separate from production camera IDs and are
+  not network payloads. This mode requires real-time sampling.
 - `--no-realtime`: remove playback waits to measure processing capacity at the
   same video sampling interval. This mode does not simulate live playback.
 - `--output-dir assets/frames`: also save sampled JPEGs. Disk writes count toward
@@ -138,11 +145,52 @@ python -m rsu.main --video assets/demo_clips/video48.mp4 --preview --interval-se
 
 The preview uses a second local video reader with a shared start time, keeping
 window events separate from inference. The display follows the clip's FPS
-metadata and is resized to fit 960×640 pixels; the VLM receives the original
+metadata and is fitted into a 960×540 image area below the status header; the VLM receives the original
 sampled frames. Only the latest prediction metadata is retained. Preview decoding
 adds CPU work, so benchmark with `--preview` when evaluating demo performance.
 Slow inference may leave the displayed prediction behind the playing video;
 the separate video and AI frame timestamps make this visible.
+
+The complete image is fitted into each preview panel with its original aspect
+ratio. Padding fills unused space for portrait or ultrawide footage. Status text
+sits above the image rather than covering its top edge, including in the grid.
+
+To run six copies of video147, play a six-panel grid, and print every prediction:
+
+```bash
+python -m rsu.main --video assets/demo_clips/video147.mp4 \
+  --streams 6 --preview --interval-sec 1 --max-frames 30
+```
+
+To use six different clips, repeat `--video` instead. Replace these example paths
+with the actual local files; `--streams 6` is not needed:
+
+```bash
+python -m rsu.main \
+  --video /path/to/clip1.mp4 --video /path/to/clip2.mp4 \
+  --video /path/to/clip3.mp4 --video /path/to/clip4.mp4 \
+  --video /path/to/clip5.mp4 --video /path/to/clip6.mp4 \
+  --preview --interval-sec 1 --max-frames 30
+```
+
+All paths are checked before loading the VLM. Each clip uses its own FPS,
+dimensions, playback position, and EOF state. A finished clip stops producing
+predictions while the others continue. Results and per-stream summaries include
+the source `video` path; preview headers show the filename. Summaries also report
+`source_exhausted`. A clip that ends before `--max-frames` does not keep the other
+streams running past their own frame limits. If `--streams` is supplied alongside
+multiple paths, it must match the path count.
+
+This prints up to 180 prediction records (30 per stream), followed by a summary
+with separate statistics for every stream. Results are emitted as the shared
+model finishes each call, so outputs are staggered across each second. Omit
+`--preview` for terminal-only output; `--only-class` and `--output-dir` also work.
+Multi-stream runs use one continuously decoded video reader per stream, with
+at most one pending frame per stream. When inference falls behind, stale pending
+frames are replaced; the summary reports the replacement count. `queue_wait_ms`
+and `capture_to_result_ms` distinguish waiting from inference time. The last
+bounded pending frames are processed at EOF; quitting cancels pending work and
+finishes only the in-flight prediction. `--no-realtime` remains single-stream only.
 
 `requirements-frame.txt` installs GUI-enabled `opencv-python`. If upgrading an
 environment that used the headless package, replace it before enabling preview:

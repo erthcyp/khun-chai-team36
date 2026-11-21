@@ -1,4 +1,4 @@
-"""Run a local video through the real VLM and measure prediction throughput.
+"""Run local videos through the real VLM and measure prediction throughput.
 
 JSON Lines on stdout: one prediction per sampled frame, then a summary.
 Startup messages go to stderr. Use --preview for local OpenCV playback alongside
@@ -57,10 +57,35 @@ def review_roi(value: str) -> ROI:
     return x, y, width, height
 
 
+class VideoPathAction(argparse.Action):
+    """Collect repeated paths while keeping the original single-video attribute."""
+
+    def __call__(self, parser, namespace, value, option_string=None):
+        paths = namespace.videos + (value,)
+        if len(paths) > 6:
+            parser.error("at most six --video paths are supported")
+        namespace.videos = paths
+        namespace.video = paths[0]
+
+
+def source_paths(args: argparse.Namespace) -> tuple[Path, ...]:
+    paths = getattr(args, "videos", ()) or (args.video,)
+    if len(paths) > 1:
+        if args.streams not in (1, len(paths)):
+            raise ValueError("with multiple --video paths, omit --streams or match the number of paths")
+        return paths
+    return paths * args.streams
+
+
 def make_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--video", type=Path, required=True, help="Path to a local video file")
-    parser.add_argument("--camera-id", choices=CAMERA_IDS, default="CAM_01")
+    parser.set_defaults(videos=())
+    parser.add_argument("--video", type=Path, required=True, action=VideoPathAction,
+                        help="Path to a local video; repeat for up to six different clips")
+    parser.add_argument("--streams", type=int, choices=range(1, 7), default=1,
+                        help="Run 1–6 local copies of this video with one shared VLM (default: 1)")
+    parser.add_argument("--camera-id", choices=CAMERA_IDS, default="CAM_01",
+                        help="Camera identifier for single-stream runs")
     parser.add_argument("--interval-sec", type=positive_seconds,
                         help="Sampling interval (default: 1s fixed, 2s normal with vision review)")
     parser.add_argument("--openai-review", action="store_true",
@@ -71,7 +96,7 @@ def make_parser() -> argparse.ArgumentParser:
                         help="OpenAI model used for vision review")
     parser.add_argument("--review-margin", type=float, default=DecisionConfig().vision_review_margin,
                         help="Maximum normalized top-two CLIP score gap for vision review")
-    parser.add_argument("--max-frames", type=positive_count, help="Stop after this many predictions")
+    parser.add_argument("--max-frames", type=positive_count, help="Stop after this many predictions per stream")
     parser.add_argument("--no-realtime", action="store_true",
                         help="Process sampled frames without playback waits; measures processing capacity")
     parser.add_argument("--output-dir", type=Path, help="Save matching sampled frames as JPEGs")
@@ -286,13 +311,33 @@ def run_predictions(
     return summary
 
 
-def preview_image(frame: np.ndarray, video_sec: float, camera_id: str, latest: dict | None) -> np.ndarray:
-    """Draw on a bounded-size display copy; prediction input stays untouched."""
+def letterbox_frame(frame: np.ndarray, size: tuple[int, int]) -> np.ndarray:
+    """Fit the complete frame inside width × height; never crop or stretch it."""
+    box_width, box_height = size
     height, width = frame.shape[:2]
-    scale = min(1.0, 960 / width, 640 / height)
-    image = cv2.resize(frame, (max(1, round(width * scale)), max(1, round(height * scale))))
-    cv2.rectangle(image, (0, 0), (image.shape[1], 94), (0, 0, 0), -1)
+    scale = min(box_width / width, box_height / height)
+    scaled = cv2.resize(frame, (max(1, round(width * scale)), max(1, round(height * scale))))
+    image = np.zeros((box_height, box_width, 3), dtype=np.uint8)
+    left = (box_width - scaled.shape[1]) // 2
+    top = (box_height - scaled.shape[0]) // 2
+    image[top:top + scaled.shape[0], left:left + scaled.shape[1]] = scaled
+    return image
+
+
+def preview_image(
+    frame: np.ndarray, video_sec: float, camera_id: str, latest: dict | None,
+    *, size: tuple[int, int] = (960, 540), source_name: str | None = None,
+) -> np.ndarray:
+    """Place status above the full, aspect-preserving image, never over footage."""
+    width, _ = size
+    compact = width < 640
+    header = np.zeros((72 if compact else 94, width, 3), dtype=np.uint8)
     lines = [f"{camera_id} | video: {video_sec:.2f}s | Q / Esc: quit"]
+    if compact:
+        lines[0] = f"{camera_id} | video: {video_sec:.2f}s"
+    if source_name:
+        name = source_name if len(source_name) <= 20 else source_name[:17] + "..."
+        lines[0] = f"{camera_id} | {name} | {video_sec:.1f}s"
     if latest is None:
         lines += ["Waiting for first prediction..."]
     else:
@@ -302,9 +347,10 @@ def preview_image(frame: np.ndarray, video_sec: float, camera_id: str, latest: d
                   f"AI frame: {latest['video_timestamp_sec']:.2f}s | "
                   f"inference: {latest['prediction_wall_ms']:.1f}ms"]
     for index, line in enumerate(lines):
-        cv2.putText(image, line, (12, 24 + index * 27), cv2.FONT_HERSHEY_SIMPLEX,
-                    0.55, (255, 255, 255), 1, cv2.LINE_AA)
-    return image
+        cv2.putText(header, line, (6 if compact else 12, (18 + index * 21) if compact else (24 + index * 27)),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.39 if compact else 0.55,
+                    (255, 255, 255), 1, cv2.LINE_AA)
+    return np.vstack((header, letterbox_frame(frame, size)))
 
 
 def run_preview(args: argparse.Namespace, predictor: Predictor, *, emit=emit_json,
@@ -356,12 +402,12 @@ def run_preview(args: argparse.Namespace, predictor: Predictor, *, emit=emit_jso
         if not capture.isOpened() or not math.isfinite(fps) or fps <= 0:
             raise ValueError(f"Could not open preview with valid FPS: {args.video}")
         try:
-            cv2.namedWindow(window, cv2.WINDOW_NORMAL)
+            cv2.namedWindow(window, cv2.WINDOW_NORMAL | cv2.WINDOW_KEEPRATIO)
         except cv2.error as exc:
             raise RuntimeError("Preview needs GUI-enabled opencv-python; replace "
                                "opencv-python-headless before using --preview") from exc
         window_created = True
-        cv2.resizeWindow(window, 960, 540)
+        cv2.resizeWindow(window, 960, 634)
         worker.start()
         worker_started = True
         index = -1
@@ -389,7 +435,8 @@ def run_preview(args: argparse.Namespace, predictor: Predictor, *, emit=emit_jso
             with lock:
                 prediction = latest
             if frame is not None and (advanced or prediction is not last_displayed_result):
-                cv2.imshow(window, preview_image(frame, video_sec, args.camera_id, prediction))
+                cv2.imshow(window, preview_image(frame, video_sec, args.camera_id, prediction,
+                                                source_name=args.video.name))
                 last_displayed_result = prediction
             key = cv2.waitKey(10) & 0xFF
             if key in (ord("q"), ord("Q"), 27):
@@ -414,13 +461,273 @@ def run_preview(args: argparse.Namespace, predictor: Predictor, *, emit=emit_jso
     return result[0]
 
 
+@dataclass
+class StreamJob:
+    frame: np.ndarray
+    frame_id: str
+    video_sec: float
+    captured_at: str
+    captured_clock: float
+    queued_at: float
+    decode_ms: float
+
+
+@dataclass
+class LocalStream:
+    stream_id: str
+    capture: cv2.VideoCapture
+    fps: float
+    stats: Throughput
+    source: Path
+    frame_index: int = -1
+    frame: np.ndarray | None = None
+    video_sec: float = 0.0
+    captured_at: str = ""
+    captured_clock: float = 0.0
+    decode_ms: float = 0.0
+    last_sample_index: int = -1
+    next_due_sec: float = 0.0
+    sequence: int = 0
+    pending: StreamJob | None = None
+    active: bool = False
+    eof: bool = False
+    latest: dict | None = None
+    dropped: int = 0
+    cancelled: int = 0
+    printed: int = 0
+    saved: int = 0
+
+
+def run_streams(args: argparse.Namespace, predictor: Predictor, *, emit=emit_json) -> dict:
+    """Local parallel-playback test with one model and one pending frame per stream.
+
+    Local STREAM identifiers are not camera IDs and do not extend the network
+    contract. Every completed prediction is emitted immediately, unless filtered.
+    """
+    interval_sec = sampling_interval(args, False)
+    if args.no_realtime:
+        raise ValueError("multiple streams require real-time mode")
+    if args.preview and threading.current_thread() is not threading.main_thread():
+        raise RuntimeError("OpenCV preview must run on the main thread")
+    sources = source_paths(args)
+    condition = threading.Condition()
+    streams: list[LocalStream] = []
+    producing = True
+    errors: list[BaseException] = []
+    status = "completed"
+    worker = None
+    window = f"RoadSense | {len(sources)} streams | Q / Esc: quit"
+    window_created = False
+    started = None
+
+    def predict():
+        cursor = 0
+        try:
+            while True:
+                with condition:
+                    condition.wait_for(lambda: any(s.pending is not None for s in streams) or not producing)
+                    order = [(cursor + offset) % len(streams) for offset in range(len(streams))]
+                    index = next((i for i in order if streams[i].pending is not None), None)
+                    if index is None:
+                        return
+                    stream = streams[index]
+                    job = stream.pending
+                    stream.pending = None
+                    stream.active = True
+                    cursor = (index + 1) % len(streams)
+                prediction_started = time.monotonic()
+                prediction = predictor.predict(job.frame)
+                prediction_ms = (time.monotonic() - prediction_started) * 1000
+                matches = args.only_class is None or prediction["prediction"] == args.only_class
+                image_path = None
+                if matches and args.output_dir:
+                    image_path = args.output_dir / f"{job.frame_id}.jpg"
+                    if not cv2.imwrite(str(image_path), job.frame):
+                        raise OSError(f"Could not save JPEG: {image_path}")
+                finished = time.monotonic()
+                processing_ms = job.decode_ms + (finished - prediction_started) * 1000
+                with condition:
+                    gap = stream.stats.record(prediction_ms, processing_ms, finished)
+                    record = {
+                        **prediction,
+                        "type": "prediction", "stream_id": stream.stream_id,
+                        "video": str(stream.source),
+                        "frame_id": job.frame_id, "video_timestamp_sec": job.video_sec,
+                        "captured_at": job.captured_at, "sampling_interval_sec": interval_sec,
+                        "output_at": datetime.now(timezone.utc).isoformat(),
+                        "prediction_wall_ms": prediction_ms, "frame_processing_ms": processing_ms,
+                        "queue_wait_ms": (prediction_started - job.queued_at) * 1000,
+                        "capture_to_result_ms": (finished - job.captured_clock) * 1000,
+                        "output_gap_sec": gap,
+                    }
+                    if image_path is not None:
+                        record["image_path"] = str(image_path)
+                        stream.saved += 1
+                    stream.latest = record
+                    stream.active = False
+                if matches:
+                    emit(record)
+                    stream.printed += 1
+        except BaseException as exc:
+            with condition:
+                errors.append(exc)
+                condition.notify_all()
+
+    try:
+        if args.output_dir:
+            args.output_dir.mkdir(parents=True, exist_ok=True)
+        for index, source in enumerate(sources):
+            capture = cv2.VideoCapture(str(source))
+            fps = capture.get(cv2.CAP_PROP_FPS)
+            streams.append(LocalStream(f"STREAM_{index + 1:02d}", capture, fps,
+                                       Throughput(interval_sec), source))
+            if not capture.isOpened() or not math.isfinite(fps) or fps <= 0:
+                raise ValueError(f"Could not open stream with valid FPS: {source}")
+        if args.preview:
+            try:
+                cv2.namedWindow(window, cv2.WINDOW_NORMAL | cv2.WINDOW_KEEPRATIO)
+            except cv2.error as exc:
+                raise RuntimeError("Preview needs GUI-enabled opencv-python") from exc
+            window_created = True
+            columns = min(3, len(sources))
+            cv2.resizeWindow(window, columns * 320, math.ceil(len(sources) / columns) * 252)
+        started = time.monotonic()
+        worker = threading.Thread(target=predict, name="roadsense-shared-vlm")
+        worker.start()
+        last_displayed = None
+        while True:
+            with condition:
+                if errors:
+                    raise errors[0]
+                if args.max_frames and all(s.eof or s.stats.count >= args.max_frames for s in streams):
+                    break
+            elapsed = time.monotonic() - started
+            advanced = False
+            for stream in streams:
+                if stream.eof:
+                    continue
+                decoded_at = time.monotonic()
+                target = max(0, int(elapsed * stream.fps))
+                changed = False
+                while stream.frame_index < target:
+                    if not stream.capture.grab():
+                        stream.eof = True
+                        break
+                    stream.frame_index += 1
+                    changed = True
+                if changed and not stream.eof:
+                    ok, frame = stream.capture.retrieve()
+                    if not ok or frame is None:
+                        raise RuntimeError(f"Could not decode {stream.stream_id}")
+                    stream.frame = frame
+                    timestamp = stream.capture.get(cv2.CAP_PROP_POS_MSEC) / 1000
+                    stream.video_sec = timestamp if math.isfinite(timestamp) and timestamp > 0 \
+                        else stream.frame_index / stream.fps
+                    stream.captured_at = datetime.now(timezone.utc).isoformat()
+                    stream.captured_clock = time.monotonic()
+                    stream.decode_ms = (stream.captured_clock - decoded_at) * 1000
+                    advanced = True
+                if stream.frame is not None and not stream.eof and elapsed >= stream.next_due_sec \
+                        and stream.frame_index != stream.last_sample_index:
+                    with condition:
+                        reserved = stream.stats.count + int(stream.active) + int(stream.pending is not None)
+                        if args.max_frames is None or reserved < args.max_frames or stream.pending is not None:
+                            if stream.pending is not None:
+                                stream.dropped += 1
+                            stream.sequence += 1
+                            stream.pending = StreamJob(
+                                stream.frame, f"{stream.stream_id}-{stream.sequence:06d}", stream.video_sec,
+                                stream.captured_at, stream.captured_clock, time.monotonic(), stream.decode_ms,
+                            )
+                            stream.last_sample_index = stream.frame_index
+                            condition.notify()
+                    stream.next_due_sec = (math.floor(elapsed / interval_sec) + 1) * interval_sec
+            with condition:
+                latest = [s.latest for s in streams]
+            if args.preview:
+                signature = tuple(item["frame_id"] if item else None for item in latest)
+                if all(s.frame is not None for s in streams) and (advanced or signature != last_displayed):
+                    panels = [preview_image(s.frame, s.video_sec, s.stream_id, item, size=(320, 180),
+                                            source_name=s.source.name)
+                              for s, item in zip(streams, latest)]
+                    columns = min(3, len(panels))
+                    while len(panels) % columns:
+                        panels.append(np.zeros_like(panels[0]))
+                    grid = np.vstack([np.hstack(panels[i:i + columns])
+                                      for i in range(0, len(panels), columns)])
+                    cv2.imshow(window, grid)
+                    last_displayed = signature
+                key = cv2.waitKey(1) & 0xFF
+                if key in (ord("q"), ord("Q"), 27):
+                    status = "stopped"
+                    break
+                try:
+                    if cv2.getWindowProperty(window, cv2.WND_PROP_VISIBLE) < 1:
+                        status = "stopped"
+                        break
+                except cv2.error:
+                    status = "stopped"
+                    break
+            if all(s.eof for s in streams):
+                break
+            time.sleep(0.001)
+    except KeyboardInterrupt:
+        status = "interrupted"
+    except BaseException:
+        status = "failed"
+        raise
+    finally:
+        with condition:
+            producing = False
+            if status != "completed":
+                for stream in streams:
+                    if stream.pending is not None:
+                        stream.pending = None
+                        stream.cancelled += 1
+            condition.notify_all()
+        for stream in streams:
+            stream.capture.release()
+        if window_created:
+            try:
+                cv2.destroyWindow(window)
+            except cv2.error:
+                pass
+        if worker is not None:
+            worker.join()  # Drain bounded pending work at EOF; finish in-flight work on quit.
+        summary = {
+            "type": "summary", "status": "failed" if errors else status,
+            "mode": "local_multistream_realtime", "video": str(args.video),
+            "videos": [str(source) for source in sources],
+            "streams": len(sources), "model_instances": 1, "preview": args.preview,
+            "predictions": sum(s.stats.count for s in streams),
+            "per_stream": [{
+                "stream_id": s.stream_id, "video": str(s.source), **s.stats.summary(),
+                "source_exhausted": s.eof,
+                "printed_predictions": s.printed, "saved_images": s.saved,
+                "replaced_pending_samples": s.dropped, "cancelled_pending_samples": s.cancelled,
+            } for s in streams],
+        }
+        emit(summary)
+    if errors:
+        raise errors[0]
+    return summary
+
+
 def main(argv: list[str] | None = None) -> None:
     parser = make_parser()
     args = parser.parse_args(argv)
+    try:
+        sources = source_paths(args)
+    except ValueError as exc:
+        parser.error(str(exc))
     if args.preview and args.no_realtime:
         parser.error("--preview cannot be combined with --no-realtime")
+    if len(sources) > 1 and args.no_realtime:
+        parser.error("multiple streams require real-time mode")
     reviewer = None
     if args.openai_review:
+        if len(sources) > 1:
+            parser.error("--openai-review requires a single stream")
         api_key = os.environ.get("OPENAI_API_KEY")
         if not api_key:
             parser.error("--openai-review requires OPENAI_API_KEY on the RSU")
@@ -430,9 +737,10 @@ def main(argv: list[str] | None = None) -> None:
     elif args.review_roi is not None:
         parser.error("--review-roi requires --openai-review")
     try:
-        # Validate the video before loading a large model or downloading weights.
-        with FrameSampler(args.video, args.camera_id, sampling_interval(args, reviewer is not None)):
-            pass
+        # Validate every source before loading a large model or downloading weights.
+        for source in dict.fromkeys(sources):
+            with FrameSampler(source, args.camera_id, sampling_interval(args, reviewer is not None)):
+                pass
         from .vlm import ClipPredictor
 
         print("Loading VLM and K30 prompts; first use may download model weights...", file=sys.stderr,
@@ -442,7 +750,9 @@ def main(argv: list[str] | None = None) -> None:
         load_ms = (time.monotonic() - started) * 1000
         print(f"VLM ready: device={predictor.device}, load_ms={load_ms:.1f}. Starting predictions.",
               file=sys.stderr, flush=True)
-        if args.preview:
+        if len(sources) > 1:
+            run_streams(args, predictor)
+        elif args.preview:
             run_preview(args, predictor, reviewer=reviewer)
         else:
             run_predictions(args, predictor, reviewer=reviewer)
