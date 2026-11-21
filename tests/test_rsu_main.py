@@ -20,6 +20,7 @@ import numpy as np
 
 from rsu.main import (Throughput, letterbox_frame, main, make_parser, preview_image,
                       run_predictions, run_preview, run_streams, source_paths)
+from rsu.vision_review import Verdict
 
 
 class Clock:
@@ -121,6 +122,33 @@ class RunnerTests(unittest.TestCase):
         self.assertEqual(summary["predictions"], 3)
         self.assertEqual(summary["target_output_fps"], 0.5)
         self.assertAlmostEqual(summary["last_video_timestamp_sec"], 4)
+
+    def test_vision_review_uses_following_frame_and_resolves_only_the_target(self):
+        clock = Clock()
+
+        class CloseScorePredictor(PredictorDouble):
+            def predict(self, frame):
+                record = super().predict(frame)
+                record["scores"] = (
+                    [0.49, 0.02, 0.48, 0.01] if self.frames_seen == 2 else [0.9, 0.03, 0.04, 0.03]
+                )
+                return record
+
+        args = make_parser().parse_args(["--video", str(self.video), "--openai-review", "--no-realtime"])
+        records = []
+        run_predictions(
+            args, CloseScorePredictor(clock), emit=records.append, clock=clock,
+            reviewer=lambda _: Verdict("accident", "Visible contact at the target time."),
+        )
+        predictions = [record for record in records if record["type"] == "prediction"]
+        review, = [record for record in records if record["type"] == "verification"]
+        self.assertEqual(predictions[1]["review_status"], "pending")
+        self.assertEqual(predictions[1]["next_sampling_interval_sec"], 1)
+        self.assertEqual(predictions[2]["prediction"], "normal_flow")
+        self.assertEqual(review["frame_id"], predictions[1]["frame_id"])
+        self.assertEqual(review["reviewed_class"], "accident")
+        self.assertEqual([frame["video_timestamp_sec"] for frame in review["evidence_frames"]], [0, 2, 3])
+        self.assertTrue(all(record["alert"] is None for record in predictions))
 
     def test_errors_emit_a_failed_summary_and_propagate(self):
         args = make_parser().parse_args(["--video", str(self.video)])

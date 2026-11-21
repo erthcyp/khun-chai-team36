@@ -31,12 +31,15 @@ class DecisionConfig:
     recovery_frames: int = 3
     normal_interval_sec: float = 2.0
     verify_interval_sec: float = 1.0
+    vision_review_margin: float = 0.08
 
     def __post_init__(self) -> None:
         if not 0 <= self.minimum_confidence <= self.high_confidence <= 1:
             raise ValueError("Confidence thresholds must be ordered within [0, 1].")
         if not 0 <= self.minimum_lead <= 1:
             raise ValueError("The score lead must be within [0, 1].")
+        if not 0 <= self.vision_review_margin <= 1:
+            raise ValueError("The vision-review margin must be within [0, 1].")
         if self.confirm_frames < 2 or self.recovery_frames < 2:
             raise ValueError("Verification and recovery require at least two frames.")
         if not 0 < self.verify_interval_sec < self.normal_interval_sec:
@@ -51,6 +54,7 @@ class Decision:
     priority: str
     event_id: str | None = None
     alert: dict[str, str] | None = None
+    review_required: bool = False
 
 
 @dataclass
@@ -69,7 +73,9 @@ class DecisionEngine:
         self.config = config
         self._cameras: dict[str, _CameraState] = {}
 
-    def update(self, camera_id: str, scores: Sequence[float]) -> Decision:
+    def update(
+        self, camera_id: str, scores: Sequence[float], *, defer_close_scores: bool = False,
+    ) -> Decision:
         """Consume one fresh prediction in playback order for the given camera."""
         if len(scores) != len(CLASS_ORDER) or not all(0 <= score <= 1 for score in scores):
             raise ValueError("Expected four normalized scores in RoadSense class order.")
@@ -80,10 +86,11 @@ class DecisionEngine:
         confidence = scores[top]
         lead = confidence - scores[runner_up]
         config = self.config
-        strong = confidence >= config.high_confidence
-        reliable = strong or (
+        ambiguous = defer_close_scores and lead <= config.vision_review_margin + 1e-9
+        strong = not ambiguous and confidence >= config.high_confidence
+        reliable = not ambiguous and (strong or (
             confidence >= config.minimum_confidence and lead >= config.minimum_lead
-        )
+        ))
 
         if reliable and label != state.candidate:
             state.candidate = label
@@ -103,7 +110,7 @@ class DecisionEngine:
 
         state.normal_count = 0
         state.verifying = True
-        if label == "invalid_scene":
+        if label == "invalid_scene" and not ambiguous:
             return Decision(label, "invalid", config.verify_interval_sec, "medium")
 
         confirmed = label in INCIDENTS and state.candidate_count >= config.confirm_frames
@@ -114,17 +121,20 @@ class DecisionEngine:
                 state.event_id = f"{camera_id}-evt-{uuid4().hex}"
             state.confirmed = confirmed
 
-        phase = "alert" if state.confirmed and state.event_class == label else "verifying"
-        return self._decision(label, phase, state)
+        already_confirmed = not ambiguous and state.confirmed and state.event_class == label
+        phase = "alert" if already_confirmed else "verifying"
+        return self._decision(label, phase, state, review_required=ambiguous)
 
-    def _decision(self, label: str, phase: str, state: _CameraState) -> Decision:
+    def _decision(
+        self, label: str, phase: str, state: _CameraState, *, review_required: bool = False,
+    ) -> Decision:
         interval = self.config.verify_interval_sec
         if state.event_class is None:
-            return Decision(label, phase, interval, "medium")
+            return Decision(label, phase, interval, "medium", review_required=review_required)
         priority, description = INCIDENTS[state.event_class]
         alert = {
             "level": "confirmed" if state.confirmed else "preliminary",
             "type": state.event_class,
             "message": description if state.confirmed else "Possible accident",
         }
-        return Decision(label, phase, interval, priority, state.event_id, alert)
+        return Decision(label, phase, interval, priority, state.event_id, alert, review_required)
