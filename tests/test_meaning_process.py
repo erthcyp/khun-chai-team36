@@ -23,7 +23,7 @@ def openai_response():
     return httpx.Response(200, json={"choices": [{"message": {"content": json.dumps({
         "summary_en": "Model predicts normal traffic flow.",
         "summary_th": "โมเดลประเมินว่าการจราจรไหลปกติ",
-        "suggested_action": "Continue monitoring.",
+        "suggested_action": "แนะนำให้ติดตามสถานการณ์ต่อไป",
     })}}]})
 
 
@@ -34,6 +34,9 @@ class MeaningProcessorTests(unittest.IsolatedAsyncioTestCase):
 
         first = await processor.on_semantic(FRAME)
         self.assertEqual(first["source"], "fallback")
+        self.assertEqual(tuple(first)[:2], ("summary_th", "summary_en"))
+        self.assertIn("การจราจรไหลปกติ", first["summary_th"])
+        self.assertEqual(first["suggested_action"], "แนะนำให้ติดตามสถานการณ์ต่อไป")
         self.assertIn("normal traffic flow", first["summary_en"])
         self.assertIn("0.69", first["summary_en"])
         self.assertNotIn("confirmed", first["summary_en"])
@@ -67,6 +70,8 @@ class MeaningProcessorTests(unittest.IsolatedAsyncioTestCase):
                 event, event_id="evt-2", alert={"level": "preliminary"})))
 
         self.assertEqual(len(calls), 4)
+        self.assertIn("primary operator summary in natural Thai",
+                      calls[0]["messages"][0]["content"])
         content = calls[0]["messages"][1]["content"]
         self.assertEqual(json.loads(content[0]["text"])["predicted_class"], "normal_flow")
         self.assertNotIn("image_path", content[0]["text"])
