@@ -1,6 +1,6 @@
 # RoadSense TCC dashboard
 
-Static, responsive operator dashboard for the TCC receiver. It polls the documented JSON endpoints every three seconds and keeps camera state, alerts, metrics, and the assistant summary visible as separate panels.
+Responsive Thai-language TCC dashboard inspired by the supplied control-room reference. It shows two camera cards, an incident panel, and a measured adaptive-versus-fixed model-call comparison. The theme toggle switches between dark and light palettes and remembers the selection in the browser.
 
 ## Run
 
@@ -22,9 +22,8 @@ The receiver must allow the dashboard origin through CORS when the static site a
 - `GET /api/v1/cameras`
 - `GET /api/v1/alerts`
 - `GET /api/v1/metrics`
-- `GET /api/v1/summary` (optional until the assistant endpoint is implemented)
 
-Camera records may include `latest_snapshot_url`, `snapshot_url`, `preview_url`, or `image_url` for the newest sampled JPEG. If none is present, the card shows a waiting state. The dashboard displays the incoming `score_kind` and uses the message `score_order` only for any future vector breakdown; it does not assume another class ordering.
+Camera records may include `latest_snapshot_url`, `snapshot_url`, `preview_url`, or `image_url` for the newest sampled JPEG. If none is present, the card shows a road-scene placeholder. Camera location labels come from the receiver payload; coordinates are shown when supplied.
 
 ## Mock preview
 
@@ -33,5 +32,5 @@ Append `?mock=1` to render clearly labeled sample UI data. Mock values are hard-
 ## Notes
 
 - The dashboard is read-only: it does not change RSU sampling intervals or classify images.
-- Metrics are rendered from receiver counters. If no measured baseline or counters are available, the UI shows `—`/waiting copy instead of estimating them.
-- The class order in the current repository contract remains `normal_flow, congestion, accident, invalid_scene`.
+- Metrics are rendered from receiver counters. If no measured baseline or counters are available, the UI shows `—` instead of estimating them.
+- Dark mode is the initial theme. Use the sun/moon control in the header to switch themes.
