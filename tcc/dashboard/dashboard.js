@@ -145,12 +145,13 @@
     $("theme-toggle").addEventListener("click", () => setTheme(document.body.dataset.theme === "dark" ? "light" : "dark"));
   }
 
-  function makeCamera(camera, variant = "", previousImage = null) {
+  const cameraCards = new WeakMap();
+
+  function makeCamera(camera, variant, picture) {
     const cameraId = String(camera.camera_id || camera.id || "กล้องไม่ทราบรหัส");
     const waiting = Boolean(camera.placeholder);
     const status = cameraState(camera);
     const online = isOnline(camera);
-    const picture = camera.snapshot;
     const latestClass = normalizeClass(prediction(camera));
     const className = picture ? normalizeClass(prediction(picture)) : latestClass;
     const isAlert = Boolean(camera.alert);
@@ -160,8 +161,7 @@
     const trafficLabel = waiting ? "รอข้อมูล" : thaiClass(trafficKind);
     const interval = number(camera.sampling_interval_sec);
     const timestamp = capturedAt(camera);
-    const imageTimestamp = picture?.captured_at || timestamp;
-    const snapshot = first(camera, ["latest_snapshot_url", "snapshot_url", "preview_url", "image_url"]);
+    const imageTimestamp = picture?.captured_at;
     const wrapper = document.createElement("article");
     wrapper.dataset.cameraId = cameraId;
     wrapper.className = `camera-card ${variant} ${waiting ? "is-placeholder" : ""}`.trim();
@@ -184,24 +184,10 @@
 
     const preview = document.createElement("div");
     preview.className = "camera-preview";
-    if (snapshot) {
-      const url = new URL(String(snapshot), apiBase || location.origin);
-      if (!picture && camera.frame_id) url.searchParams.set("frame", camera.frame_id);
-      const image = previousImage?.src === url.href ? previousImage : document.createElement("img");
-      if (image.src !== url.href) image.src = url.href;
-      image.alt = `ภาพเฟรมล่าสุดจาก ${cameraId}`;
-      image.loading = "lazy";
-      image.onerror = () => {
-        image.remove();
-        preview.insertAdjacentHTML("afterbegin", '<div class="preview-placeholder"><span class="road-shape"></span></div>');
-      };
-      preview.appendChild(image);
-    } else {
-      preview.innerHTML = '<div class="preview-placeholder"><span class="road-shape"></span></div>';
-    }
+    preview.innerHTML = '<div class="preview-placeholder"><span class="road-shape"></span></div>';
     const chip = document.createElement("span");
     chip.className = "snapshot-chip";
-    chip.textContent = snapshot ? "เฟรมล่าสุด" : "รอภาพจากกล้อง";
+    chip.textContent = picture ? "เฟรมล่าสุด" : "รอภาพจากกล้อง";
     const age = document.createElement("span");
     age.className = "snapshot-age";
     age.textContent = ageLabel(imageTimestamp);
@@ -254,7 +240,10 @@
     if (!waiting) {
       const label = summaryLanguage === "en" ? "Latest prediction" : "ผลทำนายล่าสุด";
       const pending = summaryLanguage === "en" ? "waiting for image" : "รอภาพของเฟรมนี้";
-      latest.textContent = `${label}: ${latestLabel} · ${camera.frame_id || "—"}${camera.snapshot_pending ? ` · ${pending}` : ""}`;
+      const awaitingImage = camera.snapshot_pending || (
+        camera.latest_snapshot_url && picture?.frame_id !== camera.frame_id
+      );
+      latest.textContent = `${label}: ${latestLabel} · ${camera.frame_id || "—"}${awaitingImage ? ` · ${pending}` : ""}`;
     }
     const coords = camera.location || {};
     const lat = number(coords.latitude), lon = number(coords.longitude);
@@ -294,14 +283,79 @@
     return wrapper;
   }
 
+  function snapshotRequest(camera) {
+    const snapshot = first(camera, ["latest_snapshot_url", "snapshot_url", "preview_url", "image_url"]);
+    if (!snapshot) return null;
+    const url = new URL(String(snapshot), apiBase || location.origin);
+    if (!camera.snapshot && camera.frame_id) url.searchParams.set("frame", camera.frame_id);
+    return { url: url.href, picture: camera.snapshot || camera };
+  }
+
+  function updateCardText(card, view) {
+    const draft = makeCamera(view.camera, view.variant, view.displayed?.picture);
+    const preview = card.querySelector(".camera-preview");
+    card.className = draft.className;
+    card.firstElementChild.replaceWith(draft.firstElementChild);
+    for (const selector of [".snapshot-chip", ".snapshot-age"]) {
+      preview.querySelector(selector).textContent = draft.querySelector(selector).textContent;
+    }
+    while (preview.nextElementSibling) preview.nextElementSibling.remove();
+    card.append(...Array.from(draft.children).slice(1));
+  }
+
+  async function loadCardImage(card, view, request) {
+    const image = new Image();
+    image.alt = `ภาพเฟรมล่าสุดจาก ${view.camera.camera_id}`;
+    image.src = request.url;
+    try {
+      await image.decode();
+      if (!card.isConnected || view.generation !== request.generation) return;
+      const preview = card.querySelector(".camera-preview");
+      const previous = preview.querySelector("img, .preview-placeholder");
+      previous.replaceWith(image);
+      view.displayed = request;
+      updateCardText(card, view);
+    } catch {
+      // Keep the last decoded JPEG visible. The next poll can try a newer version.
+    } finally {
+      view.loading = false;
+    }
+  }
+
+  function updateCameraCard(card, camera, variant) {
+    if (!card || card.dataset.cameraId !== camera.camera_id) {
+      card = makeCamera(camera, variant);
+      cameraCards.set(card, { camera, variant, displayed: null, loading: false, generation: 0 });
+    }
+    const view = cameraCards.get(card);
+    if (view.camera.run_id !== camera.run_id || (!view.camera.placeholder && camera.placeholder)) {
+      view.generation += 1;
+      view.displayed = null;
+      const previous = card.querySelector(".camera-preview img");
+      if (previous) {
+        const placeholder = document.createElement("span");
+        placeholder.className = "preview-placeholder";
+        previous.replaceWith(placeholder);
+      }
+    }
+    view.camera = camera;
+    updateCardText(card, view);
+    const request = snapshotRequest(camera);
+    if (request && !view.loading && request.url !== view.displayed?.url) {
+      view.loading = true;
+      void loadCardImage(card, view, { ...request, generation: view.generation });
+    }
+    return card;
+  }
+
   function renderCameraWall(cameras, receivedCount) {
     const root = $("wall-grid");
-    const previousImages = new Map([...root.children].map((card) => [
-      card.dataset.cameraId, card.querySelector(".camera-preview img"),
-    ]));
-    root.replaceChildren(...cameras.map((camera) =>
-      makeCamera(camera, "wall-camera-card", previousImages.get(camera.camera_id))
-    ));
+    const existing = new Map([...root.children].map((card) => [card.dataset.cameraId, card]));
+    for (const camera of cameras) {
+      const current = existing.get(camera.camera_id);
+      const card = updateCameraCard(current, camera, "wall-camera-card");
+      if (!current) root.append(card);
+    }
     $("wall-count").textContent = `${receivedCount} จาก 6 กล้องที่มีข้อมูล`;
   }
 
@@ -315,12 +369,9 @@
     $("metric-context").textContent = received.length
       ? `${mockMode ? "รอบจำลอง" : "ข้อมูลจริง"} · ${received.length} กล้อง`
       : `${mockMode ? "รอบจำลอง" : "ข้อมูลจริง"} · รอข้อมูล`;
-    const focusedCamera = document.activeElement?.dataset.openCamera;
     renderCameraWall(cameras, received.length);
     renderCameraDetail(cameras);
-    if (focusedCamera) {
-      $("wall-grid").querySelector(`[data-open-camera="${CSS.escape(focusedCamera)}"]`)?.focus({ preventScroll: true });
-    }
+
   }
 
   function renderCameraDetail(cameras) {
@@ -330,8 +381,9 @@
     if (!camera) return;
     $("camera-detail-title").textContent = camera.camera_id.replace("_", " ");
     const content = $("camera-detail-content");
-    const image = content.querySelector(".camera-preview img");
-    content.replaceChildren(makeCamera(camera, "detail-camera-card", image));
+    const existing = content.firstElementChild;
+    const card = updateCameraCard(existing, camera, "detail-camera-card");
+    if (card !== existing) content.replaceChildren(card);
   }
 
   function renderAlerts() {
