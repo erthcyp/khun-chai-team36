@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+from contextlib import asynccontextmanager
 from datetime import datetime, timezone
 import json
 import math
@@ -13,6 +14,8 @@ from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
+
+from tcc.meaning_process import MeaningProcessor
 
 
 CLASS_ORDER = ["normal_flow", "congestion", "accident", "invalid_scene"]
@@ -55,10 +58,54 @@ class ReceiverState:
         self.semantic_bytes = 0
         self.snapshot_count = 0
         self.jpeg_bytes = 0
+        self.meaning = MeaningProcessor()
+        self.meaning_updates: dict[str, tuple] = {}
+        self.meaning_tasks: dict[str, asyncio.Task] = {}
+
+    def update_meaning(self, camera_id: str, payload: dict) -> None:
+        alert = payload.get("alert")
+        signature = (
+            payload["predicted_class"], payload.get("verification_state"),
+            alert.get("level") if isinstance(alert, dict) else None,
+            payload.get("event_id") or None,
+        )
+        if self.meaning_updates.get(camera_id) == signature:
+            return
+        self.meaning_updates[camera_id] = signature
+        previous = self.meaning_tasks.get(camera_id)
+        if previous and not previous.done():
+            previous.cancel()
+        self.cameras[camera_id]["meaning_pending"] = True
+        self.meaning_tasks[camera_id] = asyncio.create_task(
+            self.publish_meaning(camera_id, payload),
+        )
+
+    async def publish_meaning(self, camera_id: str, payload: dict) -> None:
+        summary = await self.meaning.on_semantic(payload)
+        async with self.lock:
+            if self.meaning_tasks.get(camera_id) is not asyncio.current_task():
+                return
+            camera = self.cameras[camera_id]
+            camera.pop("meaning_pending", None)
+            if summary is not None:
+                camera["meaning"] = summary
+                if camera_id in self.alerts:
+                    self.alerts[camera_id]["meaning"] = summary
 
 
-app = FastAPI(title="RoadSense TCC receiver", version="1.0")
-app.state.receiver = ReceiverState()
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    receiver = ReceiverState()
+    app.state.receiver = receiver
+    try:
+        yield
+    finally:
+        for task in receiver.meaning_tasks.values():
+            task.cancel()
+        await asyncio.gather(*receiver.meaning_tasks.values(), return_exceptions=True)
+
+
+app = FastAPI(title="RoadSense TCC receiver", version="1.0", lifespan=lifespan)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:4173", "http://127.0.0.1:4173"],
@@ -111,7 +158,12 @@ async def receive_semantic(request: Request) -> dict:
         if timestamp < receiver.last_captured.get(camera_id, datetime.min.replace(tzinfo=timezone.utc)):
             return {"accepted": False, "reason": "stale", "camera_id": camera_id}
         receiver.last_captured[camera_id] = timestamp
+        previous_camera = receiver.cameras.get(camera_id, {})
         camera = dict(payload)
+        for field in ("meaning", "meaning_pending"):
+            camera.pop(field, None)
+            if field in previous_camera:
+                camera[field] = previous_camera[field]
         camera["online"] = True
         camera["received_at"] = datetime.now(timezone.utc).isoformat()
         if camera_id in receiver.snapshots:
@@ -125,6 +177,11 @@ async def receive_semantic(request: Request) -> dict:
             }
         elif alert is None:
             receiver.alerts.pop(camera_id, None)
+        receiver.update_meaning(camera_id, payload)
+        if camera.get("meaning_pending"):
+            camera.pop("meaning", None)
+        elif camera_id in receiver.alerts and "meaning" in camera:
+            receiver.alerts[camera_id]["meaning"] = camera["meaning"]
     return {"accepted": True, "camera_id": camera_id, "frame_id": frame_id}
 
 
@@ -158,6 +215,7 @@ async def receive_snapshot(request: Request, meta: str = Form(...), file: Upload
         receiver.snapshots[camera_id] = (sequence, jpeg)
         if camera_id in receiver.cameras:
             receiver.cameras[camera_id]["latest_snapshot_url"] = f"/api/v1/snapshots/{camera_id}"
+    await receiver.meaning.on_snapshot(metadata, jpeg)
     return {"accepted": True, "camera_id": camera_id, "frame_id": frame_id}
 
 

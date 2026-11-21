@@ -8,6 +8,8 @@
   const apiBase = (params.get("api") || "").replace(/\/$/, "");
   const state = { cameras: [], alerts: [], metrics: null, connected: false, updatedAt: null, selectedCameraId: null, wallView: false };
   const $ = (id) => document.getElementById(id);
+  let summaryLanguage = "th";
+  try { if (localStorage.getItem("roadsense-summary-language") === "en") summaryLanguage = "en"; } catch (_) {}
   const classNames = {
     normal_flow: "จราจรปกติ",
     congestion: "การจราจรติดขัด",
@@ -77,6 +79,9 @@
     return first(camera, ["predicted_class", "prediction", "final_class", "classification"]);
   }
   function naturalLanguage(camera) {
+    const summary = camera?.meaning?.[`summary_${summaryLanguage}`];
+    if (typeof summary === "string") return summary.trim();
+    if (summaryLanguage === "en") return "";
     const value = first(camera, [
       "natural_language_description", "natural_language", "description_th",
       "explanation_th", "human_readable_text", "description", "explanation", "summary"
@@ -256,12 +261,21 @@
     }));
     (primary ? primaryRoot.firstElementChild : primaryRoot).append(descriptionPanel);
     const explanation = naturalLanguage(primary);
-    $("ai-description-text").textContent = explanation || (mockMode
-      ? "กำลังรอข้อความคำอธิบายภาษาธรรมชาติจาก RSU"
-      : "ยังไม่มีคำอธิบายจาก RSU");
+    const waiting = summaryLanguage === "th"
+      ? (primary?.meaning_pending ? "กำลังรอสรุปจาก TCC" : "ยังไม่มีสรุปภาษาไทย")
+      : (primary?.meaning_pending ? "Waiting for the TCC summary" : "No English summary yet");
+    $("ai-description-text").lang = summaryLanguage;
+    $("ai-description-text").textContent = explanation || waiting;
     $("description-source").textContent = explanation
       ? `${mockMode ? "ตัวอย่างจำลอง · " : "จาก "}${primary.camera_id.replace("_", " ")}`
       : mockMode ? "ตัวอย่างจำลอง" : "รอข้อมูล";
+    if (primary?.meaning?.fallback_reason === "image_timeout") {
+      $("description-source").textContent = summaryLanguage === "th"
+        ? "ไม่ได้รับภาพประกอบ" : "Snapshot unavailable";
+    }
+    for (const language of ["th", "en"]) {
+      $(`summary-${language}`).setAttribute("aria-pressed", String(summaryLanguage === language));
+    }
     $("ai-description-text").closest(".ai-description-panel").classList.toggle("is-waiting", !explanation);
 
     const activeCount = cameras.filter(isOnline).length;
@@ -391,6 +405,13 @@
   }
 
   initTheme();
+  for (const language of ["th", "en"]) {
+    $(`summary-${language}`).addEventListener("click", () => {
+      summaryLanguage = language;
+      try { localStorage.setItem("roadsense-summary-language", language); } catch (_) {}
+      renderCameras();
+    });
+  }
   $("camera-select").addEventListener("change", (event) => {
     state.selectedCameraId = event.target.value || null;
     renderCameras();
