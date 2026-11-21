@@ -1,4 +1,4 @@
-"""Run a local video through the real VLM and measure prediction throughput.
+"""Run local videos through the real VLM and measure prediction throughput.
 
 JSON Lines on stdout: one prediction per sampled frame, then a summary.
 Startup messages go to stderr. Use --preview for local OpenCV playback alongside
@@ -44,9 +44,31 @@ def positive_count(value: str) -> int:
     return number
 
 
+class VideoPathAction(argparse.Action):
+    """Collect repeated paths while keeping the original single-video attribute."""
+
+    def __call__(self, parser, namespace, value, option_string=None):
+        paths = namespace.videos + (value,)
+        if len(paths) > 6:
+            parser.error("at most six --video paths are supported")
+        namespace.videos = paths
+        namespace.video = paths[0]
+
+
+def source_paths(args: argparse.Namespace) -> tuple[Path, ...]:
+    paths = getattr(args, "videos", ()) or (args.video,)
+    if len(paths) > 1:
+        if args.streams not in (1, len(paths)):
+            raise ValueError("with multiple --video paths, omit --streams or match the number of paths")
+        return paths
+    return paths * args.streams
+
+
 def make_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--video", type=Path, required=True, help="Path to a local video file")
+    parser.set_defaults(videos=())
+    parser.add_argument("--video", type=Path, required=True, action=VideoPathAction,
+                        help="Path to a local video; repeat for up to six different clips")
     parser.add_argument("--streams", type=int, choices=range(1, 7), default=1,
                         help="Run 1–6 local copies of this video with one shared VLM (default: 1)")
     parser.add_argument("--camera-id", choices=CAMERA_IDS, default="CAM_01",
@@ -228,7 +250,7 @@ def letterbox_frame(frame: np.ndarray, size: tuple[int, int]) -> np.ndarray:
 
 def preview_image(
     frame: np.ndarray, video_sec: float, camera_id: str, latest: dict | None,
-    *, size: tuple[int, int] = (960, 540),
+    *, size: tuple[int, int] = (960, 540), source_name: str | None = None,
 ) -> np.ndarray:
     """Place status above the full, aspect-preserving image, never over footage."""
     width, _ = size
@@ -237,6 +259,9 @@ def preview_image(
     lines = [f"{camera_id} | video: {video_sec:.2f}s | Q / Esc: quit"]
     if compact:
         lines[0] = f"{camera_id} | video: {video_sec:.2f}s"
+    if source_name:
+        name = source_name if len(source_name) <= 20 else source_name[:17] + "..."
+        lines[0] = f"{camera_id} | {name} | {video_sec:.1f}s"
     if latest is None:
         lines += ["Waiting for first prediction..."]
     else:
@@ -333,7 +358,8 @@ def run_preview(args: argparse.Namespace, predictor: Predictor, *, emit=emit_jso
             with lock:
                 prediction = latest
             if frame is not None and (advanced or prediction is not last_displayed_result):
-                cv2.imshow(window, preview_image(frame, video_sec, args.camera_id, prediction))
+                cv2.imshow(window, preview_image(frame, video_sec, args.camera_id, prediction,
+                                                source_name=args.video.name))
                 last_displayed_result = prediction
             key = cv2.waitKey(10) & 0xFF
             if key in (ord("q"), ord("Q"), 27):
@@ -375,6 +401,7 @@ class LocalStream:
     capture: cv2.VideoCapture
     fps: float
     stats: Throughput
+    source: Path
     frame_index: int = -1
     frame: np.ndarray | None = None
     video_sec: float = 0.0
@@ -401,16 +428,17 @@ def run_streams(args: argparse.Namespace, predictor: Predictor, *, emit=emit_jso
     contract. Every completed prediction is emitted immediately, unless filtered.
     """
     if args.no_realtime:
-        raise ValueError("--streams greater than 1 requires real-time mode")
+        raise ValueError("multiple streams require real-time mode")
     if args.preview and threading.current_thread() is not threading.main_thread():
         raise RuntimeError("OpenCV preview must run on the main thread")
+    sources = source_paths(args)
     condition = threading.Condition()
     streams: list[LocalStream] = []
     producing = True
     errors: list[BaseException] = []
     status = "completed"
     worker = None
-    window = f"RoadSense | {args.streams} streams | {args.video.name} | Q / Esc: quit"
+    window = f"RoadSense | {len(sources)} streams | Q / Esc: quit"
     window_created = False
     started = None
 
@@ -445,6 +473,7 @@ def run_streams(args: argparse.Namespace, predictor: Predictor, *, emit=emit_jso
                     record = {
                         **prediction,
                         "type": "prediction", "stream_id": stream.stream_id,
+                        "video": str(stream.source),
                         "frame_id": job.frame_id, "video_timestamp_sec": job.video_sec,
                         "captured_at": job.captured_at, "sampling_interval_sec": args.interval_sec,
                         "output_at": datetime.now(timezone.utc).isoformat(),
@@ -469,21 +498,21 @@ def run_streams(args: argparse.Namespace, predictor: Predictor, *, emit=emit_jso
     try:
         if args.output_dir:
             args.output_dir.mkdir(parents=True, exist_ok=True)
-        for index in range(args.streams):
-            capture = cv2.VideoCapture(str(args.video))
+        for index, source in enumerate(sources):
+            capture = cv2.VideoCapture(str(source))
             fps = capture.get(cv2.CAP_PROP_FPS)
             streams.append(LocalStream(f"STREAM_{index + 1:02d}", capture, fps,
-                                       Throughput(args.interval_sec)))
+                                       Throughput(args.interval_sec), source))
             if not capture.isOpened() or not math.isfinite(fps) or fps <= 0:
-                raise ValueError(f"Could not open stream with valid FPS: {args.video}")
+                raise ValueError(f"Could not open stream with valid FPS: {source}")
         if args.preview:
             try:
                 cv2.namedWindow(window, cv2.WINDOW_NORMAL | cv2.WINDOW_KEEPRATIO)
             except cv2.error as exc:
                 raise RuntimeError("Preview needs GUI-enabled opencv-python") from exc
             window_created = True
-            columns = min(3, args.streams)
-            cv2.resizeWindow(window, columns * 320, math.ceil(args.streams / columns) * 252)
+            columns = min(3, len(sources))
+            cv2.resizeWindow(window, columns * 320, math.ceil(len(sources) / columns) * 252)
         started = time.monotonic()
         worker = threading.Thread(target=predict, name="roadsense-shared-vlm")
         worker.start()
@@ -492,7 +521,7 @@ def run_streams(args: argparse.Namespace, predictor: Predictor, *, emit=emit_jso
             with condition:
                 if errors:
                     raise errors[0]
-                if args.max_frames and all(s.stats.count >= args.max_frames for s in streams):
+                if args.max_frames and all(s.eof or s.stats.count >= args.max_frames for s in streams):
                     break
             elapsed = time.monotonic() - started
             advanced = False
@@ -540,7 +569,8 @@ def run_streams(args: argparse.Namespace, predictor: Predictor, *, emit=emit_jso
             if args.preview:
                 signature = tuple(item["frame_id"] if item else None for item in latest)
                 if all(s.frame is not None for s in streams) and (advanced or signature != last_displayed):
-                    panels = [preview_image(s.frame, s.video_sec, s.stream_id, item, size=(320, 180))
+                    panels = [preview_image(s.frame, s.video_sec, s.stream_id, item, size=(320, 180),
+                                            source_name=s.source.name)
                               for s, item in zip(streams, latest)]
                     columns = min(3, len(panels))
                     while len(panels) % columns:
@@ -589,10 +619,12 @@ def run_streams(args: argparse.Namespace, predictor: Predictor, *, emit=emit_jso
         summary = {
             "type": "summary", "status": "failed" if errors else status,
             "mode": "local_multistream_realtime", "video": str(args.video),
-            "streams": args.streams, "model_instances": 1, "preview": args.preview,
+            "videos": [str(source) for source in sources],
+            "streams": len(sources), "model_instances": 1, "preview": args.preview,
             "predictions": sum(s.stats.count for s in streams),
             "per_stream": [{
-                "stream_id": s.stream_id, **s.stats.summary(),
+                "stream_id": s.stream_id, "video": str(s.source), **s.stats.summary(),
+                "source_exhausted": s.eof,
                 "printed_predictions": s.printed, "saved_images": s.saved,
                 "replaced_pending_samples": s.dropped, "cancelled_pending_samples": s.cancelled,
             } for s in streams],
@@ -606,14 +638,19 @@ def run_streams(args: argparse.Namespace, predictor: Predictor, *, emit=emit_jso
 def main(argv: list[str] | None = None) -> None:
     parser = make_parser()
     args = parser.parse_args(argv)
+    try:
+        sources = source_paths(args)
+    except ValueError as exc:
+        parser.error(str(exc))
     if args.preview and args.no_realtime:
         parser.error("--preview cannot be combined with --no-realtime")
-    if args.streams > 1 and args.no_realtime:
-        parser.error("--streams greater than 1 requires real-time mode")
+    if len(sources) > 1 and args.no_realtime:
+        parser.error("multiple streams require real-time mode")
     try:
-        # Validate the video before loading a large model or downloading weights.
-        with FrameSampler(args.video, args.camera_id, args.interval_sec):
-            pass
+        # Validate every source before loading a large model or downloading weights.
+        for source in dict.fromkeys(sources):
+            with FrameSampler(source, args.camera_id, args.interval_sec):
+                pass
         from .vlm import ClipPredictor
 
         print("Loading VLM and K30 prompts; first use may download model weights...", file=sys.stderr,
@@ -623,7 +660,7 @@ def main(argv: list[str] | None = None) -> None:
         load_ms = (time.monotonic() - started) * 1000
         print(f"VLM ready: device={predictor.device}, load_ms={load_ms:.1f}. Starting predictions.",
               file=sys.stderr, flush=True)
-        if args.streams > 1:
+        if len(sources) > 1:
             run_streams(args, predictor)
         elif args.preview:
             run_preview(args, predictor)

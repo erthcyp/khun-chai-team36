@@ -19,7 +19,7 @@ import cv2
 import numpy as np
 
 from rsu.main import (Throughput, letterbox_frame, main, make_parser, preview_image,
-                      run_predictions, run_preview, run_streams)
+                      run_predictions, run_preview, run_streams, source_paths)
 
 
 class Clock:
@@ -407,6 +407,83 @@ class RunnerTests(unittest.TestCase):
         summary = run_streams(args, PredictorDouble(Clock()), emit=lambda record: None)
         self.assertEqual(summary["status"], "completed")
         self.assertEqual(summary["predictions"], 2)
+
+    def test_six_different_sources_keep_frames_and_filenames_separate(self):
+        paths = []
+        arguments = []
+        expected_pixels = []
+        for index in range(6):
+            path = Path(self.temp.name) / f"different-{index}.avi"
+            paths.append(path)
+            arguments.extend(["--video", str(path)])
+            size = (64, 96) if index % 2 else (96, 64)
+            writer = cv2.VideoWriter(str(path), cv2.VideoWriter_fourcc(*"MJPG"), 5 + index, size)
+            self.assertTrue(writer.isOpened())
+            value = 30 + index * 25
+            writer.write(np.full((size[1], size[0], 3), value, dtype=np.uint8))
+            writer.release()
+            expected_pixels.append(value)
+        observed = []
+
+        class CollectingPredictor:
+            def predict(self, frame):
+                observed.append((float(frame.mean()), frame.shape))
+                return {"prediction": "normal_flow"}
+
+        args = make_parser().parse_args([*arguments, "--max-frames", "1"])
+        records = []
+        summary = run_streams(args, CollectingPredictor(), emit=records.append)
+        self.assertEqual(summary["streams"], 6)
+        self.assertEqual(summary["predictions"], 6)
+        self.assertEqual(summary["videos"], [str(path) for path in paths])
+        self.assertEqual([r["video"] for r in records[:-1]], [str(path) for path in paths])
+        for expected, (actual, shape) in zip(expected_pixels, observed):
+            self.assertAlmostEqual(actual, expected, delta=2)
+        self.assertEqual({shape for _, shape in observed}, {(64, 96, 3), (96, 64, 3)})
+
+    def test_short_clip_can_end_while_longer_clip_reaches_its_frame_limit(self):
+        paths = []
+        for name, count in (("early-end", 1), ("longer", 300)):
+            path = Path(self.temp.name) / f"{name}.avi"
+            paths.append(path)
+            writer = cv2.VideoWriter(str(path), cv2.VideoWriter_fourcc(*"MJPG"), 30, (64, 48))
+            self.assertTrue(writer.isOpened())
+            for _ in range(count):
+                writer.write(np.full((48, 64, 3), 60, dtype=np.uint8))
+            writer.release()
+        args = make_parser().parse_args(["--video", str(paths[0]), "--video", str(paths[1]),
+                                         "--max-frames", "3", "--interval-sec", "0.05"])
+        summary = run_streams(args, PredictorDouble(Clock()), emit=lambda record: None)
+        first, second = summary["per_stream"]
+        self.assertEqual(first["predictions"], 1)
+        self.assertTrue(first["source_exhausted"])
+        self.assertEqual(second["predictions"], 3)
+        self.assertFalse(second["source_exhausted"])
+
+    def test_every_source_is_validated_before_loading_the_model(self):
+        result = subprocess.run(
+            [sys.executable, "-m", "rsu.main", "--video", str(self.video),
+             "--video", str(self.video.parent / "missing-second.mp4")], capture_output=True, text=True,
+        )
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("missing-second.mp4", result.stderr)
+        self.assertNotIn("Loading VLM", result.stderr)
+
+    def test_repeated_video_arguments_and_copy_mode_are_compatible(self):
+        parser = make_parser()
+        different = parser.parse_args(["--video", "one.mp4", "--video", "two.mp4"])
+        self.assertEqual(source_paths(different), (Path("one.mp4"), Path("two.mp4")))
+        copies = parser.parse_args(["--video", "one.mp4", "--streams", "6"])
+        self.assertEqual(source_paths(copies), (Path("one.mp4"),) * 6)
+        single = parser.parse_args(["--video", "single.mp4"])
+        self.assertEqual(source_paths(single), (Path("single.mp4"),))
+
+    def test_conflicting_counts_and_too_many_sources_are_rejected(self):
+        with redirect_stderr(io.StringIO()), self.assertRaises(SystemExit):
+            main(["--video", "one.mp4", "--video", "two.mp4", "--streams", "6"])
+        with redirect_stderr(io.StringIO()), self.assertRaises(SystemExit):
+            make_parser().parse_args([value for index in range(7)
+                                      for value in ("--video", f"{index}.mp4")])
 
 
 class ThroughputTests(unittest.TestCase):
