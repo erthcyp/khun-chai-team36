@@ -43,7 +43,7 @@
 
         <section class="operator-layout" aria-label="ภาพกล้องหลัก กล้องเพิ่มเติม และการแจ้งเตือน">
           <section class="primary-camera-section">
-            <div class="operator-section-heading"><div><span class="eyebrow">กล้องหลัก</span><h2>CAM_01</h2></div><button class="fullscreen-button" id="wall-open" type="button"><span aria-hidden="true">⛶</span> ดูครบ 6 กล้อง</button></div>
+            <div class="operator-section-heading"><div><span class="eyebrow">กล้องหลัก</span><h2>CAM_01</h2></div><button class="fullscreen-button" id="wall-open" type="button"><span aria-hidden="true">▦</span> แสดงกล้องทั้งหมด</button></div>
             <div id="primary-camera" aria-live="polite"><div class="loading-state"><span class="spinner"></span><strong>กำลังเชื่อมต่อกล้อง</strong></div></div>
           </section>
           <section class="secondary-camera-section">
@@ -58,8 +58,8 @@
           </aside>
         </section>
 
-        <section class="camera-wall" id="camera-wall" role="dialog" aria-modal="true" aria-labelledby="wall-title" aria-hidden="true" hidden>
-          <header class="wall-header"><div><span class="eyebrow">ROAD SITUATION MONITORING</span><h2 id="wall-title">ภาพรวมกล้องทั้งหมด</h2><p id="wall-count">0 จาก 6 กล้อง</p></div><button class="wall-close" id="wall-close" type="button"><span aria-hidden="true">×</span> ออกจากเต็มจอ</button></header>
+        <section class="camera-wall" id="camera-wall" aria-labelledby="wall-title" hidden>
+          <header class="wall-header"><div><span class="eyebrow">ROAD SITUATION MONITORING</span><h2 id="wall-title">ภาพรวมกล้องทั้งหมด</h2><p id="wall-count">0 จาก 6 กล้อง</p></div><button class="wall-close" id="wall-close" type="button"><span aria-hidden="true">←</span> กลับมุมมองหลัก</button></header>
           <div class="wall-grid" id="wall-grid"></div>
         </section>
 

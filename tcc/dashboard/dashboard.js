@@ -6,7 +6,7 @@
   const params = new URLSearchParams(location.search);
   const mockMode = params.get("mock") === "1";
   const apiBase = (params.get("api") || "").replace(/\/$/, "");
-  const state = { cameras: [], alerts: [], metrics: null, connected: false, updatedAt: null, selectedCameraId: null, wallFullscreen: false };
+  const state = { cameras: [], alerts: [], metrics: null, connected: false, updatedAt: null, selectedCameraId: null, wallView: false };
   const $ = (id) => document.getElementById(id);
   const classNames = {
     normal_flow: "จราจรปกติ",
@@ -251,33 +251,22 @@
     renderCameraWall(cameras);
   }
 
-  async function openCameraWall() {
+  function openCameraWall() {
     const wall = $("camera-wall");
+    state.wallView = true;
     wall.hidden = false;
-    wall.setAttribute("aria-hidden", "false");
     document.body.classList.add("wall-open");
-    state.wallFullscreen = false;
     renderCameraWall(normalizeCameras(state.cameras));
-    try {
-      if (wall.requestFullscreen) {
-        await wall.requestFullscreen();
-        state.wallFullscreen = document.fullscreenElement === wall;
-      }
-    } catch (_) {
-      // Keep the fixed overlay usable if browser fullscreen is unavailable.
-    }
+    $("wall-open").innerHTML = '<span aria-hidden="true">←</span> กลับมุมมองหลัก';
     $("wall-close").focus();
   }
 
-  async function closeCameraWall() {
+  function closeCameraWall() {
     const wall = $("camera-wall");
-    state.wallFullscreen = false;
-    if (document.fullscreenElement === wall && document.exitFullscreen) {
-      try { await document.exitFullscreen(); } catch (_) {}
-    }
+    state.wallView = false;
     wall.hidden = true;
-    wall.setAttribute("aria-hidden", "true");
     document.body.classList.remove("wall-open");
+    $("wall-open").innerHTML = '<span aria-hidden="true">▦</span> แสดงกล้องทั้งหมด';
     $("wall-open").focus();
   }
 
@@ -387,19 +376,6 @@
   });
   $("wall-open").addEventListener("click", openCameraWall);
   $("wall-close").addEventListener("click", closeCameraWall);
-  document.addEventListener("fullscreenchange", () => {
-    const wall = $("camera-wall");
-    if (state.wallFullscreen && document.fullscreenElement !== wall) {
-      state.wallFullscreen = false;
-      wall.hidden = true;
-      wall.setAttribute("aria-hidden", "true");
-      document.body.classList.remove("wall-open");
-      $("wall-open").focus();
-    }
-  });
-  document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape" && !$("camera-wall").hidden) closeCameraWall();
-  });
   if (mockMode) $("mock-ribbon").hidden = false;
   render();
   poll();

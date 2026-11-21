@@ -40,6 +40,19 @@ body[data-theme="light"] .topbar{background:#f1f5f8}body[data-theme="light"] .br
 .wall-camera-card .camera-card-head{min-height:35px}.wall-camera-card .camera-id{font-size:10px}.wall-camera-card .camera-location{font-size:14px}.wall-camera-card .traffic-badge{font-size:10px;padding:4px 8px}
 .wall-camera-card .camera-preview{flex:1;height:auto;min-height:0;aspect-ratio:16/9;border-radius:10px}
 .wall-camera-card .camera-interval{font-size:18px}.wall-camera-card .camera-card-foot{font-size:10px}.wall-camera-card .location-coordinates{font-size:8px}
-body.wall-open{overflow:hidden}
 @media(max-width:1050px){.operator-layout{grid-template-columns:minmax(0,1.35fr) minmax(270px,.9fr)}.primary-camera-section{grid-column:1}.secondary-camera-section{grid-column:2}.operator-layout>.alert-panel{grid-column:1/-1;min-height:180px}.wall-grid{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:auto}.wall-camera-card .camera-preview{min-height:200px}}
 @media(max-width:680px){.operator-layout{grid-template-columns:1fr;gap:14px}.primary-camera-section,.secondary-camera-section,.operator-layout>.alert-panel{grid-column:1}.operator-section-heading{min-height:42px}.operator-section-heading h2{font-size:16px}.primary-camera-card{min-height:0;padding:13px}.primary-camera-card .camera-preview{height:210px}.secondary-camera-card{min-height:0;padding:13px}.secondary-camera-card .camera-preview{height:185px}.primary-empty{min-height:220px}.fullscreen-button{min-height:36px;font-size:11px;padding:7px 10px}.camera-wall{padding:14px;gap:12px}.wall-header h2{font-size:19px}.wall-header .eyebrow{font-size:8px}.wall-close{font-size:0;min-width:40px;padding:7px}.wall-close span{font-size:22px}.wall-grid{grid-template-columns:1fr;grid-template-rows:auto}.wall-camera-card{min-height:300px}.wall-camera-card .camera-preview{min-height:180px}}
+.operator-layout{grid-template-areas:"primary secondary alerts"}
+.primary-camera-section{grid-area:primary}.secondary-camera-section{grid-area:secondary}.operator-layout>.alert-panel{grid-area:alerts}
+@media(min-width:901px) and (max-width:1050px){.operator-layout{grid-template-columns:minmax(0,1.35fr) minmax(0,.9fr) minmax(0,.72fr);grid-template-areas:"primary secondary alerts"}.operator-layout>.alert-panel{min-height:430px}}
+@media(max-width:900px){.operator-layout{grid-template-columns:minmax(0,1.35fr) minmax(0,.9fr);grid-template-areas:"primary secondary" "alerts alerts"}.primary-camera-section,.secondary-camera-section,.operator-layout>.alert-panel{grid-column:auto}.operator-layout>.alert-panel{min-height:190px}}
+@media(max-width:680px){.operator-layout{grid-template-columns:1fr;grid-template-areas:"primary" "secondary" "alerts"}}
+.camera-wall{position:relative;inset:auto;z-index:auto;margin:4px 0 18px;padding:0;background:transparent;color:var(--text);overflow:visible}
+.camera-wall[hidden]{display:none}
+.wall-grid{grid-template-rows:auto;grid-auto-rows:minmax(300px,auto)}
+.wall-camera-card{height:auto;min-height:330px}
+.wall-camera-card .camera-preview{flex:initial;height:clamp(190px,14vw,285px);min-height:0;aspect-ratio:auto}
+body.wall-open .operator-layout{display:none}
+body.wall-open .camera-wall{display:flex}
+body.wall-open #wall-open{background:var(--surface);border-color:var(--border);color:var(--text)}
+@media(max-width:680px){.wall-grid{grid-template-columns:1fr;grid-auto-rows:auto}.wall-camera-card{min-height:0}.wall-camera-card .camera-preview{height:205px}}

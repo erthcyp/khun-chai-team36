@@ -1,6 +1,6 @@
 # RoadSense TCC dashboard
 
-Responsive Thai-language TCC dashboard inspired by the supplied control-room reference. CAM_01 is the primary feed, CAM_02–CAM_06 are available through a camera selector, and the full-screen camera wall shows every camera currently returned by the receiver. The page also shows alerts and a measured adaptive-versus-fixed model-call comparison. The theme toggle switches between dark and light palettes and remembers the selection in the browser.
+Responsive Thai-language TCC dashboard inspired by the supplied control-room reference. CAM_01 is the primary feed, CAM_02–CAM_06 are available through a center camera selector, and alerts stay in a right column on wide layouts. “แสดงกล้องทั้งหมด” replaces the main layout with an in-page 6-camera wall; it does not request browser fullscreen. The page also shows a measured adaptive-versus-fixed model-call comparison. The theme toggle switches between dark and light palettes and remembers the selection in the browser.
 
 ## Run
 
