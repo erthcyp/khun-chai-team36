@@ -116,6 +116,8 @@ included, so a short run may show a cold-start effect. Remove `--max-frames` to
 process until the clip ends. Ctrl-C also prints a summary of completed predictions.
 Paths containing spaces should be enclosed in straight quotes.
 
+- `--video PATH`: repeat this option to select up to six different clips. Each
+  path becomes one stream in the supplied order; the stream count is inferred.
 - `--preview`: play the video in an OpenCV window while VLM inference runs in a
   worker. Press Q, Esc, or close the window to stop; an in-flight prediction
   finishes before exit. A separate header shows the latest class, score, AI frame
@@ -159,6 +161,25 @@ To run six copies of video147, play a six-panel grid, and print every prediction
 python -m rsu.main --video assets/demo_clips/video147.mp4 \
   --streams 6 --preview --interval-sec 1 --max-frames 30
 ```
+
+To use six different clips, repeat `--video` instead. Replace these example paths
+with the actual local files; `--streams 6` is not needed:
+
+```bash
+python -m rsu.main \
+  --video /path/to/clip1.mp4 --video /path/to/clip2.mp4 \
+  --video /path/to/clip3.mp4 --video /path/to/clip4.mp4 \
+  --video /path/to/clip5.mp4 --video /path/to/clip6.mp4 \
+  --preview --interval-sec 1 --max-frames 30
+```
+
+All paths are checked before loading the VLM. Each clip uses its own FPS,
+dimensions, playback position, and EOF state. A finished clip stops producing
+predictions while the others continue. Results and per-stream summaries include
+the source `video` path; preview headers show the filename. Summaries also report
+`source_exhausted`. A clip that ends before `--max-frames` does not keep the other
+streams running past their own frame limits. If `--streams` is supplied alongside
+multiple paths, it must match the path count.
 
 This prints up to 180 prediction records (30 per stream), followed by a summary
 with separate statistics for every stream. Results are emitted as the shared
