@@ -16,9 +16,6 @@
     <div class="app-frame">
       <header class="topbar">
         <a class="brand" href="#overview" aria-label="RoadSense ภาพรวม">
-          <span class="brand-mark" aria-hidden="true">
-            <svg viewBox="0 0 32 32" fill="none"><path d="M16 27v-6m0 0c-4 0-7-3-7-7m7 7c4 0 7-3 7-7M16 21c-7 0-12-5-12-12m12 12c7 0 12-5 12-12M16 6v3m-2 18h4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="16" cy="13" r="2.4" fill="currentColor"/></svg>
-          </span>
           <span class="brand-copy"><strong>RoadSense</strong><small>Traffic Control Center</small></span>
         </a>
         <div class="topbar-actions">
@@ -44,17 +41,18 @@
         <section class="operator-layout" aria-label="ภาพกล้องหลัก กล้องเพิ่มเติม และการแจ้งเตือน">
           <section class="primary-camera-section">
             <div class="operator-section-heading"><div><span class="eyebrow">กล้องหลัก</span><h2 id="primary-camera-title">CAM_01</h2></div><button class="fullscreen-button" id="wall-open" type="button"><span aria-hidden="true">▦</span> แสดงกล้องทั้งหมด</button></div>
-            <div id="primary-camera" aria-live="polite"><div class="loading-state"><span class="spinner"></span><strong>กำลังเชื่อมต่อกล้อง</strong></div></div>
-            <section class="ai-description-panel is-waiting" aria-live="polite" aria-label="คำอธิบายภาษาธรรมชาติจาก AI">
-              <div class="ai-description-heading"><div><span class="eyebrow">คำอธิบายภาษาธรรมชาติ</span><h3>AI อธิบายภาพ</h3></div><span class="description-source" id="description-source">รอข้อมูล</span></div>
-              <p id="ai-description-text">รอคำอธิบายจาก RSU</p>
-            </section>
+            <div id="primary-camera" aria-live="polite"><div class="loading-state"><span class="spinner"></span><strong>กำลังเชื่อมต่อกล้อง</strong></div>
+              <section class="ai-description-panel is-waiting" aria-label="คำอธิบายภาษาธรรมชาติจาก AI">
+                <div class="ai-description-heading"><div><span class="eyebrow">คำอธิบายภาษาธรรมชาติ</span><h3>AI อธิบายภาพ</h3></div><span class="description-source" id="description-source">รอข้อมูล</span></div>
+                <p id="ai-description-text">รอคำอธิบายจาก RSU</p>
+              </section>
+            </div>
           </section>
           <section class="secondary-camera-section">
-            <div class="operator-section-heading"><div><span class="eyebrow">กล้องเพิ่มเติม</span><h2>เลือกกล้อง 02–06</h2></div></div>
-            <label class="camera-select-label" for="camera-select">เลือกกล้อง</label>
-            <div class="camera-select-wrap"><select class="camera-select" id="camera-select" aria-label="เลือกกล้อง CAM_02 ถึง CAM_06"></select></div>
-            <div id="secondary-camera" aria-live="polite"><div class="empty-camera">เลือกกล้องที่ต้องการดู</div></div>
+            <div class="operator-section-heading"><div><span class="eyebrow">กล้องเพิ่มเติม</span><h2>เลือกกล้อง 01–06</h2></div></div>
+            <label class="camera-select-label" for="camera-select">เลือกกล้องหลัก</label>
+            <div class="camera-select-wrap"><select class="camera-select" id="camera-select" aria-label="เลือกกล้องหลัก CAM_01 ถึง CAM_06"></select></div>
+            <div id="secondary-camera" aria-live="polite"><div class="empty-camera">รอข้อมูลกล้องเพิ่มเติม</div></div>
           </section>
           <aside class="alert-panel" id="alerts">
             <div class="panel-heading"><h2>แจ้งเตือน</h2><span class="alert-count" id="alert-count">0 รายการที่เปิดอยู่</span></div>

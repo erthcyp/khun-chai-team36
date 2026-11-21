@@ -217,45 +217,44 @@
   function renderCameras() {
     const cameras = normalizeCameras(state.cameras);
     const camera01 = cameras.find((camera) => cameraIndex(camera) === 1);
-    const additional = cameras.filter((camera) => {
-      const index = cameraIndex(camera);
-      return index !== null && index >= 2 && index <= 6;
-    });
     const picker = $("camera-select");
     const priorSelection = state.selectedCameraId;
     picker.replaceChildren();
-    if (!additional.length) {
+    if (!cameras.length) {
       const option = document.createElement("option");
       option.value = "";
-      option.textContent = "ยังไม่มีกล้องเพิ่มเติม";
+      option.textContent = "ยังไม่มีข้อมูลกล้อง";
       picker.append(option);
       picker.disabled = true;
       state.selectedCameraId = null;
-      $("secondary-camera").innerHTML = '<div class="empty-camera">CAM_02–CAM_06 จะแสดงที่นี่เมื่อ receiver ส่งข้อมูลมา</div>';
     } else {
       picker.disabled = false;
-      for (const camera of additional) {
+      for (const camera of cameras) {
         const option = document.createElement("option");
         option.value = camera.camera_id;
         option.textContent = `${camera.camera_id.replace("_", " ")} · ${cameraLocation(camera)}`;
         picker.append(option);
       }
-      state.selectedCameraId = additional.some((camera) => camera.camera_id === priorSelection) ? priorSelection : additional[0].camera_id;
+      state.selectedCameraId = cameras.some((camera) => camera.camera_id === priorSelection)
+        ? priorSelection : (camera01 || cameras[0]).camera_id;
       picker.value = state.selectedCameraId;
-      const selected = additional.find((camera) => camera.camera_id === state.selectedCameraId);
-      $("secondary-camera").replaceChildren(camera01
-        ? makeCamera(camera01, "secondary-camera-card")
-        : Object.assign(document.createElement("div"), { className: "empty-camera", textContent: "ยังไม่ได้รับข้อมูลจาก CAM_01" }));
     }
 
-    const selected = additional.find((camera) => camera.camera_id === state.selectedCameraId);
-    const primary = selected || camera01;
+    const primary = cameras.find((camera) => camera.camera_id === state.selectedCameraId);
+    const secondary = primary && (primary === camera01
+      ? cameras.find((camera) => camera !== primary)
+      : camera01 || cameras.find((camera) => camera !== primary));
+    $("secondary-camera").replaceChildren(secondary
+      ? makeCamera(secondary, "secondary-camera-card")
+      : Object.assign(document.createElement("div"), { className: "empty-camera", textContent: "รอข้อมูลกล้องเพิ่มเติม" }));
     $("primary-camera-title").textContent = primary ? primary.camera_id.replace("_", " ") : "CAM_01";
     const primaryRoot = $("primary-camera");
+    const descriptionPanel = primaryRoot.querySelector(".ai-description-panel");
     primaryRoot.replaceChildren(primary ? makeCamera(primary, "primary-camera-card") : Object.assign(document.createElement("div"), {
       className: "empty-camera primary-empty",
       textContent: state.connected ? "รอข้อมูลจาก CAM_01" : "ยังไม่ได้รับข้อมูลจาก TCC"
     }));
+    (primary ? primaryRoot.firstElementChild : primaryRoot).append(descriptionPanel);
     const explanation = naturalLanguage(primary);
     $("ai-description-text").textContent = explanation || (mockMode
       ? "กำลังรอข้อความคำอธิบายภาษาธรรมชาติจาก RSU"
