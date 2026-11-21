@@ -1,6 +1,6 @@
 # RoadSense TCC dashboard
 
-Responsive Thai-language TCC dashboard inspired by the supplied control-room reference. It shows two camera cards, an incident panel, and a measured adaptive-versus-fixed model-call comparison. The theme toggle switches between dark and light palettes and remembers the selection in the browser.
+Responsive Thai-language TCC dashboard inspired by the supplied control-room reference. It shows camera cards, an incident panel, and a measured adaptive-versus-fixed model-call comparison. The theme toggle switches between dark and light palettes and remembers the selection in the browser.
 
 ## Run
 
@@ -23,7 +23,7 @@ The receiver must allow the dashboard origin through CORS when the static site a
 - `GET /api/v1/alerts`
 - `GET /api/v1/metrics`
 
-Camera records may include `latest_snapshot_url`, `snapshot_url`, `preview_url`, or `image_url` for the newest sampled JPEG. If none is present, the card shows a road-scene placeholder. Camera location labels come from the receiver payload; coordinates are shown when supplied.
+Camera records for `CAM_01` through `CAM_06` are discovered from `GET /api/v1/cameras` and rendered as they appear; the dashboard polls every three seconds, sorts them by camera number, and de-duplicates repeated IDs. No missing cameras are fabricated. If offline cameras should remain visible, the receiver must return their registry records with an offline state. Records may include `latest_snapshot_url`, `snapshot_url`, `preview_url`, or `image_url` for the newest sampled JPEG. If none is present, the card shows a road-scene placeholder. Camera location labels come from the receiver payload; coordinates are shown when supplied.
 
 ## Mock preview
 

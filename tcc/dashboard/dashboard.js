@@ -82,6 +82,25 @@
   function openAlert(alert) {
     return !/recovery|resolved|closed/i.test(String(alert.level || alert.status || ""));
   }
+  function cameraIndex(camera) {
+    const id = String(camera.camera_id || camera.id || "").trim();
+    const match = id.match(/^CAM[_ -]?0?([1-6])$/i);
+    return match ? Number(match[1]) : null;
+  }
+  function normalizeCameras(cameras) {
+    const byIndex = new Map();
+    for (const camera of cameras) {
+      const index = cameraIndex(camera);
+      if (index === null) continue;
+      const current = byIndex.get(index);
+      const currentTime = new Date(capturedAt(current) || 0).getTime();
+      const nextTime = new Date(capturedAt(camera) || 0).getTime();
+      if (!current || nextTime >= currentTime) {
+        byIndex.set(index, { ...camera, camera_id: `CAM_0${index}` });
+      }
+    }
+    return [...byIndex.entries()].sort(([a], [b]) => a - b).map(([, camera]) => camera);
+  }
   async function json(path) {
     const response = await fetch(`${apiBase}${path}`, { cache: "no-store", headers: { Accept: "application/json" } });
     if (!response.ok) throw new Error(`${path}: ${response.status}`);
@@ -181,7 +200,7 @@
 
   function renderCameras() {
     const root = $("camera-list");
-    const cameras = state.cameras.slice(0, 3);
+    const cameras = normalizeCameras(state.cameras);
     if (!cameras.length) {
       root.innerHTML = `<div class="empty-camera">${state.connected ? "ตัวรับข้อมูลออนไลน์ แต่ยังไม่มีข้อมูลกล้อง" : "ยังไม่ได้รับข้อมูลจาก TCC"}</div>`;
       $("online-count").textContent = "ไม่พบกล้องออนไลน์";
@@ -190,11 +209,11 @@
       return;
     }
     root.replaceChildren(...cameras.map(makeCamera));
-    const activeCount = state.cameras.filter(isOnline).length;
+    const activeCount = cameras.filter(isOnline).length;
     $("online-count").textContent = `${activeCount} กล้องออนไลน์`;
     const hasAlert = state.alerts.some(openAlert);
     $("overall-state").textContent = hasAlert ? "มีเหตุการณ์ที่ต้องตรวจสอบ" : "เฝ้าระวังตามปกติ";
-    $("metric-context").textContent = `รอบจำลอง · ${state.cameras.length} กล้อง`;
+    $("metric-context").textContent = `รอบจำลอง · ${cameras.length} กล้อง`;
   }
 
   function renderAlerts() {
@@ -256,10 +275,10 @@
   async function poll() {
     if (mockMode) {
       state.connected = true;
-      state.cameras = [
+      state.cameras = normalizeCameras([
         { camera_id: "CAM_01", location: { label: "ถนนสายหลัก", latitude: 13.7563, longitude: 100.5018 }, predicted_class: "normal_flow", verification_state: "normal", sampling_interval_sec: 2, priority: "low", captured_at: new Date(Date.now() - 1400).toISOString(), online: true },
         { camera_id: "CAM_02", location: { label: "ทางขึ้นสะพาน", latitude: 13.7591, longitude: 100.5056 }, predicted_class: "normal_flow", verification_state: "normal", sampling_interval_sec: 2, priority: "low", captured_at: new Date(Date.now() - 2100).toISOString(), online: true }
-      ];
+      ]);
       state.alerts = [];
       state.metrics = { local_inference_count: 40, baseline_inference_count: 80, reduction_pct: 50 };
       state.updatedAt = new Date();
@@ -274,7 +293,7 @@
     const alertsOk = alerts.status === "fulfilled";
     const metricsOk = metrics.status === "fulfilled";
     state.connected = healthOk && (camerasOk || alertsOk || metricsOk);
-    if (camerasOk) state.cameras = records(cameras.value, ["cameras", "items", "data"]);
+    if (camerasOk) state.cameras = normalizeCameras(records(cameras.value, ["cameras", "items", "data"]));
     if (alertsOk) state.alerts = records(alerts.value, ["alerts", "events", "items", "data"]);
     if (metricsOk) state.metrics = metrics.value?.metrics || metrics.value;
     if (state.connected) state.updatedAt = new Date();
