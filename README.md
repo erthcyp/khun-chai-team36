@@ -34,6 +34,7 @@ flowchart TB
 
 - The adaptive loop (`decision_engine` → `frame_automation`) runs on Mac 1 only.
 - Pipeline 2 never blocks inference (bounded queue, drop stale previews).
+- Each sample → 1×4 softmax scores + camera metadata (location from `rsu/cameras.json`) sent as JSON.
 - Payload fields and endpoints: [docs/api-contract.md](docs/api-contract.md).
 
 ## Provenance

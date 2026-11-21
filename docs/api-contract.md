@@ -34,7 +34,25 @@ multipart: `file` (image/jpeg) + `meta` JSON `{camera_id, frame_id, video_timest
 ## Mac 2 read endpoints
 `GET /health` · `GET /api/v1/cameras` · `GET /api/v1/alerts` · `GET /api/v1/metrics` · `WS /ws` (optional push)
 
-## Open questions for 10:00 kickoff
-- confidence = top softmax score? (must match what the existing VLM code returns)
-- snapshot via HTTP multipart (above) or WebSocket?
+## Decisions (kickoff, 10:47)
+- **Transport: option A, JSON** (this file). Binary 16-byte vector is a stretch goal only.
+- **Scores:** `scores` = softmax(100 × cosine(image, APE class embedding)) per paper Eq. 5–6, in `score_order`; sums to 1.
+- **Confidence:** `confidence = max(scores)`. Thresholds (e.g. 0.60) refer to this value.
+- **Location comes from config, not the model:** RSU loads `rsu/cameras.json` and copies the camera's `location` into every message.
+- **Measure bytes:** TCC records the size of every semantic message and every JPEG so the dashboard can show real bandwidth vs raw frames.
+
+### `rsu/cameras.json` (example)
+```json
+[
+  {"camera_id": "CAM_01", "video": "assets/demo_clips/cam01.mp4",
+   "location": {"label": "Junction A", "latitude": null, "longitude": null}},
+  {"camera_id": "CAM_02", "video": "assets/demo_clips/cam02.mp4",
+   "location": {"label": "Junction B", "latitude": null, "longitude": null}}
+]
+```
+
+## Still open
+- Model: CLIP ViT-L-14 (best in paper) vs ViT-B-32 (faster) — decide after timing `predict()` on Mac 1
+- Prompt set: the paper's 120 APE prompts (30/class) — confirm file location
+- Snapshot via HTTP multipart (above) or WebSocket?
 - TCC port: 8000 conflicts with Docker on erthcyp's Mac → use 8010 if that Mac is Mac 2
