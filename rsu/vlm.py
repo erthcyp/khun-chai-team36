@@ -49,7 +49,8 @@ class ClipPredictor:
         prompts = parse_prompt_file(prompt_file)
         self.device = torch.device(device or choose_device())
         self.model, _, self.preprocess = open_clip.create_model_and_transforms(
-            MODEL_NAME, pretrained="openai", device=self.device
+            # OpenAI weights were trained with QuickGELU, not the GELU default.
+            MODEL_NAME, pretrained="openai", device=self.device, force_quick_gelu=True
         )
         self.model.eval()
         tokenizer = open_clip.get_tokenizer(MODEL_NAME)
