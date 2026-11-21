@@ -87,4 +87,8 @@ body.wall-open #wall-open{background:var(--surface);border-color:var(--border);c
 .camera-timing{display:block;color:var(--muted);font-size:11px;line-height:1.55}
 .camera-timing:empty{display:none}
 
-.camera-preview.accident-unseen{outline:3px solid var(--danger);outline-offset:-3px}
+.camera-preview.accident-unseen{
+  outline:4px solid #ef4444;
+  outline-offset:1px;
+  box-shadow:0 0 0 7px rgba(239,68,68,.24);
+}
