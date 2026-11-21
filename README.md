@@ -118,6 +118,11 @@ Paths containing spaces should be enclosed in straight quotes.
 
 - `--video PATH`: repeat this option to select up to six different clips. Each
   path becomes one stream in the supplied order; the stream count is inferred.
+- `--loop`: restart every clip at its own EOF and keep running until Q/Esc,
+  window close, or Ctrl-C. The longest clip also replays. An explicit
+  `--max-frames` still stops after that many predictions per stream. Continuous
+  replay uses local stream mode and cannot be combined with `--no-realtime` or
+  `--openai-review`.
 - `--preview`: play the video in an OpenCV window while VLM inference runs in a
   worker. Press Q, Esc, or close the window to stop; an in-flight prediction
   finishes before exit. A separate header shows the latest class, score, AI frame
@@ -174,14 +179,37 @@ python -m rsu.main \
 ```
 
 All paths are checked before loading the VLM. Each clip uses its own FPS,
-dimensions, playback position, and EOF state. A finished clip stops producing
+dimensions, playback position, and EOF state. Without `--loop`, a finished clip stops producing
 predictions while the others continue. Results and per-stream summaries include
 the source `video` path; preview headers show the filename. Summaries also report
 `source_exhausted`. A clip that ends before `--max-frames` does not keep the other
 streams running past their own frame limits. If `--streams` is supplied alongside
 multiple paths, it must match the path count.
 
-This prints up to 180 prediction records (30 per stream), followed by a summary
+To run all six demo clips continuously until stopped:
+
+```bash
+python -m rsu.main \
+  --video assets/for_demo/accident/accident.mp4 \
+  --video assets/for_demo/congestion/congestion.mp4 \
+  --video assets/for_demo/invalid_scene/invalid.mp4 \
+  --video assets/for_demo/normal/normal1.mp4 \
+  --video assets/for_demo/normal/normal2.mp4 \
+  --video assets/for_demo/normal/normal3.mp4 \
+  --preview --interval-sec 1 --loop
+```
+
+Each stream restarts independently without loading the model again. Frame IDs
+and sampling schedules continue across replays. `video_timestamp_sec` resets to
+the clip's start, while `playback_elapsed_sec` advances on its continuous
+frame/FPS timeline. Predictions include a zero-based `loop_index` (0 is the
+initial play), and the summary reports `replays` per stream. The preview labels
+the current and predicted loop indexes as `L0`, `L1`, etc., so delayed results
+from a previous replay remain identifiable. An unreadable/restart-failing clip
+raises an error rather than spinning forever. Without `--loop`, normal EOF
+handling described above is unchanged.
+
+With `--max-frames 30`, six streams print up to 180 prediction records (30 per stream), followed by a summary
 with separate statistics for every stream. Results are emitted as the shared
 model finishes each call, so outputs are staggered across each second. Omit
 `--preview` for terminal-only output; `--only-class` and `--output-dir` also work.
