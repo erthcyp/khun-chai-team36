@@ -10,6 +10,14 @@ import httpx
 LOG = logging.getLogger(__name__)
 
 
+def delivery_rejection(response: httpx.Response) -> bool:
+    try:
+        receipt = response.json()
+    except ValueError:
+        return False
+    return isinstance(receipt, dict) and receipt.get("accepted") is False
+
+
 class SemanticSender:
     def __init__(self, client: httpx.AsyncClient, queue_size: int = 32) -> None:
         if queue_size < 1:
@@ -18,6 +26,7 @@ class SemanticSender:
         self._queue: asyncio.Queue[bytes] = asyncio.Queue(maxsize=queue_size)
         self.delivered_bytes = 0
         self.failed_messages = 0
+        self.rejected_messages = 0
         self.last_rtt_ms: float | None = None
 
     def submit(self, payload: dict) -> bool:
@@ -54,7 +63,11 @@ class SemanticSender:
                 )
                 response.raise_for_status()
                 self.last_rtt_ms = (perf_counter() - started) * 1000
-                self.delivered_bytes += len(body)
+                if delivery_rejection(response):
+                    self.rejected_messages += 1
+                    LOG.warning("TCC rejected a semantic update")
+                else:
+                    self.delivered_bytes += len(body)
                 return
             except httpx.HTTPStatusError as exc:
                 status = exc.response.status_code

@@ -83,3 +83,6 @@ body.wall-open #wall-open{background:var(--surface);border-color:var(--border);c
 .detail-camera-card .camera-preview{height:auto;aspect-ratio:16/9}
 
 .summary-language-toggle{font-size:12px;white-space:nowrap}
+
+.camera-timing{display:block;color:var(--muted);font-size:11px;line-height:1.55}
+.camera-timing:empty{display:none}

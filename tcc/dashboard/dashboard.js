@@ -1,10 +1,12 @@
 (() => {
   "use strict";
 
-  const REFRESH_MS = 3000;
   const STALE_AFTER_MS = 12000;
   const CAMERA_IDS = Array.from({ length: 6 }, (_, index) => `CAM_0${index + 1}`);
   const params = new URLSearchParams(location.search);
+  const requestedInterval = Number(params.get("pollMs") || 1000);
+  const REFRESH_MS = Number.isFinite(requestedInterval)
+    ? Math.max(500, Math.min(60000, requestedInterval)) : 1000;
   const mockMode = params.get("mock") === "1";
   const apiBase = (params.get("api") || "").replace(/\/$/, "");
   const state = { cameras: [], alerts: [], metrics: null, connected: false, updatedAt: null, selectedCameraId: null };
@@ -13,7 +15,7 @@
   try { if (localStorage.getItem("roadsense-summary-language") === "en") summaryLanguage = "en"; } catch (_) {}
   const classNames = {
     normal_flow: "จราจรปกติ",
-    congestion: "การจราจรติดขัด",
+    congestion: "จราจรติดขัด",
     accident: "อุบัติเหตุ",
     invalid_scene: "กล้องขัดข้อง"
   };
@@ -122,7 +124,7 @@
     return CAMERA_IDS.map((cameraId) => byId.get(cameraId) || { camera_id: cameraId, placeholder: true });
   }
   async function json(path) {
-    const response = await fetch(`${apiBase}${path}`, { cache: "no-store", headers: { Accept: "application/json" } });
+    const response = await fetch(`${apiBase}${path}`, { cache: "no-store", signal: AbortSignal.timeout(5000), headers: { Accept: "application/json" } });
     if (!response.ok) throw new Error(`${path}: ${response.status}`);
     return response.json();
   }
@@ -143,21 +145,25 @@
     $("theme-toggle").addEventListener("click", () => setTheme(document.body.dataset.theme === "dark" ? "light" : "dark"));
   }
 
-  function makeCamera(camera, variant = "") {
+  function makeCamera(camera, variant = "", previousImage = null) {
     const cameraId = String(camera.camera_id || camera.id || "กล้องไม่ทราบรหัส");
     const waiting = Boolean(camera.placeholder);
     const status = cameraState(camera);
     const online = isOnline(camera);
-    const className = normalizeClass(prediction(camera));
-    const isAlert = status === "alert" || className === "accident";
-    const isInvalid = !waiting && (status === "invalid" || className === "invalid_scene" || !online);
+    const picture = camera.snapshot;
+    const latestClass = normalizeClass(prediction(camera));
+    const className = picture ? normalizeClass(prediction(picture)) : latestClass;
+    const isAlert = Boolean(camera.alert);
+    const isInvalid = status === "invalid";
     const isVerify = status === "verifying" || status === "pending";
-    const trafficKind = waiting ? "waiting" : isInvalid ? "invalid_scene" : isAlert ? "accident" : className;
-    const trafficLabel = waiting ? "รอข้อมูล" : online ? thaiClass(trafficKind) : "กล้องออฟไลน์";
+    const trafficKind = waiting ? "waiting" : className;
+    const trafficLabel = waiting ? "รอข้อมูล" : thaiClass(trafficKind);
     const interval = number(camera.sampling_interval_sec);
     const timestamp = capturedAt(camera);
+    const imageTimestamp = picture?.captured_at || timestamp;
     const snapshot = first(camera, ["latest_snapshot_url", "snapshot_url", "preview_url", "image_url"]);
     const wrapper = document.createElement("article");
+    wrapper.dataset.cameraId = cameraId;
     wrapper.className = `camera-card ${variant} ${waiting ? "is-placeholder" : ""}`.trim();
 
     const head = document.createElement("div");
@@ -172,15 +178,17 @@
     loc.textContent = cameraLocation(camera);
     title.append(id, loc);
     const badge = document.createElement("span");
-    badge.className = `traffic-badge ${trafficKind} ${isVerify ? "verifying" : ""} ${!online ? "offline" : ""}`;
+    badge.className = `traffic-badge ${trafficKind}`;
     badge.innerHTML = `<span class="badge-dot"></span>${escapeHtml(trafficLabel)}`;
     head.append(title, badge);
 
     const preview = document.createElement("div");
     preview.className = "camera-preview";
     if (snapshot) {
-      const image = document.createElement("img");
-      image.src = new URL(String(snapshot), apiBase || location.origin).href;
+      const url = new URL(String(snapshot), apiBase || location.origin);
+      if (!picture && camera.frame_id) url.searchParams.set("frame", camera.frame_id);
+      const image = previousImage?.src === url.href ? previousImage : document.createElement("img");
+      if (image.src !== url.href) image.src = url.href;
       image.alt = `ภาพเฟรมล่าสุดจาก ${cameraId}`;
       image.loading = "lazy";
       image.onerror = () => {
@@ -196,7 +204,7 @@
     chip.textContent = snapshot ? "เฟรมล่าสุด" : "รอภาพจากกล้อง";
     const age = document.createElement("span");
     age.className = "snapshot-age";
-    age.textContent = ageLabel(timestamp);
+    age.textContent = ageLabel(imageTimestamp);
     preview.append(chip, age);
     if (variant === "wall-camera-card") {
       const open = document.createElement("button");
@@ -218,6 +226,36 @@
     const updated = document.createElement("span");
     updated.textContent = timestamp ? `อัปเดต ${thaiTime(timestamp)}` : "ยังไม่ได้รับข้อมูล";
     foot.append(stateLabel, updated);
+    const timing = document.createElement("div");
+    timing.className = "camera-timing";
+    const capture = picture || camera;
+    const inference = number(capture.inference_ms);
+    const playback = number(capture.video_timestamp_sec);
+    const captureToTcc = Date.parse(capture.received_at) - Date.parse(capture.captured_at);
+    const alertLevel = camera.alert?.level === "confirmed" ? "ยืนยันแล้ว"
+      : camera.alert?.level === "preliminary" ? "เบื้องต้น" : null;
+    const displayedFrame = picture?.frame_id || camera.frame_id;
+    timing.textContent = [
+      displayedFrame && `${displayedFrame} · เวลาเก็บเฟรม ${thaiTime(capture.captured_at)}`,
+      playback !== null && `เวลาบนคลิป ${playback.toFixed(2)} s`,
+      inference !== null && `เวลารันโมเดล ${inference.toFixed(0)} ms`,
+      Number.isFinite(captureToTcc) && captureToTcc >= 0 && `เก็บเฟรมถึง TCC ${captureToTcc} ms`,
+      picture?.image_received_at && `TCC รับภาพ ${thaiTime(picture.image_received_at)}`,
+      !waiting && !online && `สถานะล่าสุดก่อนออฟไลน์: ${stateNames[status] || status}`,
+      alertLevel && `แจ้งเตือนล่าสุด ${alertLevel}`,
+    ].filter(Boolean).join(" · ");
+    const latest = document.createElement("div");
+    latest.className = "camera-timing";
+    const latestLabel = summaryLanguage === "en"
+      ? ({normal_flow: "Normal flow", congestion: "Congestion", accident: "Accident",
+          invalid_scene: "Invalid scene"}[latestClass] || latestClass)
+      : thaiClass(latestClass);
+    latest.lang = summaryLanguage;
+    if (!waiting) {
+      const label = summaryLanguage === "en" ? "Latest prediction" : "ผลทำนายล่าสุด";
+      const pending = summaryLanguage === "en" ? "waiting for image" : "รอภาพของเฟรมนี้";
+      latest.textContent = `${label}: ${latestLabel} · ${camera.frame_id || "—"}${camera.snapshot_pending ? ` · ${pending}` : ""}`;
+    }
     const coords = camera.location || {};
     const lat = number(coords.latitude), lon = number(coords.longitude);
     const coordinateLine = document.createElement("div");
@@ -245,13 +283,25 @@
       ? (camera.meaning_pending ? "กำลังรอสรุปจาก TCC" : "ยังไม่มีคำอธิบายสำหรับกล้องนี้")
       : (camera.meaning_pending ? "Waiting for the TCC summary" : "No English summary yet"));
     description.append(descriptionHeading, descriptionText);
-    wrapper.append(head, preview, intervalLabel, foot, coordinateLine, description);
+    const meaning = camera.meaning;
+    if (meaning?.source_frame_id || meaning?.generated_at) {
+      const provenance = document.createElement("small");
+      provenance.className = "camera-timing";
+      provenance.textContent = `สรุปจาก ${meaning.source_frame_id || "—"} · เก็บเฟรม ${thaiTime(meaning.source_captured_at)} · สร้างสรุป ${thaiTime(meaning.generated_at)}`;
+      description.append(provenance);
+    }
+    wrapper.append(head, preview, intervalLabel, foot, coordinateLine, timing, latest, description);
     return wrapper;
   }
 
   function renderCameraWall(cameras, receivedCount) {
     const root = $("wall-grid");
-    root.replaceChildren(...cameras.map((camera) => makeCamera(camera, "wall-camera-card")));
+    const previousImages = new Map([...root.children].map((card) => [
+      card.dataset.cameraId, card.querySelector(".camera-preview img"),
+    ]));
+    root.replaceChildren(...cameras.map((camera) =>
+      makeCamera(camera, "wall-camera-card", previousImages.get(camera.camera_id))
+    ));
     $("wall-count").textContent = `${receivedCount} จาก 6 กล้องที่มีข้อมูล`;
   }
 
@@ -279,7 +329,9 @@
     const camera = cameras.find((item) => item.camera_id === state.selectedCameraId);
     if (!camera) return;
     $("camera-detail-title").textContent = camera.camera_id.replace("_", " ");
-    $("camera-detail-content").replaceChildren(makeCamera(camera, "detail-camera-card"));
+    const content = $("camera-detail-content");
+    const image = content.querySelector(".camera-preview img");
+    content.replaceChildren(makeCamera(camera, "detail-camera-card", image));
   }
 
   function renderAlerts() {
@@ -413,7 +465,13 @@
   });
   if (mockMode) $("mock-ribbon").hidden = false;
   render();
-  poll();
-  setInterval(poll, REFRESH_MS);
+  async function pollNext() {
+    try {
+      await poll();
+    } finally {
+      if (!mockMode) setTimeout(pollNext, REFRESH_MS);
+    }
+  }
+  pollNext();
   setInterval(() => { $("clock").textContent = new Date().toLocaleTimeString("th-TH", { hour: "2-digit", minute: "2-digit", second: "2-digit", timeZone: "Asia/Bangkok" }); }, 1000);
 })();

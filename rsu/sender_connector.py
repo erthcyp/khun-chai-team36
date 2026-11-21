@@ -6,6 +6,8 @@ import logging
 from pathlib import Path
 from queue import Empty, Full, Queue
 from threading import Event, Thread
+from time import time_ns
+from uuid import uuid4
 
 import cv2
 import httpx
@@ -75,6 +77,7 @@ class SenderConnector:
                 or url.query or url.fragment or url.userinfo:
             raise ValueError("TCC URL must be an HTTP(S) origin")
         self._url = url
+        self._run_id = f"{time_ns():020d}-{uuid4().hex}"
         self._locations = locations
         self._transport = transport
         self._queue: Queue[tuple[dict, np.ndarray]] = Queue(maxsize=8)
@@ -144,6 +147,7 @@ class SenderConnector:
                     payload = {field: record[field] for field in (*FRAME_FIELDS, *RESULT_FIELDS)}
                     payload.update(
                         schema_version="1.0",
+                        run_id=self._run_id,
                         message_type="semantic_update",
                         predicted_class=record["prediction"],
                         sampling_interval_sec=record["next_sampling_interval_sec"],
@@ -159,7 +163,7 @@ class SenderConnector:
                         continue
                     if jpeg:
                         metadata = {field: payload[field] for field in (
-                            "camera_id", "frame_id", "video_timestamp_sec", "event_id",
+                            "camera_id", "frame_id", "run_id", "captured_at", "video_timestamp_sec", "event_id",
                         )}
                         frames.submit(jpeg, metadata)
                 try:

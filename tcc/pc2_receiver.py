@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+from collections import OrderedDict
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
 import json
@@ -22,6 +23,18 @@ CLASS_ORDER = ["normal_flow", "congestion", "accident", "invalid_scene"]
 CAMERA_ID = re.compile(r"^CAM_0[1-6]$")
 MAX_SEMANTIC_BYTES = 64 * 1024
 MAX_JPEG_BYTES = 4 * 1024 * 1024
+MATCH_BUFFER_SIZE = 8
+SNAPSHOT_HISTORY_SIZE = 4
+RUN_ID = re.compile(r"[0-9]{20}-[a-f0-9]{32}")
+
+
+def checked_run_id(payload: dict) -> str:
+    value = payload.get("run_id")
+    if value is None:
+        return ""
+    if not isinstance(value, str) or not RUN_ID.fullmatch(value):
+        raise HTTPException(422, "invalid run_id")
+    return value
 
 
 def frame_number(camera_id: str, frame_id: str) -> int:
@@ -47,12 +60,25 @@ def captured_time(value: object) -> datetime:
         raise HTTPException(422, "captured_at must be an ISO timestamp with timezone") from exc
 
 
+def snapshot_matches(metadata: dict, prediction: dict) -> bool:
+    timestamp = metadata.get("captured_at")
+    event_id = metadata.get("event_id")
+    return (not timestamp or captured_time(timestamp) == captured_time(prediction["captured_at"])) and (
+        not event_id or event_id == prediction.get("event_id")
+    )
+
+
 class ReceiverState:
     def __init__(self) -> None:
         self.lock = asyncio.Lock()
         self.cameras: dict[str, dict] = {}
         self.last_captured: dict[str, datetime] = {}
-        self.snapshots: dict[str, tuple[int, bytes]] = {}
+        self.runs: dict[str, str] = {}
+        self.sequences: dict[str, int] = {}
+        self.snapshots: dict[str, tuple[tuple[str, int], bytes, dict]] = {}
+        self.snapshot_history: dict[str, OrderedDict[str, bytes]] = {}
+        self.predictions: dict[str, OrderedDict] = {}
+        self.pending_images: dict[str, OrderedDict] = {}
         self.alerts: dict[str, dict] = {}
         self.semantic_count = 0
         self.semantic_bytes = 0
@@ -62,6 +88,48 @@ class ReceiverState:
         self.meaning_updates: dict[str, tuple] = {}
         self.meaning_tasks: dict[str, asyncio.Task] = {}
         self.subscribers: set[WebSocket] = set()
+
+    @staticmethod
+    def remember(buffer: OrderedDict, key: tuple, value: object) -> None:
+        buffer[key] = value
+        buffer.move_to_end(key)
+        if len(buffer) > MATCH_BUFFER_SIZE:
+            buffer.popitem(last=False)
+
+    def publish_snapshot(self, camera_id: str, key: tuple[str, int]) -> None:
+        predictions = self.predictions.get(camera_id, {})
+        images = self.pending_images.get(camera_id, {})
+        if key not in predictions or key not in images:
+            return
+        jpeg, metadata = images.pop(key)
+        prediction = predictions[key]
+        previous = self.snapshots.get(camera_id)
+        if previous and key <= previous[0]:
+            return
+        if not snapshot_matches(metadata, prediction):
+            return
+        version = f"{key[0] or 'legacy'}-{prediction['frame_id']}"
+        info = {
+            field: prediction.get(field) for field in (
+                "frame_id", "captured_at", "predicted_class", "confidence",
+                "verification_state", "alert", "video_timestamp_sec", "inference_ms", "received_at",
+            )
+        }
+        info.update(run_id=key[0] or None, version=version, image_received_at=metadata["received_at"])
+        history = self.snapshot_history.setdefault(camera_id, OrderedDict())
+        history[version] = jpeg
+        if len(history) > SNAPSHOT_HISTORY_SIZE:
+            history.popitem(last=False)
+        self.snapshots[camera_id] = (key, jpeg, info)
+
+    def attach_snapshot(self, camera_id: str) -> None:
+        camera = self.cameras[camera_id]
+        snapshot = self.snapshots.get(camera_id)
+        if snapshot:
+            info = snapshot[2]
+            camera["snapshot"] = info
+            camera["latest_snapshot_url"] = f"/api/v1/snapshots/{camera_id}?v={info['version']}"
+        camera["snapshot_pending"] = not snapshot or snapshot[2]["frame_id"] != camera["frame_id"]
 
     async def broadcast(self, message: dict) -> None:
         for subscriber in tuple(self.subscribers):
@@ -73,7 +141,7 @@ class ReceiverState:
     def update_meaning(self, camera_id: str, payload: dict) -> None:
         alert = payload.get("alert")
         signature = (
-            payload["predicted_class"], payload.get("verification_state"),
+            payload.get("run_id"), payload["predicted_class"], payload.get("verification_state"),
             alert.get("level") if isinstance(alert, dict) else None,
             payload.get("event_id") or None,
         )
@@ -96,6 +164,9 @@ class ReceiverState:
             camera = self.cameras[camera_id]
             camera.pop("meaning_pending", None)
             if summary is not None:
+                summary = {**summary, "run_id": payload.get("run_id"),
+                           "source_frame_id": payload["frame_id"],
+                           "source_captured_at": payload["captured_at"]}
                 camera["meaning"] = summary
                 if camera_id in self.alerts:
                     self.alerts[camera_id]["meaning"] = summary
@@ -150,7 +221,8 @@ async def receive_semantic(request: Request) -> dict:
     frame_id = payload.get("frame_id")
     if not isinstance(frame_id, str):
         raise HTTPException(422, "frame_id is required")
-    frame_number(camera_id, frame_id)
+    sequence = frame_number(camera_id, frame_id)
+    run = checked_run_id(payload)
     if payload.get("schema_version") != "1.0" or payload.get("message_type") != "semantic_update":
         raise HTTPException(422, "unsupported semantic schema or message type")
     if payload.get("score_order") != CLASS_ORDER or payload.get("predicted_class") not in CLASS_ORDER:
@@ -163,22 +235,40 @@ async def receive_semantic(request: Request) -> dict:
     timestamp = captured_time(payload.get("captured_at"))
     receiver: ReceiverState = request.app.state.receiver
     async with receiver.lock:
+        previous_run = receiver.runs.get(camera_id)
+        if previous_run is not None and run < previous_run:
+            return {"accepted": False, "reason": "previous_run", "camera_id": camera_id}
+        same_run = previous_run == run
+        if same_run and (sequence <= receiver.sequences[camera_id]
+                         or timestamp < receiver.last_captured[camera_id]):
+            return {"accepted": False, "reason": "stale", "camera_id": camera_id}
         receiver.semantic_count += 1
         receiver.semantic_bytes += len(body)
-        if timestamp < receiver.last_captured.get(camera_id, datetime.min.replace(tzinfo=timezone.utc)):
-            return {"accepted": False, "reason": "stale", "camera_id": camera_id}
+        if not same_run:
+            receiver.snapshots.pop(camera_id, None)
+            receiver.snapshot_history.pop(camera_id, None)
+            receiver.predictions.pop(camera_id, None)
+            images = receiver.pending_images.get(camera_id, {})
+            receiver.pending_images[camera_id] = OrderedDict(
+                (key, value) for key, value in images.items() if key[0] >= run
+            )
+        receiver.runs[camera_id] = run
+        receiver.sequences[camera_id] = sequence
         receiver.last_captured[camera_id] = timestamp
-        previous_camera = receiver.cameras.get(camera_id, {})
+        previous_camera = receiver.cameras.get(camera_id, {}) if same_run else {}
         camera = dict(payload)
-        for field in ("meaning", "meaning_pending"):
+        for field in ("meaning", "meaning_pending", "snapshot", "latest_snapshot_url", "snapshot_pending"):
             camera.pop(field, None)
+        for field in ("meaning", "meaning_pending"):
             if field in previous_camera:
                 camera[field] = previous_camera[field]
         camera["online"] = True
         camera["received_at"] = datetime.now(timezone.utc).isoformat()
-        if camera_id in receiver.snapshots:
-            camera["latest_snapshot_url"] = f"/api/v1/snapshots/{camera_id}"
         receiver.cameras[camera_id] = camera
+        key = (run, sequence)
+        receiver.remember(receiver.predictions.setdefault(camera_id, OrderedDict()), key, dict(camera))
+        receiver.publish_snapshot(camera_id, key)
+        receiver.attach_snapshot(camera_id)
         alert = payload.get("alert")
         if isinstance(alert, dict):
             receiver.alerts[camera_id] = {
@@ -188,9 +278,7 @@ async def receive_semantic(request: Request) -> dict:
         elif alert is None:
             receiver.alerts.pop(camera_id, None)
         receiver.update_meaning(camera_id, payload)
-        if camera.get("meaning_pending"):
-            camera.pop("meaning", None)
-        elif camera_id in receiver.alerts and "meaning" in camera:
+        if not camera.get("meaning_pending") and camera_id in receiver.alerts and "meaning" in camera:
             receiver.alerts[camera_id]["meaning"] = camera["meaning"]
     await receiver.broadcast({"type": "semantic", "data": camera})
     return {"accepted": True, "camera_id": camera_id, "frame_id": frame_id}
@@ -209,6 +297,9 @@ async def receive_snapshot(request: Request, meta: str = Form(...), file: Upload
     if not isinstance(frame_id, str):
         raise HTTPException(422, "frame_id is required")
     sequence = frame_number(camera_id, frame_id)
+    run = checked_run_id(metadata)
+    if run or metadata.get("captured_at") is not None:
+        captured_time(metadata.get("captured_at"))
     if file.content_type != "image/jpeg":
         raise HTTPException(415, "snapshot must be image/jpeg")
     jpeg = await file.read(MAX_JPEG_BYTES + 1)
@@ -218,27 +309,41 @@ async def receive_snapshot(request: Request, meta: str = Form(...), file: Upload
         raise HTTPException(422, "invalid JPEG data")
     receiver: ReceiverState = request.app.state.receiver
     async with receiver.lock:
+        current_run = receiver.runs.get(camera_id)
+        if current_run is not None and run < current_run:
+            return {"accepted": False, "reason": "previous_run", "camera_id": camera_id}
+        key = (run, sequence)
+        previous = receiver.snapshots.get(camera_id)
+        images = receiver.pending_images.setdefault(camera_id, OrderedDict())
+        if (previous and key <= previous[0]) or key in images:
+            return {"accepted": False, "reason": "stale", "camera_id": camera_id}
+        prediction = receiver.predictions.get(camera_id, {}).get(key)
+        if prediction and not snapshot_matches(metadata, prediction):
+            return {"accepted": False, "reason": "capture_mismatch", "camera_id": camera_id}
         receiver.snapshot_count += 1
         receiver.jpeg_bytes += len(jpeg)
-        previous = receiver.snapshots.get(camera_id)
-        if previous and sequence < previous[0]:
-            return {"accepted": False, "reason": "stale", "camera_id": camera_id}
-        receiver.snapshots[camera_id] = (sequence, jpeg)
-        if camera_id in receiver.cameras:
-            receiver.cameras[camera_id]["latest_snapshot_url"] = f"/api/v1/snapshots/{camera_id}"
+        received_at = datetime.now(timezone.utc).isoformat()
+        receiver.remember(images, key, (jpeg, {**metadata, "received_at": received_at}))
+        if current_run == run:
+            receiver.publish_snapshot(camera_id, key)
+            receiver.attach_snapshot(camera_id)
     await receiver.meaning.on_snapshot(metadata, jpeg)
     return {"accepted": True, "camera_id": camera_id, "frame_id": frame_id}
 
 
 @app.get("/api/v1/snapshots/{camera_id}")
-async def get_snapshot(request: Request, camera_id: str) -> Response:
+async def get_snapshot(request: Request, camera_id: str, v: str | None = None) -> Response:
     checked_camera_id(camera_id)
     receiver: ReceiverState = request.app.state.receiver
     async with receiver.lock:
         snapshot = receiver.snapshots.get(camera_id)
-    if snapshot is None:
+        if v is not None:
+            image = receiver.snapshot_history.get(camera_id, {}).get(v)
+        else:
+            image = snapshot[1] if snapshot else None
+    if image is None:
         raise HTTPException(404, "no snapshot for camera")
-    return Response(snapshot[1], media_type="image/jpeg", headers={"Cache-Control": "no-store"})
+    return Response(image, media_type="image/jpeg", headers={"Cache-Control": "no-store"})
 
 
 @app.get("/api/v1/cameras")

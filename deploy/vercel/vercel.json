@@ -1,6 +1,28 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": null,
-  "buildCommand": null,
-  "outputDirectory": "public"
+  "buildCommand": "mkdir -p dashboard-dist && cp ../../tcc/dashboard/index.html ../../tcc/dashboard/dashboard.js ../../tcc/dashboard/styles.css dashboard-dist/",
+  "outputDirectory": "dashboard-dist",
+  "rewrites": [
+    {
+      "source": "/health",
+      "destination": "https://treated-accordance-mls-til.trycloudflare.com/health"
+    },
+    {
+      "source": "/api/v1/cameras",
+      "destination": "https://treated-accordance-mls-til.trycloudflare.com/api/v1/cameras"
+    },
+    {
+      "source": "/api/v1/alerts",
+      "destination": "https://treated-accordance-mls-til.trycloudflare.com/api/v1/alerts"
+    },
+    {
+      "source": "/api/v1/metrics",
+      "destination": "https://treated-accordance-mls-til.trycloudflare.com/api/v1/metrics"
+    },
+    {
+      "source": "/api/v1/snapshots/:cameraId",
+      "destination": "https://treated-accordance-mls-til.trycloudflare.com/api/v1/snapshots/:cameraId"
+    }
+  ]
 }

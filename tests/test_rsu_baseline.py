@@ -108,3 +108,38 @@ class TransportTests(unittest.IsolatedAsyncioTestCase):
         self.assertIn(b"new-preview", request.content)
         self.assertNotIn(b"old-preview", request.content)
         self.assertEqual(sender.delivered_jpeg_bytes, len(b"new-preview"))
+
+    async def test_sender_rejections_and_per_camera_preview_slots(self):
+        previews = []
+
+        async def handle(request):
+            if request.url.path == "/api/v1/semantic":
+                return httpx.Response(200, json={"accepted": False, "reason": "previous_run"})
+            body = await request.aread()
+            previews.append(body)
+            return httpx.Response(200, json={"accepted": b"cam-two" in body})
+
+        async with httpx.AsyncClient(base_url="http://tcc.test",
+                                    transport=httpx.MockTransport(handle)) as client:
+            semantic = SemanticSender(client)
+            frames = FrameSender(client, queue_size=2)
+            semantic.submit({"camera_id": "CAM_01"})
+            frames.submit(b"old", {"camera_id": "CAM_01"})
+            frames.submit(b"cam-two", {"camera_id": "CAM_02"})
+            frames.submit(b"new", {"camera_id": "CAM_01"})
+            workers = [asyncio.create_task(sender.run()) for sender in (semantic, frames)]
+            try:
+                await asyncio.wait_for(asyncio.gather(semantic.drain(), frames.drain()), timeout=2)
+            finally:
+                for worker in workers:
+                    worker.cancel()
+                await asyncio.gather(*workers, return_exceptions=True)
+
+        self.assertEqual(semantic.rejected_messages, 1)
+        self.assertEqual(semantic.delivered_bytes, 0)
+        self.assertEqual(frames.rejected_previews, 1)
+        self.assertEqual(frames.delivered_jpeg_bytes, len(b"cam-two"))
+        self.assertEqual(frames.dropped_previews, 1)
+        self.assertEqual(len(previews), 2)
+        self.assertIn(b"new", previews[0])
+        self.assertIn(b"cam-two", previews[1])
