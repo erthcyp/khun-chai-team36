@@ -15,6 +15,8 @@ from .frame_sender import FrameSender
 from .semantic_sender import SemanticSender
 
 LOG = logging.getLogger(__name__)
+# The TCC dashboard and receiver expose six network camera slots.
+TCC_CAMERA_IDS = tuple(f"CAM_{index:02d}" for index in range(1, 7))
 FRAME_FIELDS = ("camera_id", "frame_id", "video_timestamp_sec", "captured_at")
 RESULT_FIELDS = ("scores", "score_order", "confidence", "inference_ms",
                  "verification_state", "priority", "alert", "event_id")

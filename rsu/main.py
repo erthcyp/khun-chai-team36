@@ -26,7 +26,7 @@ import numpy as np
 
 from .decision_engine import CLASS_ORDER, Decision, DecisionConfig, DecisionEngine
 from .frame_automation import CAMERA_IDS, DEFAULT_INTERVAL_SEC, FrameSampler
-from .sender_connector import SenderConnector, load_locations
+from .sender_connector import TCC_CAMERA_IDS, SenderConnector, load_locations
 from .vision_review import DEFAULT_MODEL, Evidence, OpenAIFrameReviewer, ROI, TemporalReview, Verdict
 
 
@@ -111,6 +111,8 @@ def make_parser() -> argparse.ArgumentParser:
                         help="Override automatic model device selection")
     parser.add_argument("--preview", action="store_true",
                         help="Play the video in an OpenCV window while predicting in a worker")
+    parser.add_argument("--loop", action="store_true",
+                        help="Replay every clip continuously until quit/Ctrl-C or --max-frames")
     return parser
 
 
@@ -341,6 +343,7 @@ def letterbox_frame(frame: np.ndarray, size: tuple[int, int]) -> np.ndarray:
 def preview_image(
     frame: np.ndarray, video_sec: float, camera_id: str, latest: dict | None,
     *, size: tuple[int, int] = (960, 540), source_name: str | None = None,
+    loop_index: int | None = None,
 ) -> np.ndarray:
     """Place status above the full, aspect-preserving image, never over footage."""
     width, _ = size
@@ -352,6 +355,8 @@ def preview_image(
     if source_name:
         name = source_name if len(source_name) <= 20 else source_name[:17] + "..."
         lines[0] = f"{camera_id} | {name} | {video_sec:.1f}s"
+    if loop_index is not None:
+        lines[0] += f" L{loop_index}"
     if latest is None:
         lines += ["Waiting for first prediction..."]
     else:
@@ -360,6 +365,9 @@ def preview_image(
         lines += [f"Latest result: {latest['prediction']}{score_text}",
                   f"AI frame: {latest['video_timestamp_sec']:.2f}s | "
                   f"inference: {latest['prediction_wall_ms']:.1f}ms"]
+        if loop_index is not None:
+            lines[-1] = (f"AI: {latest['video_timestamp_sec']:.2f}s L{latest['loop_index']} | "
+                         f"{latest['prediction_wall_ms']:.1f}ms")
     for index, line in enumerate(lines):
         cv2.putText(header, line, (6 if compact else 12, (18 + index * 21) if compact else (24 + index * 27)),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.39 if compact else 0.55,
@@ -487,6 +495,8 @@ class StreamJob:
     queued_at: float
     decode_ms: float
     interval_sec: float
+    loop_index: int
+    playback_elapsed_sec: float
 
 
 @dataclass
@@ -496,8 +506,10 @@ class LocalStream:
     fps: float
     stats: Throughput
     source: Path
-    interval_sec: float
+    interval_sec: float = DEFAULT_INTERVAL_SEC
     frame_index: int = -1
+    clip_frame_index: int = -1
+    loop_index: int = 0
     frame: np.ndarray | None = None
     video_sec: float = 0.0
     captured_at: str = ""
@@ -514,6 +526,30 @@ class LocalStream:
     cancelled: int = 0
     printed: int = 0
     saved: int = 0
+
+
+def grab_stream_frame(stream: LocalStream, looping: bool) -> bool:
+    """Advance one real frame, rewinding at EOF without resetting the run clock."""
+    if stream.capture.grab():
+        stream.frame_index += 1
+        stream.clip_frame_index += 1
+        return True
+    if not looping:
+        stream.eof = True
+        return False
+    if stream.clip_frame_index < 0:
+        raise RuntimeError(f"No decodable frames to replay: {stream.source}")
+    rewound = stream.capture.set(cv2.CAP_PROP_POS_FRAMES, 0)
+    if not rewound or not stream.capture.grab():
+        # Some backends cannot seek. Reopen once, and fail explicitly if unreadable.
+        stream.capture.release()
+        stream.capture = cv2.VideoCapture(str(stream.source))
+        if not stream.capture.isOpened() or not stream.capture.grab():
+            raise RuntimeError(f"Could not restart video: {stream.source}")
+    stream.loop_index += 1
+    stream.frame_index += 1
+    stream.clip_frame_index = 0
+    return True
 
 
 def run_streams(args: argparse.Namespace, predictor: Predictor, *, emit=emit_json,
@@ -583,6 +619,7 @@ def run_streams(args: argparse.Namespace, predictor: Predictor, *, emit=emit_jso
                         "type": "prediction", "stream_id": stream.stream_id,
                         "video": str(stream.source),
                         "frame_id": job.frame_id, "video_timestamp_sec": job.video_sec,
+                        "loop_index": job.loop_index, "playback_elapsed_sec": job.playback_elapsed_sec,
                         "captured_at": job.captured_at, "sampling_interval_sec": job.interval_sec,
                         "output_at": datetime.now(timezone.utc).isoformat(),
                         "prediction_wall_ms": prediction_ms, "frame_processing_ms": processing_ms,
@@ -611,7 +648,10 @@ def run_streams(args: argparse.Namespace, predictor: Predictor, *, emit=emit_jso
         for index, source in enumerate(sources):
             capture = cv2.VideoCapture(str(source))
             fps = capture.get(cv2.CAP_PROP_FPS)
-            stream_id = CAMERA_IDS[index] if connector is not None else f"STREAM_{index + 1:02d}"
+            if connector is None:
+                stream_id = f"STREAM_{index + 1:02d}"
+            else:
+                stream_id = tcc_camera_ids(args, len(sources))[index]
             streams.append(LocalStream(stream_id, capture, fps, Throughput(interval_sec),
                                        source, interval_sec))
             if not capture.isOpened() or not math.isfinite(fps) or fps <= 0:
@@ -643,10 +683,8 @@ def run_streams(args: argparse.Namespace, predictor: Predictor, *, emit=emit_jso
                 target = max(0, int(elapsed * stream.fps))
                 changed = False
                 while stream.frame_index < target:
-                    if not stream.capture.grab():
-                        stream.eof = True
+                    if not grab_stream_frame(stream, args.loop):
                         break
-                    stream.frame_index += 1
                     changed = True
                 if changed and not stream.eof:
                     ok, frame = stream.capture.retrieve()
@@ -655,7 +693,7 @@ def run_streams(args: argparse.Namespace, predictor: Predictor, *, emit=emit_jso
                     stream.frame = frame
                     timestamp = stream.capture.get(cv2.CAP_PROP_POS_MSEC) / 1000
                     stream.video_sec = timestamp if math.isfinite(timestamp) and timestamp > 0 \
-                        else stream.frame_index / stream.fps
+                        else stream.clip_frame_index / stream.fps
                     stream.captured_at = datetime.now(timezone.utc).isoformat()
                     stream.captured_clock = time.monotonic()
                     stream.decode_ms = (stream.captured_clock - decoded_at) * 1000
@@ -672,7 +710,7 @@ def run_streams(args: argparse.Namespace, predictor: Predictor, *, emit=emit_jso
                         stream.pending = StreamJob(
                             stream.frame, f"{stream.stream_id}-{stream.sequence:06d}", stream.video_sec,
                             stream.captured_at, stream.captured_clock, time.monotonic(), stream.decode_ms,
-                            stream.interval_sec,
+                            stream.interval_sec, stream.loop_index, stream.frame_index / stream.fps,
                         )
                         stream.last_sample_index = stream.frame_index
                         condition.notify()
@@ -686,7 +724,8 @@ def run_streams(args: argparse.Namespace, predictor: Predictor, *, emit=emit_jso
                 signature = tuple(item["frame_id"] if item else None for item in latest)
                 if all(s.frame is not None for s in streams) and (advanced or signature != last_displayed):
                     panels = [preview_image(s.frame, s.video_sec, s.stream_id, item, size=(320, 180),
-                                            source_name=s.source.name)
+                                            source_name=s.source.name,
+                                            loop_index=s.loop_index if args.loop else None)
                               for s, item in zip(streams, latest)]
                     columns = min(3, len(panels))
                     while len(panels) % columns:
@@ -737,10 +776,12 @@ def run_streams(args: argparse.Namespace, predictor: Predictor, *, emit=emit_jso
             "mode": "tcc_multistream_realtime" if connector else "local_multistream_realtime", "video": str(args.video),
             "videos": [str(source) for source in sources],
             "streams": len(sources), "model_instances": 1, "preview": args.preview,
+            "loop": args.loop,
             "predictions": sum(s.stats.count for s in streams),
             "per_stream": [{
                 "stream_id": s.stream_id, "video": str(s.source), **s.stats.summary(),
                 "source_exhausted": s.eof,
+                "replays": s.loop_index,
                 "printed_predictions": s.printed, "saved_images": s.saved,
                 "replaced_pending_samples": s.dropped, "cancelled_pending_samples": s.cancelled,
             } for s in streams],
@@ -753,6 +794,12 @@ def run_streams(args: argparse.Namespace, predictor: Predictor, *, emit=emit_jso
     return summary
 
 
+def tcc_camera_ids(args: argparse.Namespace, count: int) -> tuple[str, ...]:
+    if count == 1:
+        return (args.camera_id,)
+    return TCC_CAMERA_IDS[:count]
+
+
 def main(argv: list[str] | None = None) -> None:
     parser = make_parser()
     args = parser.parse_args(argv)
@@ -762,12 +809,12 @@ def main(argv: list[str] | None = None) -> None:
         parser.error(str(exc))
     if args.preview and args.no_realtime:
         parser.error("--preview cannot be combined with --no-realtime")
-    if len(sources) > 1 and args.no_realtime:
-        parser.error("multiple streams require real-time mode")
-    if args.tcc_url and len(sources) > len(CAMERA_IDS):
-        parser.error(f"--tcc-url supports up to {len(CAMERA_IDS)} cameras")
+    if (len(sources) > 1 or args.loop) and args.no_realtime:
+        parser.error("multiple streams and continuous replay require real-time mode")
     reviewer = None
     if args.openai_review:
+        if args.loop:
+            parser.error("--openai-review is not supported with continuous replay")
         if len(sources) > 1:
             parser.error("--openai-review requires a single stream")
         api_key = os.environ.get("OPENAI_API_KEY")
@@ -781,7 +828,7 @@ def main(argv: list[str] | None = None) -> None:
     try:
         connector = None
         if args.tcc_url:
-            camera_ids = CAMERA_IDS[:len(sources)] if len(sources) > 1 else (args.camera_id,)
+            camera_ids = tcc_camera_ids(args, len(sources))
             connector = SenderConnector(args.tcc_url, load_locations(args.camera_config, camera_ids))
         # Validate every source before loading a large model or downloading weights.
         for source in dict.fromkeys(sources):
@@ -797,7 +844,7 @@ def main(argv: list[str] | None = None) -> None:
         print(f"VLM ready: device={predictor.device}, load_ms={load_ms:.1f}. Starting predictions.",
               file=sys.stderr, flush=True)
         with connector if connector is not None else nullcontext():
-            if len(sources) > 1:
+            if len(sources) > 1 or args.loop:
                 run_streams(args, predictor, connector=connector)
             elif args.preview:
                 run_preview(args, predictor, reviewer=reviewer, connector=connector)

@@ -3,7 +3,7 @@
 The predictor doubles below exist only in unit tests; the CLI always uses CLIP.
 """
 
-from contextlib import redirect_stderr
+from contextlib import redirect_stderr, redirect_stdout
 import io
 import json
 from pathlib import Path
@@ -18,8 +18,9 @@ from unittest.mock import patch
 import cv2
 import numpy as np
 
-from rsu.main import (Throughput, letterbox_frame, main, make_parser, preview_image,
-                      run_predictions, run_preview, run_streams, source_paths)
+from rsu.main import (LocalStream, Throughput, grab_stream_frame, letterbox_frame,
+                      main, make_parser, preview_image, run_predictions, run_preview,
+                      run_streams, source_paths)
 from rsu.vision_review import Verdict
 
 
@@ -361,7 +362,7 @@ class RunnerTests(unittest.TestCase):
         self.assertEqual(sum(s["saved_images"] for s in summary["per_stream"]), 1)
 
     def test_multistream_preview_remains_responsive_and_quits(self):
-        args = make_parser().parse_args(["--video", str(self.video), "--streams", "2", "--preview"])
+        args = make_parser().parse_args(["--video", str(self.video), "--streams", "2", "--preview", "--loop"])
         entered = threading.Event()
         release = threading.Event()
         polls = []
@@ -512,6 +513,89 @@ class RunnerTests(unittest.TestCase):
         with redirect_stderr(io.StringIO()), self.assertRaises(SystemExit):
             make_parser().parse_args([value for index in range(7)
                                       for value in ("--video", f"{index}.mp4")])
+
+    def make_replay_clip(self, name, values):
+        path = Path(self.temp.name) / name
+        writer = cv2.VideoWriter(str(path), cv2.VideoWriter_fourcc(*"MJPG"), 10, (64, 48))
+        self.assertTrue(writer.isOpened())
+        for value in values:
+            writer.write(np.full((48, 64, 3), value, dtype=np.uint8))
+        writer.release()
+        return path
+
+    def test_replay_reads_actual_beginning_again_without_resetting_global_position(self):
+        path = self.make_replay_clip("replay-sequence.avi", [30, 70, 110])
+        stream = LocalStream("STREAM_01", cv2.VideoCapture(str(path)), 10, Throughput(1), path)
+        try:
+            for index in range(10):
+                self.assertTrue(grab_stream_frame(stream, True))
+                ok, frame = stream.capture.retrieve()
+                self.assertTrue(ok)
+                self.assertAlmostEqual(float(frame.mean()), [30, 70, 110][index % 3], delta=2)
+                self.assertEqual(stream.frame_index, index)
+                self.assertEqual(stream.clip_frame_index, index % 3)
+                self.assertEqual(stream.loop_index, index // 3)
+                self.assertFalse(stream.eof)
+        finally:
+            stream.capture.release()
+
+    def test_continuous_streams_keep_unique_ids_and_playback_time_across_replays(self):
+        short = self.make_replay_clip("replay-short.avi", [40])
+        longer = self.make_replay_clip("replay-longer.avi", [30, 70, 110])
+        args = make_parser().parse_args(["--video", str(short), "--video", str(longer),
+                                         "--loop", "--interval-sec", "0.05", "--max-frames", "5"])
+        records = []
+        summary = run_streams(args, PredictorDouble(Clock()), emit=records.append)
+        predictions = records[:-1]
+        self.assertEqual(summary["status"], "completed")
+        self.assertEqual(summary["predictions"], 10)
+        self.assertTrue(summary["loop"])
+        self.assertEqual(len({row["frame_id"] for row in predictions}), 10)
+        for stream_id in ("STREAM_01", "STREAM_02"):
+            rows = [row for row in predictions if row["stream_id"] == stream_id]
+            self.assertEqual(len(rows), 5)
+            self.assertGreater(rows[-1]["loop_index"], 0)
+            times = [row["playback_elapsed_sec"] for row in rows]
+            self.assertEqual(times, sorted(times))
+            self.assertEqual(rows[0]["loop_index"], 0)
+        self.assertTrue(all(row["video_timestamp_sec"] < 0.3 for row in predictions))
+        self.assertTrue(all(not item["source_exhausted"] for item in summary["per_stream"]))
+
+    def test_replay_reopens_capture_when_backend_cannot_seek(self):
+        path = self.make_replay_clip("replay-no-seek.avi", [50])
+        args = make_parser().parse_args(["--video", str(path), "--streams", "2", "--loop",
+                                         "--interval-sec", "0.05", "--max-frames", "3"])
+        with patch.object(cv2.VideoCapture, "set", return_value=False):
+            summary = run_streams(args, PredictorDouble(Clock()), emit=lambda row: None)
+        self.assertEqual(summary["predictions"], 6)
+        self.assertTrue(all(item["replays"] >= 2 for item in summary["per_stream"]))
+
+    def test_empty_replay_source_fails_instead_of_spinning(self):
+        args = make_parser().parse_args(["--video", str(self.video), "--streams", "2", "--loop"])
+        records = []
+        with patch.object(cv2.VideoCapture, "grab", return_value=False):
+            with self.assertRaisesRegex(RuntimeError, "No decodable frames"):
+                run_streams(args, PredictorDouble(Clock()), emit=records.append)
+        self.assertEqual(records[-1]["status"], "failed")
+
+    def test_loop_rejects_offline_and_review_before_model_loading(self):
+        for extra in (("--no-realtime",), ("--openai-review",)):
+            with self.subTest(extra=extra), redirect_stderr(io.StringIO()), self.assertRaises(SystemExit):
+                main(["--video", str(self.video), "--loop", *extra])
+
+    def test_single_video_loop_cli_reuses_one_model_across_replays(self):
+        path = self.make_replay_clip("single-loop-cli.avi", [50])
+        predictor = PredictorDouble(Clock())
+        predictor.device = "cpu"
+        output = io.StringIO()
+        with patch("rsu.vlm.ClipPredictor", return_value=predictor) as factory, \
+                redirect_stdout(output), redirect_stderr(io.StringIO()):
+            main(["--video", str(path), "--loop", "--interval-sec", "0.05", "--max-frames", "2"])
+        rows = [json.loads(line) for line in output.getvalue().splitlines()]
+        factory.assert_called_once()
+        self.assertEqual(rows[-1]["predictions"], 2)
+        self.assertTrue(rows[-1]["loop"])
+        self.assertGreater(rows[-2]["loop_index"], 0)
 
 
 class ThroughputTests(unittest.TestCase):

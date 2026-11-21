@@ -1,6 +1,6 @@
 # RoadSense TCC dashboard
 
-Responsive Thai-language TCC dashboard inspired by the supplied control-room reference. CAM_01–CAM_06 are available through the center camera selector; the selected camera becomes the primary feed, while another available camera appears alongside it. The primary camera card contains a natural-language explanation supplied by the RSU, or a waiting state until one arrives. Alerts stay in a right column on wide layouts. “แสดงกล้องทั้งหมด” replaces the main layout with an in-page 6-camera wall; it does not request browser fullscreen. The page also shows a measured adaptive-versus-fixed model-call comparison. The theme toggle switches between dark and light palettes and remembers the selection in the browser.
+Responsive Thai-language TCC dashboard inspired by the supplied control-room reference. CAM_01–CAM_06 are available through the center camera selector; the selected camera becomes the primary feed, while another available camera appears alongside it. Every camera card contains its own natural-language explanation from the TCC meaning processor, or a waiting state until one arrives. Alerts stay in a right column on wide layouts. “แสดงกล้องทั้งหมด” replaces the main layout with an in-page 6-camera wall; it does not request browser fullscreen. The page also shows a measured adaptive-versus-fixed model-call comparison. The theme toggle switches between dark and light palettes and remembers the selection in the browser.
 
 ## Run
 
@@ -12,6 +12,8 @@ python3 -m uvicorn tcc.pc2_receiver:app --host 0.0.0.0 --port 8010
 ```
 
 Open `http://localhost:8010/dashboard/` on Mac 2. Set the RSU sender's `TCC_URL` to `http://<Mac-2-LAN-IP>:8010`. The receiver accepts semantic JSON and JPEG snapshots on the endpoints in `docs/api-contract.md`, keeps the latest state per camera in memory, and serves the dashboard from the same origin. Restarting it clears the in-memory data.
+
+The receiver uses `tcc/meaning_process.py`: it publishes camera state immediately and attaches a `meaning` object with `summary_th`, `summary_en`, `suggested_action`, `source`, `model`, and `generated_at` when the asynchronous result arrives. Set `roadsense_meaning` (or `OPENAI_API_KEY`) in the receiver process to enable image-backed OpenAI summaries. Without a key or matching JPEG, the meaning processor returns its labeled local fallback. Each camera card displays the summary and lets the operator switch between Thai and English.
 
 For frontend-only preview, from the repository root:
 
@@ -32,7 +34,7 @@ The receiver must allow the dashboard origin through CORS when the static site a
 - `GET /api/v1/alerts`
 - `GET /api/v1/metrics`
 
-Camera records for `CAM_01` through `CAM_06` are discovered from `GET /api/v1/cameras` and rendered as they appear; the dashboard polls every three seconds, sorts them by camera number, and de-duplicates repeated IDs. No missing cameras are fabricated. If offline cameras should remain visible, the receiver must return their registry records with an offline state. Records may include `latest_snapshot_url`, `snapshot_url`, `preview_url`, or `image_url` for the newest sampled JPEG. If none is present, the card shows a road-scene placeholder. Camera location labels come from the receiver payload; coordinates are shown when supplied.
+The layout always shows CAM_01 through CAM_06 as empty camera slots. Real records from `GET /api/v1/cameras` replace their matching slots by `camera_id`; the dashboard polls every three seconds, sorts them by camera number, and de-duplicates repeated IDs. Empty slots say "รอข้อมูล" and do not invent classifications, metrics, or descriptions. Records may include `latest_snapshot_url`, `snapshot_url`, `preview_url`, or `image_url` for the newest sampled JPEG. If none is present, the card shows a road-scene placeholder. Camera location labels come from the receiver payload; coordinates are shown when supplied.
 
 ## Mock preview
 

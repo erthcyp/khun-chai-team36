@@ -30,7 +30,7 @@ class TestPredictor:
 
 class SenderConnectorTests(unittest.TestCase):
     def test_video_runners_send_contract_payload_and_jpeg(self):
-        for streams in (1, 2):
+        for streams in (1, 2, 6):
             with self.subTest(streams=streams), tempfile.TemporaryDirectory() as directory:
                 self.check_delivery(Path(directory), streams)
 
@@ -45,7 +45,7 @@ class SenderConnectorTests(unittest.TestCase):
             self.assertTrue(writer.isOpened())
             try:
                 for _ in range(8):
-                    writer.write(np.full((48, 64, 3), 40 + index * 170, dtype=np.uint8))
+                    writer.write(np.full((48, 64, 3), 40 if index == 0 else 210, dtype=np.uint8))
             finally:
                 writer.release()
             videos.extend(["--video", str(path)])
