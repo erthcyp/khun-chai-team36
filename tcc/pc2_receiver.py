@@ -10,7 +10,7 @@ import math
 from pathlib import Path
 import re
 
-from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile
+from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
@@ -61,6 +61,14 @@ class ReceiverState:
         self.meaning = MeaningProcessor()
         self.meaning_updates: dict[str, tuple] = {}
         self.meaning_tasks: dict[str, asyncio.Task] = {}
+        self.subscribers: set[WebSocket] = set()
+
+    async def broadcast(self, message: dict) -> None:
+        for subscriber in tuple(self.subscribers):
+            try:
+                await asyncio.wait_for(subscriber.send_json(message), timeout=0.2)
+            except (RuntimeError, WebSocketDisconnect, asyncio.TimeoutError):
+                self.subscribers.discard(subscriber)
 
     def update_meaning(self, camera_id: str, payload: dict) -> None:
         alert = payload.get("alert")
@@ -91,6 +99,8 @@ class ReceiverState:
                 camera["meaning"] = summary
                 if camera_id in self.alerts:
                     self.alerts[camera_id]["meaning"] = summary
+        if summary is not None:
+            await self.broadcast({"type": "meaning", "data": {"camera_id": camera_id, **summary}})
 
 
 @asynccontextmanager
@@ -182,6 +192,7 @@ async def receive_semantic(request: Request) -> dict:
             camera.pop("meaning", None)
         elif camera_id in receiver.alerts and "meaning" in camera:
             receiver.alerts[camera_id]["meaning"] = camera["meaning"]
+    await receiver.broadcast({"type": "semantic", "data": camera})
     return {"accepted": True, "camera_id": camera_id, "frame_id": frame_id}
 
 
@@ -257,3 +268,17 @@ async def get_metrics(request: Request) -> dict:
                 "semantic_bytes": receiver.semantic_bytes,
                 "received_snapshot_count": receiver.snapshot_count,
                 "jpeg_bytes": receiver.jpeg_bytes}
+
+
+@app.websocket("/ws")
+async def websocket_updates(websocket: WebSocket) -> None:
+    await websocket.accept()
+    receiver: ReceiverState = websocket.app.state.receiver
+    receiver.subscribers.add(websocket)
+    try:
+        while True:
+            await websocket.receive_text()
+    except WebSocketDisconnect:
+        pass
+    finally:
+        receiver.subscribers.discard(websocket)
