@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#101517" />
+    <meta name="description" content="RoadSense traffic control center dashboard" />
+    <title>RoadSense · Traffic Control Center</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./styles.css" />
+    <script defer src="./dashboard.js"></script>
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="Main navigation">
+        <a class="brand" href="#overview" aria-label="RoadSense overview">
+          <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></span>
+          <span class="brand-word">road<span>sense</span></span>
+        </a>
+        <div class="site-picker">
+          <span class="site-icon" aria-hidden="true">⌖</span>
+          <span><small>CONTROL CENTER</small><strong>Bangkok · North</strong></span>
+          <span class="chevron" aria-hidden="true">⌄</span>
+        </div>
+        <div class="nav-caption">WORKSPACE</div>
+        <nav class="nav-list">
+          <a class="nav-item active" href="#overview"><span class="nav-icon">▦</span>Overview<span class="nav-indicator"></span></a>
+          <a class="nav-item" href="#camera-grid"><span class="nav-icon">▣</span>Cameras<span class="nav-count" id="nav-camera-count">—</span></a>
+          <a class="nav-item" href="#alerts"><span class="nav-icon">♧</span>Incidents<span class="nav-count alert-count" id="nav-alert-count">0</span></a>
+          <a class="nav-item" href="#performance"><span class="nav-icon">⌁</span>Performance</a>
+        </nav>
+        <div class="sidebar-bottom">
+          <div class="link-state"><span class="link-dot" id="sidebar-link-dot"></span><span><small>RSU CONNECTION</small><strong id="sidebar-link-label">Connecting…</strong></span></div>
+          <div class="sidebar-foot"><span class="mini-mark">RS</span><span>RoadSense <small>EDGE MONITORING · v0.1</small></span></div>
+        </div>
+      </aside>
+
+      <main class="main-content" id="overview">
+        <header class="topbar">
+          <div class="breadcrumbs"><span>Workspace</span><b>/</b><strong>Overview</strong></div>
+          <div class="topbar-right">
+            <div class="live-pill"><span class="pulse-dot" id="live-dot"></span><span id="connection-label">Connecting to TCC</span></div>
+            <div class="clock" id="clock">--:--:--</div>
+            <span class="timezone">ICT</span>
+            <button class="icon-button" id="refresh-button" type="button" aria-label="Refresh dashboard" title="Refresh now">↻</button>
+            <div class="operator"><span class="operator-avatar">OC</span><span>Operator Console<small>TRAFFIC OPERATIONS</small></span></div>
+          </div>
+        </header>
+
+        <section class="page-heading">
+          <div><div class="eyebrow"><span class="eyebrow-line"></span>TRAFFIC OPERATIONS</div><h1>Network overview</h1><p class="subheading">Live situation across monitored road corridors.</p></div>
+          <div class="heading-meta"><span class="date-chip"><span class="calendar-icon">▦</span><span id="today-label">—</span></span><span class="sync-label">Updated <b id="last-updated">—</b></span></div>
+        </section>
+
+        <section class="summary-strip" aria-label="Network summary">
+          <article class="summary-card"><div class="summary-label">ACTIVE CAMERAS <span class="summary-icon teal">▣</span></div><div class="summary-value"><strong id="metric-active">—</strong><span id="metric-total">/ — online</span></div><div class="summary-foot"><span class="status-dot green"></span><span id="metric-active-note">Waiting for camera data</span></div></article>
+          <article class="summary-card"><div class="summary-label">OPEN INCIDENTS <span class="summary-icon amber">♧</span></div><div class="summary-value"><strong id="metric-incidents">—</strong><span>requiring attention</span></div><div class="summary-foot"><span class="status-dot amber-dot"></span><span id="metric-incident-note">No active incident data</span></div></article>
+          <article class="summary-card"><div class="summary-label">AI CALLS SAVED <span class="summary-icon blue">⌁</span></div><div class="summary-value"><strong id="metric-saved">—</strong><span id="metric-saved-unit">vs. fixed 1s sampling</span></div><div class="summary-foot"><span class="metric-source" id="metric-source">Awaiting measured metrics</span></div></article>
+          <article class="summary-card"><div class="summary-label">NETWORK STATUS <span class="summary-icon green">⌁</span></div><div class="summary-value network-value"><strong id="metric-network">Checking</strong></div><div class="summary-foot"><span class="status-dot green" id="network-dot"></span><span id="network-detail">Connecting to TCC receiver</span></div></article>
+        </section>
+
+        <div class="section-row camera-section-heading" id="camera-grid">
+          <div><div class="section-title-wrap"><span class="section-accent"></span><h2>Camera monitoring</h2><span class="section-chip" id="camera-section-count">0 FEEDS</span></div><p class="section-caption">Prioritized by current operational state</p></div>
+          <div class="section-actions"><span class="sort-label"><span class="sort-icon">☷</span> Priority: highest first</span><button class="filter-button" type="button" aria-label="Current camera filter">All cameras <span>⌄</span></button></div>
+        </div>
+        <section class="camera-grid" id="camera-list" aria-live="polite" aria-label="Camera feeds">
+          <div class="empty-state"><span class="empty-spinner"></span><strong>Connecting to camera network</strong><span>Camera state will appear here when the TCC receiver is online.</span></div>
+        </section>
+
+        <div class="lower-grid">
+          <section class="panel alert-panel" id="alerts">
+            <div class="panel-heading"><div><div class="section-title-wrap"><span class="section-accent amber-accent"></span><h2>Incident timeline</h2><span class="section-chip" id="alert-section-count">0 EVENTS</span></div><p class="section-caption">Recent camera alerts and state changes</p></div><a class="text-action" href="#alerts">View all <span>→</span></a></div>
+            <div class="alert-list" id="alert-list"><div class="empty-inline">No alert data received yet.</div></div>
+          </section>
+
+          <section class="panel assistant-panel">
+            <div class="panel-heading"><div><div class="assistant-heading"><span class="assistant-symbol">✳</span><h2>Traffic assistant</h2><span class="ai-tag">AI</span></div><p class="section-caption">Situation summary from validated camera data</p></div><span class="assistant-state" id="summary-state">WAITING</span></div>
+            <div class="assistant-body" id="summary-body"><div class="assistant-orb">✳</div><p>Situation summaries will appear when the TCC assistant is connected.</p></div>
+            <div class="assistant-footer"><span id="summary-time">No summary generated</span><span class="summary-source">TCC ASSISTANT</span></div>
+          </section>
+        </div>
+
+        <section class="panel performance-panel" id="performance">
+          <div class="panel-heading"><div><div class="section-title-wrap"><span class="section-accent blue-accent"></span><h2>System performance</h2><span class="section-chip">LIVE METRICS</span></div><p class="section-caption">Measured processing and communication activity</p></div><span class="metric-updated" id="metrics-updated">No metrics received</span></div>
+          <div class="performance-grid">
+            <div class="performance-item"><span>Local inference calls</span><strong id="metric-inference-count">—</strong><small>Actual VLM samples processed</small></div>
+            <div class="performance-item"><span>Fixed-rate baseline</span><strong id="metric-baseline-count">—</strong><small>Expected calls at 1s sampling</small></div>
+            <div class="performance-item"><span>Event detection delay</span><strong id="metric-delay">—</strong><small>Measured from event onset</small></div>
+            <div class="performance-item"><span>OpenAI calls</span><strong id="metric-openai-count">—</strong><small>Vision verification · assistant</small></div>
+            <div class="performance-item"><span>Data transmitted</span><strong id="metric-data-bytes">—</strong><small>Semantic JSON + JPEG snapshots</small></div>
+          </div>
+        </section>
+
+        <footer class="page-footer"><span>RoadSense <b>·</b> Edge AI traffic monitoring</span><span>Classification at the roadside. Decisions stay with the operator.</span></footer>
+      </main>
+    </div>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  </body>
+</html>
