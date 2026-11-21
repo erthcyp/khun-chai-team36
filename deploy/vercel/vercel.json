@@ -6,23 +6,23 @@
   "rewrites": [
     {
       "source": "/health",
-      "destination": "https://treated-accordance-mls-til.trycloudflare.com/health"
+      "destination": "https://remark-separate-bookmark-integrity.trycloudflare.com/health"
     },
     {
       "source": "/api/v1/cameras",
-      "destination": "https://treated-accordance-mls-til.trycloudflare.com/api/v1/cameras"
+      "destination": "https://remark-separate-bookmark-integrity.trycloudflare.com/api/v1/cameras"
     },
     {
       "source": "/api/v1/alerts",
-      "destination": "https://treated-accordance-mls-til.trycloudflare.com/api/v1/alerts"
+      "destination": "https://remark-separate-bookmark-integrity.trycloudflare.com/api/v1/alerts"
     },
     {
       "source": "/api/v1/metrics",
-      "destination": "https://treated-accordance-mls-til.trycloudflare.com/api/v1/metrics"
+      "destination": "https://remark-separate-bookmark-integrity.trycloudflare.com/api/v1/metrics"
     },
     {
       "source": "/api/v1/snapshots/:cameraId",
-      "destination": "https://treated-accordance-mls-til.trycloudflare.com/api/v1/snapshots/:cameraId"
+      "destination": "https://remark-separate-bookmark-integrity.trycloudflare.com/api/v1/snapshots/:cameraId"
     }
   ]
 }
