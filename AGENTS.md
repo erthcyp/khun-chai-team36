@@ -3,6 +3,7 @@
 Codex reads this file automatically. Sub-folders have their own AGENTS.md; the closest one wins.
 
 ## Project
+- **Team:** khun-chai (TEAM36), 4 members
 - **What:** RSU-edge traffic-state inference with VLMs → 16-byte semantic vector → Traffic Control Center (TCC) → OpenAI agent that drafts an incident response plan → live dashboard.
 - **Based on:** our paper "Adaptive Prompt Ensemble for VLM-Based Traffic State Inference in RSU Semantic Communication Systems" (APE + CPV). The hackathon adds the TCC response agent (paper's future work) and the product demo.
 - **Tracks:** Deep Domain AI (ITS / traffic) + Autonomous & Adaptive AI (CPV self-checks uncertain predictions; agent escalates to humans when unsure).

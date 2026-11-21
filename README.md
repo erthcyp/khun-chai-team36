@@ -1,6 +1,7 @@
 # TODO: Product name — Semantic Traffic Intelligence at the Roadside
 
 > Sea x OpenAI Regional Codex Hackathon (Thailand) — 21 Nov 2026
+> Team: **khun-chai (TEAM36)**
 > Tracks: Deep Domain AI · Autonomous & Adaptive AI
 
 ## Problem
@@ -23,7 +24,7 @@ Real VLMs at the RSU: `make install-clip`, put images in `data/samples/`, `make 
 ## Docs
 - [Architecture](docs/architecture.md) · [Contracts](docs/api.md) · [Pitch](docs/pitch.md) · [Codex log](docs/codex-log.md)
 
-## Team
+## Team — khun-chai (TEAM36)
 | Name | Role |
 |---|---|
 | Bhuchi Kumprakob | TODO |
