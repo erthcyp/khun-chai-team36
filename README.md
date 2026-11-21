@@ -100,6 +100,53 @@ Run the frame extraction tests, including generated-video decoding and real-time
 python -m unittest discover -s tests -v
 ```
 
+### Video → VLM predictions and throughput
+
+Choose any local video path with `--video`:
+
+```bash
+source .venv/bin/activate
+python -m rsu.main --video assets/demo_clips/video48.mp4 --interval-sec 1 --max-frames 30
+```
+
+The runner loads the existing VLM and K30 prompts once, then prints one JSON line
+per prediction and a final `summary` JSON line. Startup messages go to stderr;
+model loading is excluded from the prediction timings. The first inference is
+included, so a short run may show a cold-start effect. Remove `--max-frames` to
+process until the clip ends. Ctrl-C also prints a summary of completed predictions.
+Paths containing spaces should be enclosed in straight quotes.
+
+- `--no-realtime`: remove playback waits to measure processing capacity at the
+  same video sampling interval. This mode does not simulate live playback.
+- `--output-dir assets/frames`: also save sampled JPEGs. Disk writes count toward
+  frame processing time; this inspection option has no automatic cleanup.
+- `--only-class invalid_scene`: print/save only matching predictions. Every
+  sampled frame is still classified and included in throughput statistics.
+- `--camera-id CAM_02`: override the default `CAM_01` identifier.
+- `--device mps`: explicitly select the Apple GPU; otherwise selection is automatic.
+
+Example for inspecting invalid scenes:
+
+```bash
+python -m rsu.main --video assets/demo_clips/video48.mp4 \
+  --only-class invalid_scene --output-dir assets/frames/invalid_scene
+```
+
+In the summary, `observed_output_fps` measures completed prediction cadence
+across all processed frames using `(N - 1) / (last output time - first output time)`.
+It is `null` until at least two predictions complete. `model_call_rate_fps`
+excludes decoding, sampling waits and image saving and is not end-to-end FPS.
+`frame_processing_overruns` counts frames whose decoding + prediction + optional
+JPEG writing exceeded the configured interval; sampling waits are excluded.
+The p95 latency uses at most the most recent 1,000 predictions. Saving images or
+slow terminal/file output can reduce the observed output rate.
+
+This runner uses a fixed sampling interval for benchmarking. It does not yet
+start adaptive decisions, a video preview, or the network senders. It reuses the
+sampler's stale-frame skipping in real-time mode, so slow inference can skip
+sections of the video instead of building a backlog. No AI-call reduction or
+classification-accuracy claims are inferred from this throughput test.
+
 ## Team — khun-chai (TEAM36)
 | Name | GitHub | Role |
 |---|---|---|
