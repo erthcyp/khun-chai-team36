@@ -18,7 +18,8 @@ from unittest.mock import patch
 import cv2
 import numpy as np
 
-from rsu.main import Throughput, main, make_parser, preview_image, run_predictions, run_preview
+from rsu.main import (Throughput, letterbox_frame, main, make_parser, preview_image,
+                      run_predictions, run_preview, run_streams)
 
 
 class Clock:
@@ -274,8 +275,138 @@ class RunnerTests(unittest.TestCase):
             "prediction": "normal_flow", "confidence": 0.8,
             "video_timestamp_sec": 1, "prediction_wall_ms": 100,
         })
-        self.assertEqual(image.shape, (540, 960, 3))
+        self.assertEqual(image.shape, (634, 960, 3))
+        self.assertTrue(np.all(image[94:] == 50))  # Text is outside the complete video image.
         self.assertTrue(np.all(original == 50))
+
+    def test_letterbox_preserves_portrait_and_ultrawide_frames(self):
+        for height, width in ((200, 100), (100, 400)):
+            with self.subTest(height=height, width=width):
+                frame = np.full((height, width, 3), 60, dtype=np.uint8)
+                frame[:10] = (0, 0, 255)
+                frame[-10:] = (255, 0, 0)
+                result = letterbox_frame(frame, (320, 180))
+                scale = min(320 / width, 180 / height)
+                expected_width, expected_height = round(width * scale), round(height * scale)
+                left, top = (320 - expected_width) // 2, (180 - expected_height) // 2
+                content = result[top:top + expected_height, left:left + expected_width]
+                self.assertEqual(result.shape, (180, 320, 3))
+                self.assertTrue(np.all(content[0] == (0, 0, 255)))
+                self.assertTrue(np.all(content[-1] == (255, 0, 0)))
+                # Non-black bounding box retains source aspect ratio within rounding.
+                rows, cols = np.nonzero(np.any(result != 0, axis=2))
+                self.assertEqual(cols.max() - cols.min() + 1, expected_width)
+                self.assertEqual(rows.max() - rows.min() + 1, expected_height)
+
+    def test_multistream_emits_each_result_and_uses_one_predictor(self):
+        args = make_parser().parse_args(["--video", str(self.video), "--streams", "6",
+                                         "--max-frames", "2", "--interval-sec", "0.05"])
+        predictor = PredictorDouble(Clock())
+        records = []
+        summary = run_streams(args, predictor, emit=records.append)
+        predictions = [r for r in records if r["type"] == "prediction"]
+        self.assertEqual(predictor.frames_seen, 12)
+        self.assertEqual(len(predictions), 12)
+        self.assertEqual(summary["model_instances"], 1)
+        self.assertEqual(summary["predictions"], 12)
+        self.assertEqual(len({r["frame_id"] for r in predictions}), 12)
+        self.assertEqual({r["stream_id"] for r in predictions},
+                         {f"STREAM_{index:02d}" for index in range(1, 7)})
+        self.assertTrue(all(s["predictions"] == 2 for s in summary["per_stream"]))
+        self.assertTrue(all("queue_wait_ms" in r for r in predictions))
+        self.assertTrue(all("camera_id" not in r for r in predictions))
+        self.assertEqual(records[-1]["type"], "summary")
+
+    def test_multistream_filters_output_but_counts_all_inferences(self):
+        output = Path(self.temp.name) / "multi-filter"
+        args = make_parser().parse_args(["--video", str(self.video), "--streams", "2", "--max-frames", "1",
+                                         "--only-class", "invalid_scene", "--output-dir", str(output)])
+        predictor = PredictorDouble(Clock(), labels=["normal_flow", "invalid_scene"])
+        records = []
+        summary = run_streams(args, predictor, emit=records.append)
+        predictions = records[:-1]
+        self.assertEqual(predictor.frames_seen, 2)
+        self.assertEqual(summary["predictions"], 2)
+        self.assertEqual(len(predictions), 1)
+        self.assertEqual(predictions[0]["prediction"], "invalid_scene")
+        self.assertTrue(Path(predictions[0]["image_path"]).is_file())
+        self.assertEqual(sum(s["saved_images"] for s in summary["per_stream"]), 1)
+
+    def test_multistream_preview_remains_responsive_and_quits(self):
+        args = make_parser().parse_args(["--video", str(self.video), "--streams", "2", "--preview"])
+        entered = threading.Event()
+        release = threading.Event()
+        polls = []
+        records = []
+
+        class WaitingPredictor:
+            def predict(self, frame):
+                entered.set()
+                if not release.wait(2):
+                    raise RuntimeError("GUI failed to poll during inference")
+                return {"prediction": "normal_flow"}
+
+        def quit_after_polling(delay):
+            if entered.is_set():
+                polls.append(threading.current_thread())
+                if len(polls) >= 3:
+                    release.set()
+                    return ord("q")
+            time.sleep(0.005)
+            return -1
+
+        with patch.object(cv2, "namedWindow"), patch.object(cv2, "resizeWindow"), \
+                patch.object(cv2, "imshow") as show, patch.object(cv2, "destroyWindow"), \
+                patch.object(cv2, "getWindowProperty", return_value=1), \
+                patch.object(cv2, "waitKey", side_effect=quit_after_polling):
+            summary = run_streams(args, WaitingPredictor(), emit=records.append)
+        self.assertEqual(summary["status"], "stopped")
+        self.assertTrue(all(t is threading.main_thread() for t in polls))
+        self.assertGreater(show.call_count, 0)
+        canvas = show.call_args.args[1]
+        self.assertEqual(canvas.shape, (252, 640, 3))
+        self.assertFalse(any(t.name == "roadsense-shared-vlm" for t in threading.enumerate()))
+
+    def test_multistream_replaces_stale_pending_frames_when_predictor_is_slow(self):
+        args = make_parser().parse_args(["--video", str(self.video), "--streams", "2",
+                                         "--max-frames", "3", "--interval-sec", "0.01"])
+
+        class SlowPredictor:
+            def predict(self, frame):
+                time.sleep(0.09)
+                return {"prediction": "normal_flow"}
+
+        summary = run_streams(args, SlowPredictor(), emit=lambda record: None)
+        self.assertEqual(summary["predictions"], 6)
+        self.assertGreater(sum(s["replaced_pending_samples"] for s in summary["per_stream"]), 0)
+
+    def test_multistream_worker_failure_is_reported(self):
+        args = make_parser().parse_args(["--video", str(self.video), "--streams", "2"])
+        records = []
+
+        class FailedPredictor:
+            def predict(self, frame):
+                raise RuntimeError("shared VLM failed")
+
+        with self.assertRaisesRegex(RuntimeError, "shared VLM failed"):
+            run_streams(args, FailedPredictor(), emit=records.append)
+        self.assertEqual(records[-1]["status"], "failed")
+        self.assertFalse(any(t.name == "roadsense-shared-vlm" for t in threading.enumerate()))
+
+    def test_multistream_rejects_offline_before_loading_model(self):
+        with redirect_stderr(io.StringIO()), self.assertRaises(SystemExit):
+            main(["--video", str(self.video), "--streams", "6", "--no-realtime"])
+
+    def test_multistream_eof_drains_pending_predictions(self):
+        short = Path(self.temp.name) / "one-frame.avi"
+        writer = cv2.VideoWriter(str(short), cv2.VideoWriter_fourcc(*"MJPG"), 30, (64, 48))
+        self.assertTrue(writer.isOpened())
+        writer.write(np.full((48, 64, 3), 50, dtype=np.uint8))
+        writer.release()
+        args = make_parser().parse_args(["--video", str(short), "--streams", "2"])
+        summary = run_streams(args, PredictorDouble(Clock()), emit=lambda record: None)
+        self.assertEqual(summary["status"], "completed")
+        self.assertEqual(summary["predictions"], 2)
 
 
 class ThroughputTests(unittest.TestCase):
