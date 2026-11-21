@@ -158,7 +158,6 @@
     const timestamp = capturedAt(camera);
     const snapshot = first(camera, ["latest_snapshot_url", "snapshot_url", "preview_url", "image_url"]);
     const wrapper = document.createElement("article");
-    wrapper.dataset.cameraId = cameraId;
     wrapper.className = `camera-card ${variant} ${waiting ? "is-placeholder" : ""}`.trim();
 
     const head = document.createElement("div");
@@ -240,25 +239,12 @@
       : meaningSource === "fallback" ? "ข้อความสำรอง"
       : meaningSource === "json+image" ? "AI + ภาพ" : explanation ? "จาก TCC" : "รอข้อมูล";
     descriptionHeading.append(heading, source);
-    const languages = document.createElement("div");
-    languages.className = "summary-languages";
-    languages.setAttribute("role", "group");
-    languages.setAttribute("aria-label", `ภาษาของสรุป ${cameraId}`);
-    for (const language of ["th", "en"]) {
-      const button = document.createElement("button");
-      button.type = "button";
-      button.dataset.summaryLanguage = language;
-      button.lang = language;
-      button.textContent = language === "th" ? "ไทย" : "English";
-      button.setAttribute("aria-pressed", String(summaryLanguage === language));
-      languages.append(button);
-    }
     const descriptionText = document.createElement("p");
     descriptionText.lang = summaryLanguage;
     descriptionText.textContent = explanation || (summaryLanguage === "th"
       ? (camera.meaning_pending ? "กำลังรอสรุปจาก TCC" : "ยังไม่มีคำอธิบายสำหรับกล้องนี้")
       : (camera.meaning_pending ? "Waiting for the TCC summary" : "No English summary yet"));
-    description.append(descriptionHeading, languages, descriptionText);
+    description.append(descriptionHeading, descriptionText);
     wrapper.append(head, preview, intervalLabel, foot, coordinateLine, description);
     return wrapper;
   }
@@ -279,17 +265,11 @@
     $("metric-context").textContent = received.length
       ? `${mockMode ? "รอบจำลอง" : "ข้อมูลจริง"} · ${received.length} กล้อง`
       : `${mockMode ? "รอบจำลอง" : "ข้อมูลจริง"} · รอข้อมูล`;
-    const active = document.activeElement;
-    const cameraId = active?.closest(".camera-card")?.dataset.cameraId;
-    const language = active?.dataset.summaryLanguage;
-    const wasDetail = $("camera-detail").contains(active);
+    const focusedCamera = document.activeElement?.dataset.openCamera;
     renderCameraWall(cameras, received.length);
     renderCameraDetail(cameras);
-    if (language && cameraId) {
-      const root = wasDetail ? $("camera-detail-content") : $("wall-grid");
-      root.querySelector(`[data-camera-id="${CSS.escape(cameraId)}"] [data-summary-language="${language}"]`)?.focus({ preventScroll: true });
-    } else if (active?.dataset.openCamera) {
-      $("wall-grid").querySelector(`[data-open-camera="${CSS.escape(active.dataset.openCamera)}"]`)?.focus({ preventScroll: true });
+    if (focusedCamera) {
+      $("wall-grid").querySelector(`[data-open-camera="${CSS.escape(focusedCamera)}"]`)?.focus({ preventScroll: true });
     }
   }
 
@@ -403,11 +383,20 @@
   }
 
   initTheme();
-  document.addEventListener("click", (event) => {
-    const button = event.target.closest("[data-summary-language]");
-    if (!button) return;
-    summaryLanguage = button.dataset.summaryLanguage;
+  const languageToggle = $("summary-language-toggle");
+  function updateLanguageToggle() {
+    const english = summaryLanguage === "en";
+    languageToggle.textContent = english ? "ไทย" : "English";
+    languageToggle.lang = english ? "th" : "en";
+    languageToggle.setAttribute("aria-label", english
+      ? "Switch event descriptions to Thai"
+      : "แสดงคำอธิบายเหตุการณ์เป็นภาษาอังกฤษ");
+  }
+  updateLanguageToggle();
+  languageToggle.addEventListener("click", () => {
+    summaryLanguage = summaryLanguage === "th" ? "en" : "th";
     try { localStorage.setItem("roadsense-summary-language", summaryLanguage); } catch (_) {}
+    updateLanguageToggle();
     renderCameras();
   });
   $("wall-grid").addEventListener("click", (event) => {
