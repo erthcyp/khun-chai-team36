@@ -2,13 +2,14 @@
 
 JSON Lines on stdout: one prediction per sampled frame, then a summary.
 Startup messages go to stderr. Use --preview for local OpenCV playback alongside
-inference. Network senders are not started. Sampling is fixed by default.
+inference. Use --tcc-url to send results with adaptive sampling.
 """
 
 from __future__ import annotations
 
 import argparse
 from collections import deque
+from contextlib import nullcontext
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 import json
@@ -23,8 +24,9 @@ from typing import Callable, Protocol
 import cv2
 import numpy as np
 
-from .decision_engine import CLASS_ORDER, DecisionConfig, DecisionEngine
+from .decision_engine import CLASS_ORDER, Decision, DecisionConfig, DecisionEngine
 from .frame_automation import CAMERA_IDS, DEFAULT_INTERVAL_SEC, FrameSampler
+from .sender_connector import SenderConnector, load_locations
 from .vision_review import DEFAULT_MODEL, Evidence, OpenAIFrameReviewer, ROI, TemporalReview, Verdict
 
 
@@ -88,6 +90,9 @@ def make_parser() -> argparse.ArgumentParser:
                         help="Camera identifier for single-stream runs")
     parser.add_argument("--interval-sec", type=positive_seconds,
                         help="Sampling interval (default: 1s fixed, 2s normal with vision review)")
+    parser.add_argument("--tcc-url", help="Send semantic updates and JPEGs to this TCC HTTP(S) origin")
+    parser.add_argument("--camera-config", type=Path, default=Path("rsu/cameras.json"),
+                        help="Camera locations for network delivery")
     parser.add_argument("--openai-review", action="store_true",
                         help="Send ambiguous cases to OpenAI using up to three timestamped frames")
     parser.add_argument("--review-roi", type=review_roi, metavar="X,Y,W,H",
@@ -189,6 +194,16 @@ class Throughput:
         }
 
 
+def decision_fields(decision: Decision) -> dict:
+    return {
+        "verification_state": decision.verification_state,
+        "next_sampling_interval_sec": decision.sampling_interval_sec,
+        "priority": decision.priority,
+        "alert": decision.alert,
+        "event_id": decision.event_id,
+    }
+
+
 def run_predictions(
     args: argparse.Namespace,
     predictor: Predictor,
@@ -200,17 +215,19 @@ def run_predictions(
     on_ready: Callable[[], None] | None = None,
     on_prediction: Callable[[dict], None] | None = None,
     reviewer: Callable[[Evidence], Verdict] | None = None,
+    connector: SenderConnector | None = None,
 ) -> dict:
     """Run one camera. Only the CLI constructs the real, cached model instance."""
-    interval = sampling_interval(args, reviewer is not None)
+    interval = sampling_interval(args, reviewer is not None or connector is not None)
     stats = Throughput(interval)
     engine = reviews = None
-    if reviewer is not None:
+    if reviewer is not None or connector is not None:
         engine = DecisionEngine(DecisionConfig(
             normal_interval_sec=interval,
             verify_interval_sec=min(DecisionConfig().verify_interval_sec, interval / 2),
             vision_review_margin=args.review_margin,
         ))
+    if reviewer is not None:
         reviews = TemporalReview(reviewer, clock=clock)
     status = "completed"
     printed = 0
@@ -241,19 +258,14 @@ def run_predictions(
                 prediction_started = clock()
                 prediction = predictor.predict(sample.frame_bgr)
                 prediction_ms = (clock() - prediction_started) * 1000
-                decision_fields = {}
-                if engine is not None and reviews is not None:
-                    scores = prediction["scores"]
-                    decision = engine.update(sample.camera_id, scores, defer_close_scores=True)
+                decision_data = {}
+                if engine is not None:
+                    decision = engine.update(sample.camera_id, prediction["scores"],
+                                             defer_close_scores=reviews is not None)
                     camera.set_interval(decision.sampling_interval_sec)
-                    decision_fields = {
-                        "verification_state": decision.verification_state,
-                        "next_sampling_interval_sec": decision.sampling_interval_sec,
-                        "priority": decision.priority,
-                        "alert": decision.alert,
-                        "event_id": decision.event_id,
-                        "review_status": reviews.observe(sample, decision.review_required),
-                    }
+                    decision_data = decision_fields(decision)
+                    if reviews is not None:
+                        decision_data["review_status"] = reviews.observe(sample, decision.review_required)
                 matches = args.only_class is None or prediction["prediction"] == args.only_class
                 image_path = None
                 if matches and args.output_dir:
@@ -270,7 +282,7 @@ def run_predictions(
                 record = {
                     **sample.metadata(),
                     **prediction,
-                    **decision_fields,
+                    **decision_data,
                     "type": "prediction",
                     "output_at": datetime.now(timezone.utc).isoformat(),
                     "prediction_wall_ms": prediction_ms,
@@ -279,6 +291,8 @@ def run_predictions(
                 }
                 if image_path is not None:
                     record["image_path"] = str(image_path)
+                if connector is not None:
+                    connector.submit(record, sample.frame_bgr)
                 if on_prediction:
                     on_prediction(record)
                 if matches:
@@ -305,7 +319,7 @@ def run_predictions(
             "first_video_timestamp_sec": first_video_sec,
             "last_video_timestamp_sec": last_video_sec,
         }
-        if reviews is not None:
+        if engine is not None:
             summary["adaptive_sampling"] = True
         emit(summary)
     return summary
@@ -354,7 +368,8 @@ def preview_image(
 
 
 def run_preview(args: argparse.Namespace, predictor: Predictor, *, emit=emit_json,
-                reviewer: Callable[[Evidence], Verdict] | None = None) -> dict:
+                reviewer: Callable[[Evidence], Verdict] | None = None,
+                connector: SenderConnector | None = None) -> dict:
     """Keep macOS GUI events on the main thread, with serialized VLM work off-thread.
 
     Preview and inference use separate local file readers, synchronized at start.
@@ -388,7 +403,8 @@ def run_preview(args: argparse.Namespace, predictor: Predictor, *, emit=emit_jso
     def predict():
         try:
             result.append(run_predictions(args, predictor, emit=emit, stop_event=stop,
-                                          on_ready=source_ready, on_prediction=remember, reviewer=reviewer))
+                                          on_ready=source_ready, on_prediction=remember, reviewer=reviewer,
+                                          connector=connector))
         except BaseException as exc:
             errors.append(exc)
         finally:
@@ -470,6 +486,7 @@ class StreamJob:
     captured_clock: float
     queued_at: float
     decode_ms: float
+    interval_sec: float
 
 
 @dataclass
@@ -479,6 +496,7 @@ class LocalStream:
     fps: float
     stats: Throughput
     source: Path
+    interval_sec: float
     frame_index: int = -1
     frame: np.ndarray | None = None
     video_sec: float = 0.0
@@ -498,13 +516,17 @@ class LocalStream:
     saved: int = 0
 
 
-def run_streams(args: argparse.Namespace, predictor: Predictor, *, emit=emit_json) -> dict:
+def run_streams(args: argparse.Namespace, predictor: Predictor, *, emit=emit_json,
+                connector: SenderConnector | None = None) -> dict:
     """Local parallel-playback test with one model and one pending frame per stream.
 
-    Local STREAM identifiers are not camera IDs and do not extend the network
-    contract. Every completed prediction is emitted immediately, unless filtered.
+    Local runs retain STREAM IDs. Connected runs use the configured camera IDs.
     """
-    interval_sec = sampling_interval(args, False)
+    interval_sec = sampling_interval(args, connector is not None)
+    engine = DecisionEngine(DecisionConfig(
+        normal_interval_sec=interval_sec,
+        verify_interval_sec=min(DecisionConfig().verify_interval_sec, interval_sec / 2),
+    )) if connector is not None else None
     if args.no_realtime:
         raise ValueError("multiple streams require real-time mode")
     if args.preview and threading.current_thread() is not threading.main_thread():
@@ -547,13 +569,21 @@ def run_streams(args: argparse.Namespace, predictor: Predictor, *, emit=emit_jso
                 finished = time.monotonic()
                 processing_ms = job.decode_ms + (finished - prediction_started) * 1000
                 with condition:
-                    gap = stream.stats.record(prediction_ms, processing_ms, finished)
+                    gap = stream.stats.record(prediction_ms, processing_ms, finished, job.interval_sec)
+                    decision_data = {}
+                    if engine is not None:
+                        decision = engine.update(stream.stream_id, prediction["scores"])
+                        decision_data = decision_fields(decision)
+                        if stream.interval_sec != decision.sampling_interval_sec:
+                            stream.interval_sec = decision.sampling_interval_sec
+                            stream.next_due_sec = job.captured_clock - started + stream.interval_sec
                     record = {
                         **prediction,
+                        **decision_data,
                         "type": "prediction", "stream_id": stream.stream_id,
                         "video": str(stream.source),
                         "frame_id": job.frame_id, "video_timestamp_sec": job.video_sec,
-                        "captured_at": job.captured_at, "sampling_interval_sec": interval_sec,
+                        "captured_at": job.captured_at, "sampling_interval_sec": job.interval_sec,
                         "output_at": datetime.now(timezone.utc).isoformat(),
                         "prediction_wall_ms": prediction_ms, "frame_processing_ms": processing_ms,
                         "queue_wait_ms": (prediction_started - job.queued_at) * 1000,
@@ -565,6 +595,8 @@ def run_streams(args: argparse.Namespace, predictor: Predictor, *, emit=emit_jso
                         stream.saved += 1
                     stream.latest = record
                     stream.active = False
+                if connector is not None:
+                    connector.submit({**record, "camera_id": stream.stream_id}, job.frame)
                 if matches:
                     emit(record)
                     stream.printed += 1
@@ -579,8 +611,9 @@ def run_streams(args: argparse.Namespace, predictor: Predictor, *, emit=emit_jso
         for index, source in enumerate(sources):
             capture = cv2.VideoCapture(str(source))
             fps = capture.get(cv2.CAP_PROP_FPS)
-            streams.append(LocalStream(f"STREAM_{index + 1:02d}", capture, fps,
-                                       Throughput(interval_sec), source))
+            stream_id = CAMERA_IDS[index] if connector is not None else f"STREAM_{index + 1:02d}"
+            streams.append(LocalStream(stream_id, capture, fps, Throughput(interval_sec),
+                                       source, interval_sec))
             if not capture.isOpened() or not math.isfinite(fps) or fps <= 0:
                 raise ValueError(f"Could not open stream with valid FPS: {source}")
         if args.preview:
@@ -627,21 +660,26 @@ def run_streams(args: argparse.Namespace, predictor: Predictor, *, emit=emit_jso
                     stream.captured_clock = time.monotonic()
                     stream.decode_ms = (stream.captured_clock - decoded_at) * 1000
                     advanced = True
-                if stream.frame is not None and not stream.eof and elapsed >= stream.next_due_sec \
-                        and stream.frame_index != stream.last_sample_index:
-                    with condition:
-                        reserved = stream.stats.count + int(stream.active) + int(stream.pending is not None)
-                        if args.max_frames is None or reserved < args.max_frames or stream.pending is not None:
-                            if stream.pending is not None:
-                                stream.dropped += 1
-                            stream.sequence += 1
-                            stream.pending = StreamJob(
-                                stream.frame, f"{stream.stream_id}-{stream.sequence:06d}", stream.video_sec,
-                                stream.captured_at, stream.captured_clock, time.monotonic(), stream.decode_ms,
-                            )
-                            stream.last_sample_index = stream.frame_index
-                            condition.notify()
-                    stream.next_due_sec = (math.floor(elapsed / interval_sec) + 1) * interval_sec
+                with condition:
+                    if (stream.frame is None or stream.eof or elapsed < stream.next_due_sec
+                            or stream.frame_index == stream.last_sample_index):
+                        continue
+                    reserved = stream.stats.count + int(stream.active) + int(stream.pending is not None)
+                    if args.max_frames is None or reserved < args.max_frames or stream.pending is not None:
+                        if stream.pending is not None:
+                            stream.dropped += 1
+                        stream.sequence += 1
+                        stream.pending = StreamJob(
+                            stream.frame, f"{stream.stream_id}-{stream.sequence:06d}", stream.video_sec,
+                            stream.captured_at, stream.captured_clock, time.monotonic(), stream.decode_ms,
+                            stream.interval_sec,
+                        )
+                        stream.last_sample_index = stream.frame_index
+                        condition.notify()
+                    if connector is None:
+                        stream.next_due_sec = (math.floor(elapsed / interval_sec) + 1) * interval_sec
+                    else:
+                        stream.next_due_sec = elapsed + stream.interval_sec
             with condition:
                 latest = [s.latest for s in streams]
             if args.preview:
@@ -696,7 +734,7 @@ def run_streams(args: argparse.Namespace, predictor: Predictor, *, emit=emit_jso
             worker.join()  # Drain bounded pending work at EOF; finish in-flight work on quit.
         summary = {
             "type": "summary", "status": "failed" if errors else status,
-            "mode": "local_multistream_realtime", "video": str(args.video),
+            "mode": "tcc_multistream_realtime" if connector else "local_multistream_realtime", "video": str(args.video),
             "videos": [str(source) for source in sources],
             "streams": len(sources), "model_instances": 1, "preview": args.preview,
             "predictions": sum(s.stats.count for s in streams),
@@ -707,6 +745,8 @@ def run_streams(args: argparse.Namespace, predictor: Predictor, *, emit=emit_jso
                 "replaced_pending_samples": s.dropped, "cancelled_pending_samples": s.cancelled,
             } for s in streams],
         }
+        if engine is not None:
+            summary["adaptive_sampling"] = True
         emit(summary)
     if errors:
         raise errors[0]
@@ -724,6 +764,8 @@ def main(argv: list[str] | None = None) -> None:
         parser.error("--preview cannot be combined with --no-realtime")
     if len(sources) > 1 and args.no_realtime:
         parser.error("multiple streams require real-time mode")
+    if args.tcc_url and len(sources) > len(CAMERA_IDS):
+        parser.error(f"--tcc-url supports up to {len(CAMERA_IDS)} cameras")
     reviewer = None
     if args.openai_review:
         if len(sources) > 1:
@@ -737,6 +779,10 @@ def main(argv: list[str] | None = None) -> None:
     elif args.review_roi is not None:
         parser.error("--review-roi requires --openai-review")
     try:
+        connector = None
+        if args.tcc_url:
+            camera_ids = CAMERA_IDS[:len(sources)] if len(sources) > 1 else (args.camera_id,)
+            connector = SenderConnector(args.tcc_url, load_locations(args.camera_config, camera_ids))
         # Validate every source before loading a large model or downloading weights.
         for source in dict.fromkeys(sources):
             with FrameSampler(source, args.camera_id, sampling_interval(args, reviewer is not None)):
@@ -750,12 +796,13 @@ def main(argv: list[str] | None = None) -> None:
         load_ms = (time.monotonic() - started) * 1000
         print(f"VLM ready: device={predictor.device}, load_ms={load_ms:.1f}. Starting predictions.",
               file=sys.stderr, flush=True)
-        if len(sources) > 1:
-            run_streams(args, predictor)
-        elif args.preview:
-            run_preview(args, predictor, reviewer=reviewer)
-        else:
-            run_predictions(args, predictor, reviewer=reviewer)
+        with connector if connector is not None else nullcontext():
+            if len(sources) > 1:
+                run_streams(args, predictor, connector=connector)
+            elif args.preview:
+                run_preview(args, predictor, reviewer=reviewer, connector=connector)
+            else:
+                run_predictions(args, predictor, reviewer=reviewer, connector=connector)
     except KeyboardInterrupt:
         parser.exit(130, "Interrupted.\n")
     except (OSError, ValueError, RuntimeError, cv2.error) as exc:
