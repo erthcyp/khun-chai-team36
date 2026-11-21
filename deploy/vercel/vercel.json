@@ -6,23 +6,23 @@
   "rewrites": [
     {
       "source": "/health",
-      "destination": "https://childhood-pest-illustration-glossary.trycloudflare.com/health"
+      "destination": "https://tired-newbie-hobby-tvs.trycloudflare.com/health"
     },
     {
       "source": "/api/v1/cameras",
-      "destination": "https://childhood-pest-illustration-glossary.trycloudflare.com/api/v1/cameras"
+      "destination": "https://tired-newbie-hobby-tvs.trycloudflare.com/api/v1/cameras"
     },
     {
       "source": "/api/v1/alerts",
-      "destination": "https://childhood-pest-illustration-glossary.trycloudflare.com/api/v1/alerts"
+      "destination": "https://tired-newbie-hobby-tvs.trycloudflare.com/api/v1/alerts"
     },
     {
       "source": "/api/v1/metrics",
-      "destination": "https://childhood-pest-illustration-glossary.trycloudflare.com/api/v1/metrics"
+      "destination": "https://tired-newbie-hobby-tvs.trycloudflare.com/api/v1/metrics"
     },
     {
       "source": "/api/v1/snapshots/:cameraId",
-      "destination": "https://childhood-pest-illustration-glossary.trycloudflare.com/api/v1/snapshots/:cameraId"
+      "destination": "https://tired-newbie-hobby-tvs.trycloudflare.com/api/v1/snapshots/:cameraId"
     }
   ]
 }
