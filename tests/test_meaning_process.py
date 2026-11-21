@@ -37,8 +37,9 @@ class MeaningProcessorTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(tuple(first)[:2], ("summary_th", "summary_en"))
         self.assertIn("การจราจรไหลปกติ", first["summary_th"])
         self.assertEqual(first["suggested_action"], "แนะนำให้ติดตามสถานการณ์ต่อไป")
-        self.assertIn("normal traffic flow", first["summary_en"])
-        self.assertIn("0.69", first["summary_en"])
+        self.assertTrue(first["summary_en"].startswith("Normal traffic flow"))
+        self.assertTrue(first["summary_th"].startswith("การจราจรไหลปกติ"))
+        self.assertNotIn("0.69", first["summary_en"])
         self.assertNotIn("confirmed", first["summary_en"])
         self.assertIsNone(first["event_id"])
         self.assertIsNone(await processor.on_semantic(dict(FRAME, confidence=0.81)))
@@ -46,6 +47,10 @@ class MeaningProcessorTests(unittest.IsolatedAsyncioTestCase):
         alert = dict(FRAME, predicted_class="accident", event_id="evt-1",
                      verification_state="alert", alert={"level": "confirmed", "type": "accident"})
         self.assertIn("Confirmed alert", (await processor.on_semantic(alert))["summary_en"])
+        suspected = dict(FRAME, predicted_class="congestion", verification_state="verifying")
+        summary = await processor.on_semantic(suspected)
+        self.assertTrue(summary["summary_en"].startswith("Possible congestion"))
+        self.assertTrue(summary["summary_th"].startswith("พบสัญญาณการจราจรติดขัด"))
 
     async def test_api_trigger_and_snapshot_matching(self):
         calls = []
@@ -82,8 +87,7 @@ class MeaningProcessorTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(len(calls), 2)
         self.assertIn("primary operator summary in natural Thai",
                       calls[0]["messages"][0]["content"])
-        self.assertIn("โมเดลทำนายจากเฟรมเดียวว่า", calls[0]["messages"][0]["content"])
-        self.assertIn("The model predicts from a single frame that",
+        self.assertIn("Start both summaries with what happened or what was observed at the camera",
                       calls[0]["messages"][0]["content"])
         content = calls[0]["messages"][1]["content"]
         facts = json.loads(content[0]["text"])
