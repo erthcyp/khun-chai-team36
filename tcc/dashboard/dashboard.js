@@ -7,7 +7,7 @@
   const params = new URLSearchParams(location.search);
   const mockMode = params.get("mock") === "1";
   const apiBase = (params.get("api") || "").replace(/\/$/, "");
-  const state = { cameras: [], alerts: [], metrics: null, connected: false, updatedAt: null, selectedCameraId: null, wallView: false };
+  const state = { cameras: [], alerts: [], metrics: null, connected: false, updatedAt: null, selectedCameraId: null };
   const $ = (id) => document.getElementById(id);
   let summaryLanguage = "th";
   try { if (localStorage.getItem("roadsense-summary-language") === "en") summaryLanguage = "en"; } catch (_) {}
@@ -158,6 +158,7 @@
     const timestamp = capturedAt(camera);
     const snapshot = first(camera, ["latest_snapshot_url", "snapshot_url", "preview_url", "image_url"]);
     const wrapper = document.createElement("article");
+    wrapper.dataset.cameraId = cameraId;
     wrapper.className = `camera-card ${variant} ${waiting ? "is-placeholder" : ""}`.trim();
 
     const head = document.createElement("div");
@@ -198,6 +199,14 @@
     age.className = "snapshot-age";
     age.textContent = ageLabel(timestamp);
     preview.append(chip, age);
+    if (variant === "wall-camera-card") {
+      const open = document.createElement("button");
+      open.type = "button";
+      open.className = "camera-preview-open";
+      open.dataset.openCamera = cameraId;
+      open.setAttribute("aria-label", `ดูรายละเอียด ${cameraId}`);
+      preview.append(open);
+    }
 
     const intervalLabel = document.createElement("div");
     intervalLabel.className = "camera-interval";
@@ -218,16 +227,11 @@
     const explanation = naturalLanguage(camera);
     const description = document.createElement("section");
     description.className = `ai-description-panel${explanation ? "" : " is-waiting"}`;
-    description.setAttribute("aria-label", `คำอธิบายภาษาธรรมชาติของ ${cameraId}`);
+    description.setAttribute("aria-label", `คำอธิบายเหตุการณ์ของ ${cameraId}`);
     const descriptionHeading = document.createElement("div");
     descriptionHeading.className = "ai-description-heading";
-    const headingCopy = document.createElement("div");
-    const eyebrow = document.createElement("span");
-    eyebrow.className = "eyebrow";
-    eyebrow.textContent = "คำอธิบายภาษาธรรมชาติ";
     const heading = document.createElement("h3");
-    heading.textContent = "AI อธิบายภาพ";
-    headingCopy.append(eyebrow, heading);
+    heading.textContent = "คำอธิบายเหตุการณ์";
     const source = document.createElement("span");
     source.className = "description-source";
     const meaningSource = camera.meaning?.source || camera.source;
@@ -235,7 +239,7 @@
       ? (summaryLanguage === "th" ? "ไม่ได้รับภาพประกอบ" : "Snapshot unavailable")
       : meaningSource === "fallback" ? "ข้อความสำรอง"
       : meaningSource === "json+image" ? "AI + ภาพ" : explanation ? "จาก TCC" : "รอข้อมูล";
-    descriptionHeading.append(headingCopy, source);
+    descriptionHeading.append(heading, source);
     const languages = document.createElement("div");
     languages.className = "summary-languages";
     languages.setAttribute("role", "group");
@@ -268,44 +272,6 @@
   function renderCameras() {
     const received = normalizeCameras(state.cameras);
     const cameras = displayCameras(received);
-    const camera01 = cameras.find((camera) => cameraIndex(camera) === 1);
-    const picker = $("camera-select");
-    const priorSelection = state.selectedCameraId;
-    picker.replaceChildren();
-    if (!cameras.length) {
-      const option = document.createElement("option");
-      option.value = "";
-      option.textContent = "ยังไม่มีข้อมูลกล้อง";
-      picker.append(option);
-      picker.disabled = true;
-      state.selectedCameraId = null;
-    } else {
-      picker.disabled = false;
-      for (const camera of cameras) {
-        const option = document.createElement("option");
-        option.value = camera.camera_id;
-        option.textContent = `${camera.camera_id.replace("_", " ")} · ${cameraLocation(camera)}`;
-        picker.append(option);
-      }
-      state.selectedCameraId = cameras.some((camera) => camera.camera_id === priorSelection)
-        ? priorSelection : (camera01 || cameras[0]).camera_id;
-      picker.value = state.selectedCameraId;
-    }
-
-    const primary = cameras.find((camera) => camera.camera_id === state.selectedCameraId);
-    const secondary = primary && (primary === camera01
-      ? cameras.find((camera) => camera !== primary)
-      : camera01 || cameras.find((camera) => camera !== primary));
-    $("secondary-camera").replaceChildren(secondary
-      ? makeCamera(secondary, "secondary-camera-card")
-      : Object.assign(document.createElement("div"), { className: "empty-camera", textContent: "รอข้อมูลกล้องเพิ่มเติม" }));
-    $("primary-camera-title").textContent = primary ? primary.camera_id.replace("_", " ") : "CAM_01";
-    const primaryRoot = $("primary-camera");
-    primaryRoot.replaceChildren(primary ? makeCamera(primary, "primary-camera-card") : Object.assign(document.createElement("div"), {
-      className: "empty-camera primary-empty",
-      textContent: state.connected ? "รอข้อมูลจาก CAM_01" : "ยังไม่ได้รับข้อมูลจาก TCC"
-    }));
-
     const activeCount = received.filter(isOnline).length;
     $("online-count").textContent = `${activeCount} กล้องออนไลน์`;
     const hasAlert = state.alerts.some(openAlert);
@@ -313,27 +279,27 @@
     $("metric-context").textContent = received.length
       ? `${mockMode ? "รอบจำลอง" : "ข้อมูลจริง"} · ${received.length} กล้อง`
       : `${mockMode ? "รอบจำลอง" : "ข้อมูลจริง"} · รอข้อมูล`;
+    const active = document.activeElement;
+    const cameraId = active?.closest(".camera-card")?.dataset.cameraId;
+    const language = active?.dataset.summaryLanguage;
+    const wasDetail = $("camera-detail").contains(active);
     renderCameraWall(cameras, received.length);
+    renderCameraDetail(cameras);
+    if (language && cameraId) {
+      const root = wasDetail ? $("camera-detail-content") : $("wall-grid");
+      root.querySelector(`[data-camera-id="${CSS.escape(cameraId)}"] [data-summary-language="${language}"]`)?.focus({ preventScroll: true });
+    } else if (active?.dataset.openCamera) {
+      $("wall-grid").querySelector(`[data-open-camera="${CSS.escape(active.dataset.openCamera)}"]`)?.focus({ preventScroll: true });
+    }
   }
 
-  function openCameraWall() {
-    const wall = $("camera-wall");
-    state.wallView = true;
-    wall.hidden = false;
-    document.body.classList.add("wall-open");
-    const received = normalizeCameras(state.cameras);
-    renderCameraWall(displayCameras(received), received.length);
-    $("wall-open").innerHTML = '<span aria-hidden="true">←</span> กลับมุมมองหลัก';
-    $("wall-close").focus();
-  }
-
-  function closeCameraWall() {
-    const wall = $("camera-wall");
-    state.wallView = false;
-    wall.hidden = true;
-    document.body.classList.remove("wall-open");
-    $("wall-open").innerHTML = '<span aria-hidden="true">▦</span> แสดงกล้องทั้งหมด';
-    $("wall-open").focus();
+  function renderCameraDetail(cameras) {
+    const dialog = $("camera-detail");
+    if (!dialog.open) return;
+    const camera = cameras.find((item) => item.camera_id === state.selectedCameraId);
+    if (!camera) return;
+    $("camera-detail-title").textContent = camera.camera_id.replace("_", " ");
+    $("camera-detail-content").replaceChildren(makeCamera(camera, "detail-camera-card"));
   }
 
   function renderAlerts() {
@@ -444,12 +410,18 @@
     try { localStorage.setItem("roadsense-summary-language", summaryLanguage); } catch (_) {}
     renderCameras();
   });
-  $("camera-select").addEventListener("change", (event) => {
-    state.selectedCameraId = event.target.value || null;
-    renderCameras();
+  $("wall-grid").addEventListener("click", (event) => {
+    const button = event.target.closest("[data-open-camera]");
+    if (!button) return;
+    state.selectedCameraId = button.dataset.openCamera;
+    $("camera-detail").showModal();
+    renderCameraDetail(displayCameras(normalizeCameras(state.cameras)));
   });
-  $("wall-open").addEventListener("click", openCameraWall);
-  $("wall-close").addEventListener("click", closeCameraWall);
+  $("camera-detail").addEventListener("close", () => {
+    const id = state.selectedCameraId;
+    state.selectedCameraId = null;
+    if (id) $("wall-grid").querySelector(`[data-open-camera="${CSS.escape(id)}"]`)?.focus();
+  });
   if (mockMode) $("mock-ribbon").hidden = false;
   render();
   poll();

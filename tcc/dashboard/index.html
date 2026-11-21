@@ -38,27 +38,23 @@
           <div class="scenario-state"><span>สถานการณ์โดยรวม</span><strong id="overall-state">กำลังรอข้อมูล</strong></div>
         </section>
 
-        <section class="operator-layout" aria-label="ภาพกล้องหลัก กล้องเพิ่มเติม และการแจ้งเตือน">
-          <section class="primary-camera-section">
-            <div class="operator-section-heading"><div><span class="eyebrow">กล้องหลัก</span><h2 id="primary-camera-title">CAM_01</h2></div><button class="fullscreen-button" id="wall-open" type="button"><span aria-hidden="true">▦</span> แสดงกล้องทั้งหมด</button></div>
-            <div id="primary-camera" aria-live="polite"><div class="loading-state"><span class="spinner"></span><strong>กำลังเชื่อมต่อกล้อง</strong></div></div>
-          </section>
-          <section class="secondary-camera-section">
-            <div class="operator-section-heading"><div><span class="eyebrow">กล้องเพิ่มเติม</span><h2>เลือกกล้อง 01–06</h2></div></div>
-            <label class="camera-select-label" for="camera-select">เลือกกล้องหลัก</label>
-            <div class="camera-select-wrap"><select class="camera-select" id="camera-select" aria-label="เลือกกล้องหลัก CAM_01 ถึง CAM_06"></select></div>
-            <div id="secondary-camera" aria-live="polite"><div class="empty-camera">รอข้อมูลกล้องเพิ่มเติม</div></div>
-          </section>
+        <section class="camera-wall" aria-labelledby="wall-title">
+          <header class="wall-header"><div><h2 id="wall-title">ภาพรวมกล้องทั้งหมด</h2><p id="wall-count">0 จาก 6 กล้อง</p></div></header>
+          <div class="wall-grid" id="wall-grid"></div>
+        </section>
+
+        <dialog class="camera-dialog" id="camera-detail" aria-labelledby="camera-detail-title">
+          <header class="wall-header">
+            <h2 id="camera-detail-title">รายละเอียดกล้อง</h2>
+            <form method="dialog"><button class="detail-close" type="submit">กลับภาพรวม</button></form>
+          </header>
+          <div id="camera-detail-content"></div>
+        </dialog>
+
           <aside class="alert-panel" id="alerts">
             <div class="panel-heading"><h2>แจ้งเตือน</h2><span class="alert-count" id="alert-count">0 รายการที่เปิดอยู่</span></div>
             <div class="alert-list" id="alert-list"><p class="empty-state">ยังไม่มีรายการแจ้งเตือน</p></div>
           </aside>
-        </section>
-
-        <section class="camera-wall" id="camera-wall" aria-labelledby="wall-title" hidden>
-          <header class="wall-header"><div><span class="eyebrow">ROAD SITUATION MONITORING</span><h2 id="wall-title">ภาพรวมกล้องทั้งหมด</h2><p id="wall-count">0 จาก 6 กล้อง</p></div><button class="wall-close" id="wall-close" type="button"><span aria-hidden="true">←</span> กลับมุมมองหลัก</button></header>
-          <div class="wall-grid" id="wall-grid"></div>
-        </section>
 
         <section class="model-metrics" id="performance" aria-label="จำนวนการเรียกโมเดล AI">
           <div class="metric-intro"><h2>การเรียกโมเดล</h2><p id="metric-context">รอบจำลอง · รอข้อมูล</p></div>
