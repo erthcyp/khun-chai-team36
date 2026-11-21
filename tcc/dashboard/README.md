@@ -27,7 +27,7 @@ Camera records for `CAM_01` through `CAM_06` are discovered from `GET /api/v1/ca
 
 ## Mock preview
 
-Append `?mock=1` to render clearly labeled sample UI data. Mock values are hard-coded only in this explicit preview mode and are not used by the live API path. Remove `mock=1` for real receiver data.
+Append `?mock=1` to render six clearly labeled sample camera cards for previewing the layout. These mock records are used only in this explicit preview mode and are not used by the live API path. Remove `mock=1` for receiver-driven camera data.
 
 ## Notes
 

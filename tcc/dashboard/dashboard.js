@@ -277,7 +277,11 @@
       state.connected = true;
       state.cameras = normalizeCameras([
         { camera_id: "CAM_01", location: { label: "ถนนสายหลัก", latitude: 13.7563, longitude: 100.5018 }, predicted_class: "normal_flow", verification_state: "normal", sampling_interval_sec: 2, priority: "low", captured_at: new Date(Date.now() - 1400).toISOString(), online: true },
-        { camera_id: "CAM_02", location: { label: "ทางขึ้นสะพาน", latitude: 13.7591, longitude: 100.5056 }, predicted_class: "normal_flow", verification_state: "normal", sampling_interval_sec: 2, priority: "low", captured_at: new Date(Date.now() - 2100).toISOString(), online: true }
+        { camera_id: "CAM_02", location: { label: "ทางขึ้นสะพาน", latitude: 13.7591, longitude: 100.5056 }, predicted_class: "normal_flow", verification_state: "normal", sampling_interval_sec: 2, priority: "low", captured_at: new Date(Date.now() - 2100).toISOString(), online: true },
+        { camera_id: "CAM_03", location: { label: "พื้นที่จำลอง CAM_03" }, predicted_class: "normal_flow", verification_state: "normal", sampling_interval_sec: 2, priority: "low", captured_at: new Date(Date.now() - 2700).toISOString(), online: true },
+        { camera_id: "CAM_04", location: { label: "พื้นที่จำลอง CAM_04" }, predicted_class: "normal_flow", verification_state: "normal", sampling_interval_sec: 2, priority: "low", captured_at: new Date(Date.now() - 3200).toISOString(), online: true },
+        { camera_id: "CAM_05", location: { label: "พื้นที่จำลอง CAM_05" }, predicted_class: "normal_flow", verification_state: "normal", sampling_interval_sec: 2, priority: "low", captured_at: new Date(Date.now() - 3800).toISOString(), online: true },
+        { camera_id: "CAM_06", location: { label: "พื้นที่จำลอง CAM_06" }, predicted_class: "normal_flow", verification_state: "normal", sampling_interval_sec: 2, priority: "low", captured_at: new Date(Date.now() - 4300).toISOString(), online: true }
       ]);
       state.alerts = [];
       state.metrics = { local_inference_count: 40, baseline_inference_count: 80, reduction_pct: 50 };
