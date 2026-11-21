@@ -24,3 +24,18 @@ Use the eventual integration start commands for the two processes. This scaffold
 - [ ] Choose the data source. For a live link, publish selected camera, alert, and metric updates from Mac 2 to an authenticated HTTPS service with shared storage. Serve only the intended read endpoints to viewers. Keep ingestion credentials and the OpenAI key server-side. For a replay link, deploy a recorded run that is safe to share and label it clearly.
 - [ ] Set the frontend API base URL. Use a same-origin API route or configure the external API to allow the dashboard origin through CORS. Start with polling for live updates and display the last update time so stale data is visible.
 - [ ] Test from a judge's device or mobile data. Verify the link opens, updates appear, viewer access cannot write updates, and the local demo keeps running if the cloud link drops.
+
+## Run Mac 2 from one terminal
+
+Stop the existing TCC in its terminal before starting the launcher. From the repository root with the Mac 2 virtual environment active:
+
+```bash
+set -a
+source .env
+set +a
+python deploy/vercel/run_mac2.py --host 172.20.10.11
+```
+
+Use Mac 2's current LAN IP for `--host`. The launcher starts the receiver on port 8010 and the read-only proxy on loopback port 8012. Pass `--cloudflared /path/to/cloudflared` if it is outside your PATH. Pressing Ctrl+C in this terminal closes the receiver, proxy and tunnel. The Vercel page still loads while the data feed is offline.
+
+Quick Tunnel gives you a new URL each time. To reuse the same upstream URL after a restart, configure an existing Cloudflare named tunnel with a public hostname and a local service of `http://127.0.0.1:8012`. Point the Vercel rewrites at that hostname once and pass `--tunnel-config /path/to/config.yml --tunnel-name NAME` to the launcher.
