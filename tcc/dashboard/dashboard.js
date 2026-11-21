@@ -146,6 +146,23 @@
   }
 
   const cameraCards = new WeakMap();
+  const accidentStates = new Map();
+  const unseenAccidents = new Set();
+
+  function updateAccidentHighlights(cameras) {
+    for (const camera of cameras) {
+      const id = camera.camera_id;
+      const previous = accidentStates.get(id);
+      const accident = !camera.placeholder && normalizeClass(prediction(camera)) === "accident";
+      if (camera.placeholder || (previous && previous.run !== camera.run_id)) {
+        unseenAccidents.delete(id);
+      }
+      if (accident && (!previous?.accident || previous.run !== camera.run_id)) {
+        unseenAccidents.add(id);
+      }
+      accidentStates.set(id, { accident, run: camera.run_id });
+    }
+  }
 
   function makeCamera(camera, variant, picture) {
     const cameraId = String(camera.camera_id || camera.id || "กล้องไม่ทราบรหัส");
@@ -294,6 +311,8 @@
   function updateCardText(card, view) {
     const draft = makeCamera(view.camera, view.variant, view.displayed?.picture);
     const preview = card.querySelector(".camera-preview");
+    preview.classList.toggle("accident-unseen",
+      view.variant === "wall-camera-card" && unseenAccidents.has(view.camera.camera_id));
     card.className = draft.className;
     card.firstElementChild.replaceWith(draft.firstElementChild);
     for (const selector of [".snapshot-chip", ".snapshot-age"]) {
@@ -362,6 +381,7 @@
   function renderCameras() {
     const received = normalizeCameras(state.cameras);
     const cameras = displayCameras(received);
+    updateAccidentHighlights(cameras);
     const activeCount = received.filter(isOnline).length;
     $("online-count").textContent = `${activeCount} กล้องออนไลน์`;
     const hasAlert = state.alerts.some(openAlert);
@@ -508,6 +528,8 @@
     if (!button) return;
     state.selectedCameraId = button.dataset.openCamera;
     $("camera-detail").showModal();
+    unseenAccidents.delete(state.selectedCameraId);
+    button.closest(".camera-preview").classList.remove("accident-unseen");
     renderCameraDetail(displayCameras(normalizeCameras(state.cameras)));
   });
   $("camera-detail").addEventListener("close", () => {
