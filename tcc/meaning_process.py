@@ -59,7 +59,7 @@ class MeaningProcessor:
         self._timeout = timeout
         self._image_timeout = image_timeout
         self._client = client
-        self._api_key = os.environ.get("OPENAI_API_KEY")
+        self._api_key = os.environ.get("roadsense_meaning") or os.environ.get("OPENAI_API_KEY")
         self._updates: dict[str, _Update] = {}
         self._early_images: OrderedDict[tuple[str, str], tuple[str | None, bytes, float]] = (
             OrderedDict()

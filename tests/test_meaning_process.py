@@ -51,11 +51,12 @@ class MeaningProcessorTests(unittest.IsolatedAsyncioTestCase):
         calls = []
 
         async def send(request):
+            self.assertEqual(request.headers["Authorization"], "Bearer test-key")
             calls.append(json.loads(request.content))
             return openai_response()
 
         async with httpx.AsyncClient(transport=httpx.MockTransport(send)) as client:
-            with patch.dict(os.environ, {"OPENAI_API_KEY": "test-key"}):
+            with patch.dict(os.environ, {"roadsense_meaning": "test-key", "OPENAI_API_KEY": "legacy-key"}):
                 processor = MeaningProcessor(client=client)
             event = dict(FRAME, event_id="evt-1", verification_state="verifying",
                          location={"label": "Junction A"})
@@ -100,7 +101,7 @@ class MeaningProcessorTests(unittest.IsolatedAsyncioTestCase):
             await asyncio.sleep(60)
 
         async with httpx.AsyncClient(transport=httpx.MockTransport(send)) as client:
-            with patch.dict(os.environ, {"OPENAI_API_KEY": "test-key"}):
+            with patch.dict(os.environ, {"roadsense_meaning": "", "OPENAI_API_KEY": "test-key"}):
                 processor = MeaningProcessor(client=client, timeout=0.01, image_timeout=0.01)
             self.assertEqual(
                 (await processor.on_semantic(FRAME))["fallback_reason"], "image_timeout",
@@ -125,7 +126,7 @@ class MeaningProcessorTests(unittest.IsolatedAsyncioTestCase):
             return openai_response()
 
         async with httpx.AsyncClient(transport=httpx.MockTransport(send)) as client:
-            with patch.dict(os.environ, {"OPENAI_API_KEY": "test-key"}):
+            with patch.dict(os.environ, {"roadsense_meaning": "test-key"}):
                 processor = MeaningProcessor(client=client)
             await processor.on_snapshot(FRAME, b"first")
             first = asyncio.create_task(processor.on_semantic(FRAME))

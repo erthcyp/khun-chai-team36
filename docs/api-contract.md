@@ -36,7 +36,7 @@ multipart: `file` (image/jpeg) + `meta` JSON `{camera_id, frame_id, video_timest
 `GET /health` · `GET /api/v1/cameras` · `GET /api/v1/alerts` · `GET /api/v1/metrics` · `WS /ws` (optional push)
 
 ## Meaning process (Mac 2, OpenAI)
-- Runs on the TCC only; key from `OPENAI_API_KEY` env on Mac 2.
+- Runs on the TCC only; set `roadsense_meaning` in the Mac 2 process environment. Existing setups may still use `OPENAI_API_KEY` if `roadsense_meaning` is empty.
 - **Trigger:** only when a camera's `verification_state`, `predicted_class` or `alert.level` changes (or a new `event_id` appears) — never on every message.
 - **Inputs:** semantic JSON plus a JPEG with the same `camera_id` and `frame_id`. When the JPEG supplies an `event_id`, it must match the semantic update.
 - **Timing:** publish camera status and alerts immediately. The asynchronous summary worker waits up to 2 seconds for the matching JPEG by default. It calls OpenAI once per qualifying update when both inputs are available. A late or duplicate JPEG does not trigger another call.
