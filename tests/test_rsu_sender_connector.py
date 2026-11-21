@@ -86,3 +86,5 @@ class SenderConnectorTests(unittest.TestCase):
             matched = by_frame[item["frame_id"]]
             self.assertEqual(matched["camera_id"], camera_id)
             self.assertEqual(matched["event_id"], item["event_id"])
+            self.assertEqual(matched["run_id"], item["run_id"])
+            self.assertEqual(matched["captured_at"], item["captured_at"])

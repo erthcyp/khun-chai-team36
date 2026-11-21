@@ -61,7 +61,7 @@ class MeaningProcessor:
         self._client = client
         self._api_key = os.environ.get("roadsense_meaning") or os.environ.get("OPENAI_API_KEY")
         self._updates: dict[str, _Update] = {}
-        self._early_images: OrderedDict[tuple[str, str], tuple[str | None, bytes, float]] = (
+        self._early_images: OrderedDict[tuple[str, str | None, str], tuple[str | None, str | None, bytes, float]] = (
             OrderedDict()
         )
 
@@ -77,7 +77,7 @@ class MeaningProcessor:
         alert = alert if isinstance(alert, dict) else {}
         location = payload.get("location")
         event_id = payload.get("event_id") or None
-        key = (predicted_class, payload.get("verification_state"), alert.get("level"), event_id)
+        key = (predicted_class, payload.get("verification_state"), alert.get("level"), event_id, payload.get("run_id"))
         previous = self._updates.get(camera_id)
         if previous and key == previous.key:
             return None
@@ -104,12 +104,12 @@ class MeaningProcessor:
             key, frame_id, image,
         )
         self._updates[camera_id] = update
-        early = self._early_images.pop((camera_id, frame_id), None)
+        early = self._early_images.pop((camera_id, key[4], frame_id), None)
         if image is not None and early:
-            snapshot_event, jpeg, arrived_at = early
+            snapshot_event, snapshot_capture, jpeg, arrived_at = early
             if (not snapshot_event or snapshot_event == event_id) and (
-                loop.time() - arrived_at <= self._image_timeout
-            ):
+                not snapshot_capture or snapshot_capture == facts.get("captured_at")
+            ) and loop.time() - arrived_at <= self._image_timeout:
                 image.set_result(jpeg)
         try:
             return await self._summarize(update)
@@ -125,15 +125,18 @@ class MeaningProcessor:
             return
         event_id = meta.get("event_id")
         update = self._updates.get(camera_id)
-        if update and frame_id == update.frame_id:
+        run_id = meta.get("run_id")
+        if update and frame_id == update.frame_id and run_id == update.key[4]:
             if (update.image is not None and not update.image.done()
-                    and (not event_id or event_id == update.facts.get("event_id"))):
+                    and (not event_id or event_id == update.facts.get("event_id"))
+                    and (not meta.get("captured_at")
+                         or meta["captured_at"] == update.facts.get("captured_at"))):
                 update.image.set_result(jpeg)
             return
-        self._early_images[(camera_id, frame_id)] = (
-            event_id, jpeg, asyncio.get_running_loop().time(),
+        self._early_images[(camera_id, run_id, frame_id)] = (
+            event_id, meta.get("captured_at"), jpeg, asyncio.get_running_loop().time(),
         )
-        self._early_images.move_to_end((camera_id, frame_id))
+        self._early_images.move_to_end((camera_id, run_id, frame_id))
         if len(self._early_images) > MAX_EARLY_SNAPSHOTS:
             self._early_images.popitem(last=False)
 
