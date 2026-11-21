@@ -168,7 +168,7 @@
     preview.className = "camera-preview";
     if (snapshot) {
       const image = document.createElement("img");
-      image.src = String(snapshot);
+      image.src = new URL(String(snapshot), apiBase || location.origin).href;
       image.alt = `ภาพเฟรมล่าสุดจาก ${cameraId}`;
       image.loading = "lazy";
       image.onerror = () => {
@@ -371,10 +371,10 @@
     const camerasOk = cameras.status === "fulfilled";
     const alertsOk = alerts.status === "fulfilled";
     const metricsOk = metrics.status === "fulfilled";
-    state.connected = healthOk && (camerasOk || alertsOk || metricsOk);
     if (camerasOk) state.cameras = normalizeCameras(records(cameras.value, ["cameras", "items", "data"]));
     if (alertsOk) state.alerts = records(alerts.value, ["alerts", "events", "items", "data"]);
     if (metricsOk) state.metrics = metrics.value?.metrics || metrics.value;
+    state.connected = healthOk && camerasOk && state.cameras.some(isOnline);
     if (state.connected) state.updatedAt = new Date();
     render();
   }

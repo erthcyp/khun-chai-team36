@@ -4,7 +4,16 @@ Responsive Thai-language TCC dashboard inspired by the supplied control-room ref
 
 ## Run
 
-From the repository root:
+From the repository root, install and start the Mac 2 receiver:
+
+```bash
+python3 -m pip install -r tcc/requirements.txt
+python3 -m uvicorn tcc.pc2_receiver:app --host 0.0.0.0 --port 8010
+```
+
+Open `http://localhost:8010/dashboard/` on Mac 2. Set the RSU sender's `TCC_URL` to `http://<Mac-2-LAN-IP>:8010`. The receiver accepts semantic JSON and JPEG snapshots on the endpoints in `docs/api-contract.md`, keeps the latest state per camera in memory, and serves the dashboard from the same origin. Restarting it clears the in-memory data.
+
+For frontend-only preview, from the repository root:
 
 ```bash
 python3 -m http.server 4173 --directory tcc/dashboard

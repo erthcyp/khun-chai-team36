@@ -71,3 +71,4 @@ body.wall-open #wall-open{background:var(--surface);border-color:var(--border);c
 @media(max-width:680px){.ai-description-panel{padding:13px 14px}.ai-description-heading h3{font-size:14px}.ai-description-panel p{font-size:12px}}
 .primary-camera-card .ai-description-panel{margin-top:4px;padding:14px 0 0;border:0;border-top:1px solid var(--border);border-radius:0;background:transparent}
 @media(max-width:680px){.primary-camera-card .ai-description-panel{padding:12px 0 0}}
+@media(min-width:681px){.topbar{min-height:78px;padding-block:14px}main{padding-top:23px}.overview-heading{margin-bottom:16px}.primary-camera-card{min-height:0;flex:0 0 auto}.primary-camera-card .camera-preview{height:clamp(190px,17vw,270px)}.primary-camera-card .camera-card-foot{margin-top:0}}
