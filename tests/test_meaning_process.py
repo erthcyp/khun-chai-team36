@@ -72,6 +72,9 @@ class MeaningProcessorTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(len(calls), 4)
         self.assertIn("primary operator summary in natural Thai",
                       calls[0]["messages"][0]["content"])
+        self.assertIn("โมเดลทำนายจากเฟรมเดียวว่า", calls[0]["messages"][0]["content"])
+        self.assertIn("The model predicts from a single frame that",
+                      calls[0]["messages"][0]["content"])
         content = calls[0]["messages"][1]["content"]
         self.assertEqual(json.loads(content[0]["text"])["predicted_class"], "normal_flow")
         self.assertNotIn("image_path", content[0]["text"])
