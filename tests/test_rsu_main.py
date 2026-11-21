@@ -10,12 +10,15 @@ from pathlib import Path
 import subprocess
 import sys
 import tempfile
+import threading
+import time
 import unittest
+from unittest.mock import patch
 
 import cv2
 import numpy as np
 
-from rsu.main import Throughput, main, make_parser, run_predictions
+from rsu.main import Throughput, main, make_parser, preview_image, run_predictions, run_preview
 
 
 class Clock:
@@ -162,6 +165,117 @@ class RunnerTests(unittest.TestCase):
             with self.subTest(flag=flag, value=value), redirect_stderr(io.StringIO()):
                 with self.assertRaises(SystemExit):
                     main(["--video", str(self.video), flag, value])
+
+    def test_stop_event_ends_wait_without_another_prediction(self):
+        args = make_parser().parse_args(["--video", str(self.video)])
+        stop = threading.Event()
+        records = []
+        clock = Clock()
+        predictor = PredictorDouble(clock)
+        summary = run_predictions(args, predictor, emit=records.append,
+                                  on_prediction=lambda record: stop.set(), stop_event=stop)
+        self.assertEqual(summary["status"], "stopped")
+        self.assertEqual(summary["predictions"], 1)
+
+    def test_preview_observer_receives_predictions_excluded_by_filter(self):
+        args = make_parser().parse_args(["--video", str(self.video), "--no-realtime",
+                                         "--only-class", "invalid_scene", "--max-frames", "2"])
+        clock = Clock()
+        predictor = PredictorDouble(clock)
+        observed = []
+        summary = run_predictions(args, predictor, emit=lambda record: None,
+                                  clock=clock, on_prediction=observed.append)
+        self.assertEqual(len(observed), 2)
+        self.assertEqual(summary["printed_predictions"], 0)
+
+    def test_preview_requires_realtime(self):
+        with redirect_stderr(io.StringIO()), self.assertRaises(SystemExit):
+            main(["--video", str(self.video), "--preview", "--no-realtime"])
+
+    def test_gui_keeps_polling_while_predictor_waits_in_another_thread(self):
+        args = make_parser().parse_args(["--video", str(self.video), "--preview", "--max-frames", "1"])
+        entered = threading.Event()
+        release = threading.Event()
+        inference_threads = []
+        gui_threads = []
+        polls_during_inference = []
+        records = []
+
+        class WaitingPredictor:
+            def predict(self, frame):
+                inference_threads.append(threading.current_thread())
+                entered.set()
+                if not release.wait(2):
+                    raise RuntimeError("GUI stopped polling during inference")
+                return {"prediction": "normal_flow", "confidence": 0.7}
+
+        def poll(delay):
+            gui_threads.append(threading.current_thread())
+            if entered.is_set():
+                polls_during_inference.append(1)
+                if len(polls_during_inference) >= 3:
+                    release.set()
+            time.sleep(0.005)
+            return -1
+
+        with patch.object(cv2, "namedWindow"), patch.object(cv2, "resizeWindow"), \
+                patch.object(cv2, "imshow"), patch.object(cv2, "destroyWindow") as destroy, \
+                patch.object(cv2, "getWindowProperty", return_value=1), \
+                patch.object(cv2, "waitKey", side_effect=poll):
+            summary = run_preview(args, WaitingPredictor(), emit=records.append)
+        self.assertGreaterEqual(len(polls_during_inference), 3)
+        self.assertTrue(all(t is threading.main_thread() for t in gui_threads))
+        self.assertTrue(all(t is not threading.main_thread() for t in inference_threads))
+        self.assertEqual(summary["predictions"], 1)
+        self.assertTrue(summary["preview"])
+        destroy.assert_called_once()
+
+    def test_preview_quit_stops_worker_and_closes_window(self):
+        args = make_parser().parse_args(["--video", str(self.video), "--preview"])
+        entered = threading.Event()
+
+        class BriefPredictor:
+            def predict(self, frame):
+                entered.set()
+                time.sleep(0.02)
+                return {"prediction": "normal_flow"}
+
+        def quit_key(delay):
+            if not entered.wait(2):
+                raise RuntimeError("Prediction worker did not start")
+            return ord("q")
+
+        with patch.object(cv2, "namedWindow"), patch.object(cv2, "resizeWindow"), \
+                patch.object(cv2, "imshow"), patch.object(cv2, "destroyWindow") as destroy, \
+                patch.object(cv2, "waitKey", side_effect=quit_key):
+            summary = run_preview(args, BriefPredictor(), emit=lambda record: None)
+        self.assertEqual(summary["status"], "stopped")
+        self.assertEqual(summary["predictions"], 1)
+        destroy.assert_called_once()
+        self.assertFalse(any(t.name == "roadsense-inference" for t in threading.enumerate()))
+
+    def test_preview_reports_worker_failure(self):
+        args = make_parser().parse_args(["--video", str(self.video), "--preview"])
+
+        class FailedPredictor:
+            def predict(self, frame):
+                raise RuntimeError("worker inference failed")
+
+        with patch.object(cv2, "namedWindow"), patch.object(cv2, "resizeWindow"), \
+                patch.object(cv2, "imshow"), patch.object(cv2, "destroyWindow"), \
+                patch.object(cv2, "getWindowProperty", return_value=1), \
+                patch.object(cv2, "waitKey", return_value=-1):
+            with self.assertRaisesRegex(RuntimeError, "worker inference failed"):
+                run_preview(args, FailedPredictor(), emit=lambda record: None)
+
+    def test_overlay_resizes_without_modifying_input_pixels(self):
+        original = np.full((1080, 1920, 3), 50, dtype=np.uint8)
+        image = preview_image(original, 2, "CAM_01", {
+            "prediction": "normal_flow", "confidence": 0.8,
+            "video_timestamp_sec": 1, "prediction_wall_ms": 100,
+        })
+        self.assertEqual(image.shape, (540, 960, 3))
+        self.assertTrue(np.all(original == 50))
 
 
 class ThroughputTests(unittest.TestCase):

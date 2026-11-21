@@ -49,8 +49,8 @@ flowchart TB
 
 ## Run
 
-The OpenCV sampler and VLM baseline are available on this integration branch.
-The inference, decision, and transport modules still need to be wired together.
+The OpenCV sampler and VLM runner support local video predictions and an optional
+preview window. Adaptive decisions and network transport still need to be connected.
 
 ```bash
 python3 -m venv .venv
@@ -116,6 +116,11 @@ included, so a short run may show a cold-start effect. Remove `--max-frames` to
 process until the clip ends. Ctrl-C also prints a summary of completed predictions.
 Paths containing spaces should be enclosed in straight quotes.
 
+- `--preview`: play the video in an OpenCV window while VLM inference runs in a
+  worker. Press Q, Esc, or close the window to stop; an in-flight prediction
+  finishes before exit. The overlay shows the latest class, score, AI frame
+  timestamp and inference time. It updates for every prediction even when
+  `--only-class` filters terminal output. Preview requires real-time mode.
 - `--no-realtime`: remove playback waits to measure processing capacity at the
   same video sampling interval. This mode does not simulate live playback.
 - `--output-dir assets/frames`: also save sampled JPEGs. Disk writes count toward
@@ -124,6 +129,28 @@ Paths containing spaces should be enclosed in straight quotes.
   sampled frame is still classified and included in throughput statistics.
 - `--camera-id CAM_02`: override the default `CAM_01` identifier.
 - `--device mps`: explicitly select the Apple GPU; otherwise selection is automatic.
+
+To play the video while delivering predictions:
+
+```bash
+python -m rsu.main --video assets/demo_clips/video48.mp4 --preview --interval-sec 1
+```
+
+The preview uses a second local video reader with a shared start time, keeping
+window events separate from inference. The display follows the clip's FPS
+metadata and is resized to fit 960×640 pixels; the VLM receives the original
+sampled frames. Only the latest prediction metadata is retained. Preview decoding
+adds CPU work, so benchmark with `--preview` when evaluating demo performance.
+Slow inference may leave the displayed prediction behind the playing video;
+the separate video and AI frame timestamps make this visible.
+
+`requirements-frame.txt` installs GUI-enabled `opencv-python`. If upgrading an
+environment that used the headless package, replace it before enabling preview:
+
+```bash
+python -m pip uninstall opencv-python-headless
+python -m pip install -r requirements-frame.txt
+```
 
 Example for inspecting invalid scenes:
 
@@ -142,7 +169,7 @@ The p95 latency uses at most the most recent 1,000 predictions. Saving images or
 slow terminal/file output can reduce the observed output rate.
 
 This runner uses a fixed sampling interval for benchmarking. It does not yet
-start adaptive decisions, a video preview, or the network senders. It reuses the
+start adaptive decisions or the network senders. It reuses the
 sampler's stale-frame skipping in real-time mode, so slow inference can skip
 sections of the video instead of building a backlog. No AI-call reduction or
 classification-accuracy claims are inferred from this throughput test.
