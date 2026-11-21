@@ -6,23 +6,23 @@
   "rewrites": [
     {
       "source": "/health",
-      "destination": "https://remark-separate-bookmark-integrity.trycloudflare.com/health"
+      "destination": "https://airports-fails-keys-farming.trycloudflare.com/health"
     },
     {
       "source": "/api/v1/cameras",
-      "destination": "https://remark-separate-bookmark-integrity.trycloudflare.com/api/v1/cameras"
+      "destination": "https://airports-fails-keys-farming.trycloudflare.com/api/v1/cameras"
     },
     {
       "source": "/api/v1/alerts",
-      "destination": "https://remark-separate-bookmark-integrity.trycloudflare.com/api/v1/alerts"
+      "destination": "https://airports-fails-keys-farming.trycloudflare.com/api/v1/alerts"
     },
     {
       "source": "/api/v1/metrics",
-      "destination": "https://remark-separate-bookmark-integrity.trycloudflare.com/api/v1/metrics"
+      "destination": "https://airports-fails-keys-farming.trycloudflare.com/api/v1/metrics"
     },
     {
       "source": "/api/v1/snapshots/:cameraId",
-      "destination": "https://remark-separate-bookmark-integrity.trycloudflare.com/api/v1/snapshots/:cameraId"
+      "destination": "https://airports-fails-keys-farming.trycloudflare.com/api/v1/snapshots/:cameraId"
     }
   ]
 }
