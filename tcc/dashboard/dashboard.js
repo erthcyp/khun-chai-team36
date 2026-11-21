@@ -6,7 +6,7 @@
   const params = new URLSearchParams(location.search);
   const mockMode = params.get("mock") === "1";
   const apiBase = (params.get("api") || "").replace(/\/$/, "");
-  const state = { cameras: [], alerts: [], metrics: null, connected: false, updatedAt: null };
+  const state = { cameras: [], alerts: [], metrics: null, connected: false, updatedAt: null, selectedCameraId: null, wallFullscreen: false };
   const $ = (id) => document.getElementById(id);
   const classNames = {
     normal_flow: "จราจรปกติ",
@@ -123,7 +123,7 @@
     $("theme-toggle").addEventListener("click", () => setTheme(document.body.dataset.theme === "dark" ? "light" : "dark"));
   }
 
-  function makeCamera(camera) {
+  function makeCamera(camera, variant = "") {
     const cameraId = String(camera.camera_id || camera.id || "กล้องไม่ทราบรหัส");
     const status = cameraState(camera);
     const online = isOnline(camera);
@@ -137,7 +137,7 @@
     const timestamp = capturedAt(camera);
     const snapshot = first(camera, ["latest_snapshot_url", "snapshot_url", "preview_url", "image_url"]);
     const wrapper = document.createElement("article");
-    wrapper.className = "camera-card";
+    wrapper.className = `camera-card ${variant}`.trim();
 
     const head = document.createElement("div");
     head.className = "camera-card-head";
@@ -198,22 +198,87 @@
     return wrapper;
   }
 
+  function renderCameraWall(cameras) {
+    const root = $("wall-grid");
+    root.replaceChildren(...cameras.map((camera) => makeCamera(camera, "wall-camera-card")));
+    $("wall-count").textContent = `${cameras.length} จาก 6 กล้อง`;
+    if (!cameras.length) root.innerHTML = '<div class="empty-camera">ยังไม่ได้รับข้อมูลกล้องจาก TCC</div>';
+  }
+
   function renderCameras() {
-    const root = $("camera-list");
     const cameras = normalizeCameras(state.cameras);
-    if (!cameras.length) {
-      root.innerHTML = `<div class="empty-camera">${state.connected ? "ตัวรับข้อมูลออนไลน์ แต่ยังไม่มีข้อมูลกล้อง" : "ยังไม่ได้รับข้อมูลจาก TCC"}</div>`;
-      $("online-count").textContent = "ไม่พบกล้องออนไลน์";
-      $("overall-state").textContent = state.connected ? "รอข้อมูลกล้อง" : "TCC ออฟไลน์";
-      $("metric-context").textContent = "รอบจำลอง · รอข้อมูล";
-      return;
+    const primary = cameras.find((camera) => cameraIndex(camera) === 1);
+    const additional = cameras.filter((camera) => {
+      const index = cameraIndex(camera);
+      return index !== null && index >= 2 && index <= 6;
+    });
+    const primaryRoot = $("primary-camera");
+    primaryRoot.replaceChildren(primary ? makeCamera(primary, "primary-camera-card") : Object.assign(document.createElement("div"), {
+      className: "empty-camera primary-empty",
+      textContent: state.connected ? "รอข้อมูลจาก CAM_01" : "ยังไม่ได้รับข้อมูลจาก TCC"
+    }));
+
+    const picker = $("camera-select");
+    const priorSelection = state.selectedCameraId;
+    picker.replaceChildren();
+    if (!additional.length) {
+      const option = document.createElement("option");
+      option.value = "";
+      option.textContent = "ยังไม่มีกล้องเพิ่มเติม";
+      picker.append(option);
+      picker.disabled = true;
+      state.selectedCameraId = null;
+      $("secondary-camera").innerHTML = '<div class="empty-camera">CAM_02–CAM_06 จะแสดงที่นี่เมื่อ receiver ส่งข้อมูลมา</div>';
+    } else {
+      picker.disabled = false;
+      for (const camera of additional) {
+        const option = document.createElement("option");
+        option.value = camera.camera_id;
+        option.textContent = `${camera.camera_id.replace("_", " ")} · ${cameraLocation(camera)}`;
+        picker.append(option);
+      }
+      state.selectedCameraId = additional.some((camera) => camera.camera_id === priorSelection) ? priorSelection : additional[0].camera_id;
+      picker.value = state.selectedCameraId;
+      const selected = additional.find((camera) => camera.camera_id === state.selectedCameraId);
+      $("secondary-camera").replaceChildren(makeCamera(selected, "secondary-camera-card"));
     }
-    root.replaceChildren(...cameras.map(makeCamera));
+
     const activeCount = cameras.filter(isOnline).length;
     $("online-count").textContent = `${activeCount} กล้องออนไลน์`;
     const hasAlert = state.alerts.some(openAlert);
-    $("overall-state").textContent = hasAlert ? "มีเหตุการณ์ที่ต้องตรวจสอบ" : "เฝ้าระวังตามปกติ";
-    $("metric-context").textContent = `รอบจำลอง · ${cameras.length} กล้อง`;
+    $("overall-state").textContent = hasAlert ? "มีเหตุการณ์ที่ต้องตรวจสอบ" : cameras.length ? "เฝ้าระวังตามปกติ" : state.connected ? "รอข้อมูลกล้อง" : "TCC ออฟไลน์";
+    $("metric-context").textContent = cameras.length ? `รอบจำลอง · ${cameras.length} กล้อง` : "รอบจำลอง · รอข้อมูล";
+    renderCameraWall(cameras);
+  }
+
+  async function openCameraWall() {
+    const wall = $("camera-wall");
+    wall.hidden = false;
+    wall.setAttribute("aria-hidden", "false");
+    document.body.classList.add("wall-open");
+    state.wallFullscreen = false;
+    renderCameraWall(normalizeCameras(state.cameras));
+    try {
+      if (wall.requestFullscreen) {
+        await wall.requestFullscreen();
+        state.wallFullscreen = document.fullscreenElement === wall;
+      }
+    } catch (_) {
+      // Keep the fixed overlay usable if browser fullscreen is unavailable.
+    }
+    $("wall-close").focus();
+  }
+
+  async function closeCameraWall() {
+    const wall = $("camera-wall");
+    state.wallFullscreen = false;
+    if (document.fullscreenElement === wall && document.exitFullscreen) {
+      try { await document.exitFullscreen(); } catch (_) {}
+    }
+    wall.hidden = true;
+    wall.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("wall-open");
+    $("wall-open").focus();
   }
 
   function renderAlerts() {
@@ -316,6 +381,25 @@
   }
 
   initTheme();
+  $("camera-select").addEventListener("change", (event) => {
+    state.selectedCameraId = event.target.value || null;
+    renderCameras();
+  });
+  $("wall-open").addEventListener("click", openCameraWall);
+  $("wall-close").addEventListener("click", closeCameraWall);
+  document.addEventListener("fullscreenchange", () => {
+    const wall = $("camera-wall");
+    if (state.wallFullscreen && document.fullscreenElement !== wall) {
+      state.wallFullscreen = false;
+      wall.hidden = true;
+      wall.setAttribute("aria-hidden", "true");
+      document.body.classList.remove("wall-open");
+      $("wall-open").focus();
+    }
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && !$("camera-wall").hidden) closeCameraWall();
+  });
   if (mockMode) $("mock-ribbon").hidden = false;
   render();
   poll();
