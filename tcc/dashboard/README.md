@@ -1,6 +1,6 @@
 # RoadSense TCC dashboard
 
-Responsive Thai-language TCC dashboard inspired by the supplied control-room reference. CAM_01–CAM_06 are available through the center camera selector; the selected camera becomes the primary feed, while another available camera appears alongside it. Every camera card contains its own natural-language explanation from the TCC meaning processor, or a waiting state until one arrives. Alerts stay in a right column on wide layouts. “แสดงกล้องทั้งหมด” replaces the main layout with an in-page 6-camera wall; it does not request browser fullscreen. The page also shows a measured adaptive-versus-fixed model-call comparison. The theme toggle switches between dark and light palettes and remembers the selection in the browser.
+Responsive Thai-language TCC dashboard inspired by the supplied control-room reference. CAM_01–CAM_06 are available through the center camera selector; the selected camera becomes the primary feed, while another available camera appears alongside it. Every camera card contains its own natural-language explanation from the TCC meaning processor, or a waiting state until one arrives. Alerts stay in a right column on wide layouts. “แสดงกล้องทั้งหมด” replaces the main layout with an in-page 6-camera wall; it does not request browser fullscreen. The theme toggle switches between dark and light palettes and remembers the selection in the browser.
 
 ## Run
 
@@ -32,7 +32,6 @@ The receiver must allow the dashboard origin through CORS when the static site a
 - `GET /health`
 - `GET /api/v1/cameras`
 - `GET /api/v1/alerts`
-- `GET /api/v1/metrics`
 
 The layout always shows CAM_01 through CAM_06 as empty camera slots. Real records from `GET /api/v1/cameras` replace their matching slots by `camera_id`; the dashboard polls every three seconds, sorts them by camera number, and de-duplicates repeated IDs. Empty slots say "รอข้อมูล" and do not invent classifications, metrics, or descriptions. Records may include `latest_snapshot_url`, `snapshot_url`, `preview_url`, or `image_url` for the newest sampled JPEG. If none is present, the card shows a road-scene placeholder. Camera location labels come from the receiver payload; coordinates are shown when supplied.
 
