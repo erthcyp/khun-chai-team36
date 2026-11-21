@@ -26,14 +26,20 @@ flowchart TB
   subgraph TCC["Mac 2 · TCC"]
     RX["pc2_receiver.py<br/>FastAPI"] --> ST["Camera state<br/>(in memory)"]
     ST --> UI["Monitoring dashboard<br/>status · 2 s/1 s · alerts · metrics"]
+    ST -- "event changes" --> MP["meaning_process.py<br/>OpenAI → natural-language summary"]
+    RX -. "JPEG arrives later" .-> MP
+    MP --> UI
   end
   SS -- "Pipeline 1 · JSON" --> RX
   FS -. "Pipeline 2 · JPEG" .-> RX
   style DE fill:#FAECE7,stroke:#D85A30
+  style MP fill:#EEEDFE,stroke:#534AB7
 ```
 
 - The adaptive loop (`decision_engine` → `frame_automation`) runs on Mac 1 only.
+- `meaning_process` (Mac 2) turns JSON into an operator-readable summary with OpenAI first, then refines it when the matching JPEG arrives. It runs async and never delays the dashboard.
 - Pipeline 2 never blocks inference (bounded queue, drop stale previews).
+- Each sample → 1×4 softmax scores + camera metadata (location from `rsu/cameras.json`) sent as JSON.
 - Payload fields and endpoints: [docs/api-contract.md](docs/api-contract.md).
 
 ## Provenance
@@ -43,13 +49,13 @@ flowchart TB
 
 ## Run
 
-The OpenCV frame sampler is available; VLM inference, decisions, and transport
-still need to be connected as their modules land.
+The OpenCV sampler and VLM baseline are available on this integration branch.
+The inference, decision, and transport modules still need to be wired together.
 
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
-pip install -r requirements-frame.txt
+pip install -r requirements-frame.txt -r requirements-rsu.txt
 python -m rsu.frame_automation --video CAM_01=assets/demo_clips/traffic.mp4
 ```
 
@@ -60,6 +66,8 @@ Optional `--output-dir /tmp/roadsense-frames` saves sampled JPEGs for inspection
 `--no-realtime` extracts offline as fast as decoding permits. Clips stop at EOF
 (or decode failure); Ctrl-C releases the video handles. Video files stay local.
 The CLI only extracts frames and does not classify them or send predictions.
+The VLM uses the existing `assets/prompts/ape_k30.md` prompts; see
+[VLM setup](docs/rsu-baseline.md) for model loading and the input interface.
 
 For the RSU automation loop, use one `FrameSampler` per camera:
 

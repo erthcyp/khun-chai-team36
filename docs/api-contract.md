@@ -22,7 +22,8 @@ Class order: `["normal_flow", "congestion", "accident", "invalid_scene"]`
   "sampling_interval_sec": 1.0,
   "verification_state": "verifying",
   "alert": {"level": "preliminary", "type": "congestion", "message": "Congestion suspected"},
-  "priority": "high"
+  "priority": "high",
+  "event_id": "CAM_02-evt-0003"
 }
 ```
 Values are examples only. `verification_state`: `normal | verifying | alert | recovery | invalid`.
@@ -34,7 +35,38 @@ multipart: `file` (image/jpeg) + `meta` JSON `{camera_id, frame_id, video_timest
 ## Mac 2 read endpoints
 `GET /health` · `GET /api/v1/cameras` · `GET /api/v1/alerts` · `GET /api/v1/metrics` · `WS /ws` (optional push)
 
-## Open questions for 10:00 kickoff
-- confidence = top softmax score? (must match what the existing VLM code returns)
-- snapshot via HTTP multipart (above) or WebSocket?
+## Meaning process (Mac 2, OpenAI)
+- Runs on the TCC only; key from `OPENAI_API_KEY` env on Mac 2.
+- **Trigger:** only when a camera's `verification_state`, `predicted_class` or `alert.level` changes (or a new `event_id` appears) — never on every message.
+- **Stage 1 (JSON):** summarize from the JSON alone; must not state anything the JSON doesn't contain (no car counts, no injuries).
+- **Stage 2 (image, optional):** when a snapshot with the same `event_id` / `frame_id` arrives, refine the summary using the image; mark it `source: "json+image"`.
+- Async, timeout + template fallback; the dashboard shows the JSON status immediately and fills the summary in when ready.
+- Output attached to the alert:
+```json
+{"event_id": "CAM_02-evt-0003", "summary_en": "...", "summary_th": "...",
+ "suggested_action": "...", "source": "json | json+image | fallback", "model": "...", "generated_at": "..."}
+```
+Exposed via `GET /api/v1/alerts` and pushed on `WS /ws` as `{"type": "meaning", "data": {...}}`.
+
+## Decisions (kickoff, 10:47)
+- **Transport: option A, JSON** (this file). Binary 16-byte vector is a stretch goal only.
+- **Scores:** `scores` = softmax(100 × cosine(image, APE class embedding)) per paper Eq. 5–6, in `score_order`; sums to 1.
+- **Confidence:** `confidence = max(scores)`. Thresholds (e.g. 0.60) refer to this value.
+- **Location comes from config, not the model:** RSU loads `rsu/cameras.json` and copies the camera's `location` into every message.
+- **Measure bytes:** TCC records the size of every semantic message and every JPEG so the dashboard can show real bandwidth vs raw frames.
+
+### `rsu/cameras.json` (example)
+```json
+[
+  {"camera_id": "CAM_01", "video": "assets/demo_clips/cam01.mp4",
+   "location": {"label": "Junction A", "latitude": null, "longitude": null}},
+  {"camera_id": "CAM_02", "video": "assets/demo_clips/cam02.mp4",
+   "location": {"label": "Junction B", "latitude": null, "longitude": null}}
+]
+```
+
+## Still open
+- Model: CLIP ViT-L-14 (best in paper) vs ViT-B-32 (faster) — decide after timing `predict()` on Mac 1
+- Prompt set: the paper's 120 APE prompts (30/class) — confirm file location
+- Snapshot via HTTP multipart (above) or WebSocket?
 - TCC port: 8000 conflicts with Docker on erthcyp's Mac → use 8010 if that Mac is Mac 2
