@@ -1,0 +1,8 @@
+[
+  {"camera_id": "CAM_01", "location": {"label": "Demo camera 1"}},
+  {"camera_id": "CAM_02", "location": {"label": "Demo camera 2"}},
+  {"camera_id": "CAM_03", "location": {"label": "Demo camera 3"}},
+  {"camera_id": "CAM_04", "location": {"label": "Demo camera 4"}},
+  {"camera_id": "CAM_05", "location": {"label": "Demo camera 5"}},
+  {"camera_id": "CAM_06", "location": {"label": "Demo camera 6"}}
+]
