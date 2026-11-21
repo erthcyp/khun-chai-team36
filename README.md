@@ -28,6 +28,6 @@ Real VLMs at the RSU: `make install-clip`, put images in `data/samples/`, `make 
 | Name | Role |
 |---|---|
 | Bhuchi Kumprakob | TODO |
-| TODO | TODO |
-| TODO | TODO |
-| TODO | TODO |
+| Chaiyapat Anantarasuchart | TODO |
+| Chaitawat Boonkitticharoen | TODO |
+| Kanteeded Limkangwalmongkol | TODO |
