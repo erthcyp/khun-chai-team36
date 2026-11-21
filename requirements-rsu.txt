@@ -1,0 +1,5 @@
+httpx
+numpy
+open_clip_torch
+pillow
+torch

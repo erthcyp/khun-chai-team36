@@ -1,0 +1,2011 @@
+## [ACCIDENT] — 500 prompts
+
+- Roadside camera captures a car crash near the highway lane
+- CCTV shows emergency detour around accident scene on the tunnel approach
+- Camera sees a vehicle collision near the bridge lane
+- CCTV shows a road crash near the bus lane
+- Roadside camera captures a traffic accident on the road shoulder
+- Traffic camera shows a motorcycle crash blocking the outer lane
+- RSU camera shows a bus crash on the highway lane
+- Camera sees a car crash blocking the road shoulder
+- Roadside camera captures a mangled vehicle beside the straight lane
+- Roadside camera captures lane closure due to collision on the expressway ramp
+- Traffic camera shows a truck with damaged side panel on the straight lane
+- Overhead camera sees emergency barrier around damaged vehicles
+- A multi-vehicle accident is visible near the road shoulder
+- Overhead camera sees a pile-up on the exit ramp
+- RSU camera shows a motorcycle crash on the main road
+- Traffic camera shows emergency response around an overturned car
+- Camera sees a traffic accident blocking the exit ramp
+- Overhead camera sees lane blocked by overturned vehicle on the middle lane
+- Roadside camera captures paramedics near the vehicle impact
+- Traffic camera shows a mangled vehicle beside the arterial road
+- Traffic camera shows a road crash on the arterial road
+- CCTV shows a damaged car with emergency barrier
+- CCTV shows a multi-vehicle accident on the exit ramp
+- CCTV shows a smashed vehicle beside the straight lane
+- Roadside camera captures reflective triangle behind vehicle beside the crash area
+- Camera sees a smashed vehicle beside the signalized junction
+- Overhead camera sees a rollover accident near the main road
+- CCTV shows a traffic accident near the straight lane
+- Traffic camera shows emergency response around a vehicle with crushed front bumper
+- RSU camera shows a serious collision near the toll approach
+- RSU camera shows a motorcycle crash blocking the urban road
+- Camera sees vehicles stopped around a multi-vehicle accident
+- Traffic camera shows a multi-vehicle accident near the straight lane
+- Traffic camera shows a motorcycle lying beside lane on the signalized junction
+- Overhead camera sees lane blocked by overturned vehicle on the roundabout entry
+- RSU camera shows a traffic accident blocking the expressway ramp
+- RSU camera shows a vehicle impact near the highway lane
+- Camera sees rescue workers near wrecked car beside damaged vehicles
+- CCTV shows a motorcycle crash on the outer lane
+- RSU camera shows a roadside crash on the expressway ramp
+- Roadside camera captures a mangled vehicle on the middle lane
+- Camera sees a truck with damaged side panel beside the expressway ramp
+- CCTV shows a vehicle impact blocking the expressway ramp
+- CCTV shows a side-impact crash near the signalized junction
+- A two-car collision is visible near the arterial road
+- Overhead camera sees a roadside crash beside moving vehicles
+- Roadside camera captures a destroyed car after impact
+- Traffic camera shows a roadside crash near the arterial road
+- Traffic camera shows deployed airbags across the highway lane
+- RSU camera shows detached bumper across the right lane
+- Traffic camera shows a flipped vehicle on the tunnel approach
+- RSU camera shows a flipped vehicle on the highway lane
+- Traffic camera shows a rollover accident blocking the exit ramp
+- Traffic camera shows a disabled vehicle after crash on the right lane
+- CCTV shows a truck collision on the straight lane
+- Traffic camera shows rescue workers beside wrecked car at the bus crash
+- Roadside camera captures broken glass on road across the tunnel approach
+- CCTV shows a bus crash near the toll approach
+- Camera sees skid marks across the exit ramp
+- Roadside camera captures a disabled vehicle after crash on the expressway ramp
+- Overhead camera sees a crushed car beside the intersection approach
+- Roadside camera captures road closure sign beside the crash area
+- RSU camera shows a bus crash blocking the turning lane
+- Traffic camera shows a smashed vehicle beside the right lane
+- A road crash is visible near the intersection approach
+- Camera sees a vehicle collision near the bus lane
+- RSU camera shows a rear-end collision blocking the exit ramp
+- CCTV shows a truck collision on the road shoulder
+- Traffic camera shows a minor crash blocking the signalized junction
+- Roadside camera captures a road crash blocking the bus lane
+- Overhead camera sees a rear-end collision on the right lane
+- RSU camera shows flashing emergency lights near the traffic accident
+- Camera sees emergency response around a vehicle with crushed front bumper
+- RSU camera shows a damaged car with temporary crash barrier
+- CCTV shows a damaged vehicle beside the intersection approach
+- Roadside camera captures rescue workers near wrecked car beside damaged vehicles
+- RSU camera shows vehicle parts on lane across the bus lane
+- Traffic camera shows a motorcycle crash near the bus lane
+- Traffic camera shows paramedics near the vehicle collision
+- A truck with damaged side panel is visible on the middle lane
+- CCTV shows blocked lane caused by crash on the toll approach
+- Traffic camera shows police directing traffic around crash near the side-impact crash
+- RSU camera shows a multi-vehicle accident blocking the turning lane
+- Camera sees a road crash near the tunnel approach
+- Camera sees a multi-vehicle accident blocking the urban road
+- Camera sees a serious collision on the turning lane
+- Roadside camera captures blocked lane caused by crash on the road shoulder
+- Traffic camera shows vehicles passing damaged cars slowly on the outer lane
+- Overhead camera sees a flipped vehicle beside the turning lane
+- Camera sees warning triangle around damaged vehicles
+- Roadside camera captures broken glass on road across the outer lane
+- CCTV shows an ambulance near the truck collision
+- Camera sees a rollover accident near the intersection approach
+- RSU camera shows a damaged car with road flare beside damaged car
+- Traffic camera shows a traffic accident blocking the highway lane
+- Traffic camera shows a car crash near the tunnel approach
+- Traffic camera shows broken headlight pieces across the left lane
+- Overhead camera sees a smashed vehicle on the highway lane
+- CCTV shows a vehicle impact near the bus lane
+- CCTV shows a vehicle with shattered windshield beside the toll approach
+- CCTV shows visible wreckage on the middle lane
+- Traffic camera shows a vehicle with shattered windshield on the exit ramp
+- RSU camera shows a damaged vehicle beside the urban road
+- Roadside camera captures a motorcycle lying beside lane on the right lane
+- Traffic camera shows a flipped vehicle on the turning lane
+- Overhead camera sees a crash scene with damaged roadside barrier
+- Camera sees traffic diverted around wrecked car on the bridge lane
+- RSU camera shows an overturned car beside the main road
+- Camera sees a roadside crash near the left lane
+- RSU camera shows emergency detour around accident scene on the arterial road
+- RSU camera shows a destroyed car beside the exit ramp
+- CCTV shows a disabled vehicle after crash beside the intersection approach
+- Traffic camera shows a vehicle with broken rear bumper beside the middle lane
+- Camera sees oil spill after collision near stopped vehicles
+- CCTV shows a serious collision on the expressway ramp
+- Camera sees a damaged vehicle on the tunnel approach
+- CCTV shows a disabled vehicle after crash on the road shoulder
+- RSU camera shows a truck with damaged side panel on the turning lane
+- Traffic camera shows a multi-vehicle accident near the intersection approach
+- Camera sees a side-impact crash near the tunnel approach
+- Overhead camera sees a multi-vehicle accident blocking the expressway ramp
+- Overhead camera sees stopped traffic behind collision scene on the main road
+- CCTV shows smoke from vehicle across the roundabout entry
+- RSU camera shows deployed airbags across the roundabout entry
+- CCTV shows a smashed vehicle beside the intersection approach
+- Camera sees traffic disruption near damaged vehicles on the main road
+- Overhead camera sees a mangled vehicle on the road shoulder
+- Camera sees vehicle parts on lane across the right lane
+- RSU camera shows a damaged car with caution tape
+- Roadside camera captures a rear-end collision near the bus lane
+- RSU camera shows a wrecked car on the toll approach
+- Traffic camera shows traffic disruption near damaged vehicles on the roundabout entry
+- Traffic camera shows cars waiting behind crash scene on the roundabout entry
+- CCTV shows a damaged car with barrier tape around crash scene
+- Traffic camera shows a side-impact crash on the tunnel approach
+- Overhead camera sees a roadside crash near the signalized junction
+- Traffic camera shows a truck with damaged side panel beside the straight lane
+- A wrecked car is visible on the tunnel approach
+- A flipped vehicle is visible on the middle lane
+- Roadside camera captures traffic disruption near damaged vehicles on the exit ramp
+- CCTV shows a rear-end collision near the outer lane
+- Overhead camera sees a motorcycle lying beside lane on the urban road
+- RSU camera shows a truck collision blocking the straight lane
+- Roadside camera captures a minor crash on the arterial road
+- Camera sees crash debris across the arterial road
+- Overhead camera sees a roadside crash near the straight lane
+- CCTV shows a rollover accident blocking the tunnel approach
+- CCTV shows a vehicle collision on the roundabout entry
+- Roadside camera captures a rollover accident on the toll approach
+- A side-impact crash is visible near the left lane
+- Roadside camera captures a side-impact crash on the main road
+- Camera sees a damaged car with emergency cones
+- Overhead camera sees a smashed vehicle on the arterial road
+- RSU camera shows a pile-up near the main road
+- Overhead camera sees a side-impact crash near the bus lane
+- Roadside camera captures a vehicle with crushed front bumper on the outer lane
+- Overhead camera sees a multi-vehicle accident on the main road
+- Roadside camera captures a police car near crash at the roadside crash
+- CCTV shows emergency detour around accident scene on the highway lane
+- Traffic camera shows a smashed vehicle on the highway lane
+- Overhead camera sees a head-on collision near the highway lane
+- Roadside camera captures an overturned car on the left lane
+- A traffic accident is visible near the highway lane
+- RSU camera shows a rollover accident on the expressway ramp
+- Overhead camera sees an overturned car beside the toll approach
+- Camera sees police directing traffic around crash near the truck collision
+- A roadside crash is visible near the signalized junction
+- RSU camera shows stopped traffic behind collision scene on the highway lane
+- A car with smashed hood is visible on the left lane
+- CCTV shows lane closure due to collision on the signalized junction
+- Camera sees a tow truck beside damaged car near the roadside crash
+- CCTV shows a side-impact crash blocking the urban road
+- Roadside camera captures a serious collision on the road shoulder
+- Traffic camera shows a road rescue operation near the vehicle impact
+- Camera sees a car with smashed hood on the signalized junction
+- RSU camera shows hazard lights near damaged vehicles on the bus lane
+- RSU camera shows a crash scene with detached bumper
+- Overhead camera sees a rear-end collision near the right lane
+- RSU camera shows a rear-end collision blocking the bridge lane
+- Roadside camera captures damaged roadside barrier across the intersection approach
+- CCTV shows a damaged vehicle beside the road shoulder
+- Roadside camera captures a roadside crash on the urban road
+- Traffic camera shows a truck collision near the middle lane
+- Traffic camera shows a vehicle with crushed front bumper beside the left lane
+- Camera sees cars waiting behind crash scene on the roundabout entry
+- Overhead camera sees a vehicle with broken rear bumper on the right lane
+- CCTV shows a rescue team near the bus crash
+- Traffic camera shows a hazard crew near collision at the bus crash
+- CCTV shows fallen mirror on road across the left lane
+- Traffic camera shows detached bumper across the turning lane
+- Camera sees smoke from vehicle across the road shoulder
+- Roadside camera captures detached bumper across the roundabout entry
+- RSU camera shows vehicles passing damaged cars slowly on the outer lane
+- CCTV shows a car with smashed hood on the intersection approach
+- Overhead camera sees a car with smashed hood on the toll approach
+- Camera sees a serious collision blocking the toll approach
+- Camera sees vehicles passing damaged cars slowly on the urban road
+- Roadside camera captures a police car near crash at the rear-end collision
+- Traffic camera shows a traffic accident near the arterial road
+- A car with smashed hood is visible on the outer lane
+- RSU camera shows a vehicle with crushed front bumper on the highway lane
+- Traffic camera shows a serious collision on the tunnel approach
+- CCTV shows damaged roadside barrier across the exit ramp
+- A minor crash is visible near the main road
+- Camera sees a head-on collision on the bus lane
+- CCTV shows oil spill after collision across the arterial road
+- Overhead camera sees vehicles passing damaged cars slowly on the roundabout entry
+- Overhead camera sees orange cones around wreck beside the crash area
+- Traffic camera shows leaking fluid under car across the toll approach
+- RSU camera shows a vehicle collision on the expressway ramp
+- RSU camera shows a crash scene with vehicle parts on lane
+- RSU camera shows a traffic accident on the turning lane
+- Roadside camera captures a motorcycle lying beside lane beside the left lane
+- Overhead camera sees leaking fluid under car across the intersection approach
+- RSU camera shows cars waiting behind crash scene on the signalized junction
+- Roadside camera captures traffic diverted around wrecked car on the expressway ramp
+- Roadside camera captures a flipped vehicle on the bridge lane
+- Roadside camera captures a vehicle impact blocking the urban road
+- RSU camera shows detached bumper beside a damaged car
+- Roadside camera captures a rear-end collision on the turning lane
+- Traffic camera shows a motorcycle crash on the intersection approach
+- Overhead camera sees a vehicle with broken rear bumper on the turning lane
+- Roadside camera captures emergency vehicles on scene near the truck collision
+- CCTV shows a vehicle with shattered windshield on the left lane
+- Overhead camera sees a road rescue operation near the vehicle collision
+- A damaged vehicle is visible on the right lane
+- RSU camera shows a wrecked car on the signalized junction
+- Roadside camera captures a destroyed car beside the bus lane
+- RSU camera shows oil spill after collision across the turning lane
+- Overhead camera sees a side-impact crash on the bridge lane
+- Roadside camera captures a roadside crash blocking the outer lane
+- Camera sees scraped guardrail across the urban road
+- CCTV shows a roadside crash on the straight lane
+- A minor crash is visible near the bridge lane
+- Traffic camera shows a rear-end collision near the outer lane
+- Camera sees tire marks near crash across the main road
+- RSU camera shows a truck collision near the bus lane
+- RSU camera shows a car crash blocking the tunnel approach
+- CCTV shows a car crash near the left lane
+- Roadside camera captures traffic diverted around wrecked car on the left lane
+- CCTV shows a truck with damaged side panel on the straight lane
+- Overhead camera sees a two-car collision near the bus lane
+- RSU camera shows deployed airbags across the urban road
+- Traffic camera shows a traffic accident near the left lane
+- Camera sees a mangled vehicle on the straight lane
+- Overhead camera sees a vehicle collision blocking the road shoulder
+- Camera sees skid marks across the outer lane
+- Camera sees a truck with damaged side panel on the highway lane
+- Camera sees a rollover accident blocking the straight lane
+- Roadside camera captures a crushed car beside the road shoulder
+- Traffic camera shows a traffic accident near the toll approach
+- Traffic camera shows a multi-vehicle accident on the arterial road
+- Roadside camera captures tire marks near crash across the left lane
+- Overhead camera sees road hazard from crash debris on the signalized junction
+- RSU camera shows a bus crash near the middle lane
+- Overhead camera sees an overturned car beside the exit ramp
+- RSU camera shows a vehicle collision on the intersection approach
+- Camera sees damaged roadside barrier across the arterial road
+- Overhead camera sees traffic diverted around wrecked car on the highway lane
+- Traffic camera shows oil spill after collision near stopped vehicles
+- CCTV shows traffic diverted around wrecked car on the highway lane
+- Traffic camera shows a rollover accident blocking the roundabout entry
+- Traffic camera shows a truck with damaged side panel beside the middle lane
+- A road crash is visible near the middle lane
+- Traffic camera shows a road crash on the bridge lane
+- Camera sees an ambulance beside damaged vehicles
+- Roadside camera captures a motorcycle lying beside lane beside the straight lane
+- Camera sees a destroyed car on the road shoulder
+- Roadside camera captures a side-impact crash on the arterial road
+- RSU camera shows a pile-up blocking the signalized junction
+- Camera sees a head-on collision on the exit ramp
+- Roadside camera captures a two-car collision blocking the bus lane
+- Roadside camera captures a traffic accident on the straight lane
+- Camera sees accident ahead sign beside the crash area
+- Traffic camera shows detached bumper across the main road
+- RSU camera shows a serious collision blocking the toll approach
+- Overhead camera sees a vehicle collision on the road shoulder
+- Camera sees road hazard from crash debris on the highway lane
+- RSU camera shows a pile-up on the highway lane
+- Roadside camera captures a side-impact crash near the expressway ramp
+- Overhead camera sees a vehicle with shattered windshield beside the straight lane
+- Roadside camera captures a vehicle with broken rear bumper beside the road shoulder
+- Camera sees a vehicle impact on the tunnel approach
+- Roadside camera captures blocked lane caused by crash on the roundabout entry
+- Roadside camera captures a motorcycle lying beside lane beside the toll approach
+- RSU camera shows scattered vehicle parts across the expressway ramp
+- Camera sees a two-car collision beside moving vehicles
+- RSU camera shows a rollover accident on the roundabout entry
+- Overhead camera sees broken headlight pieces across the middle lane
+- Roadside camera captures a bus crash near the signalized junction
+- CCTV shows a smashed vehicle beside the urban road
+- Camera sees a road rescue operation near the motorcycle crash
+- Camera sees traffic disruption near damaged vehicles on the arterial road
+- Roadside camera captures skid marks across the roundabout entry
+- CCTV shows a road rescue operation near the vehicle impact
+- Traffic camera shows a motorcycle crash blocking the right lane
+- Camera sees a car with smashed hood beside the arterial road
+- Camera sees a road crash blocking the road shoulder
+- Camera sees a car with smashed hood on the straight lane
+- Traffic camera shows first responders near the traffic accident
+- Camera sees a fire truck near the truck collision
+- Traffic camera shows a two-car collision blocking the signalized junction
+- Traffic camera shows hazard lights near damaged vehicles on the main road
+- CCTV shows a damaged vehicle on the bridge lane
+- A motorcycle lying beside lane is visible on the signalized junction
+- Roadside camera captures a rollover accident near the exit ramp
+- Roadside camera captures a roadside crash on the intersection approach
+- RSU camera shows vehicles stopped around visible crash on the roundabout entry
+- Camera sees a rescue team near the two-car collision
+- Traffic camera shows a serious collision blocking the left lane
+- Roadside camera captures barrier tape around crash scene beside the crash area
+- CCTV shows crash debris across the tunnel approach
+- Overhead camera sees road hazard from crash debris on the tunnel approach
+- Overhead camera sees a vehicle with broken rear bumper beside the urban road
+- A multi-vehicle accident is visible near the expressway ramp
+- Camera sees a bus crash on the road shoulder
+- Camera sees a vehicle collision near the road shoulder
+- Roadside camera captures a vehicle collision near the bus lane
+- Camera sees a bus crash near the outer lane
+- Roadside camera captures a bus crash near the bus lane
+- RSU camera shows a crushed car on the tunnel approach
+- Overhead camera sees a rescue team near the minor crash
+- CCTV shows a side-impact crash on the left lane
+- Roadside camera captures a truck collision on the toll approach
+- RSU camera shows a hazard crew near collision at the serious collision
+- Traffic camera shows a pile-up on the signalized junction
+- Overhead camera sees oil spill after collision across the main road
+- Camera sees a tow truck beside damaged car near the car crash
+- CCTV shows a tow truck beside damaged car near the head-on collision
+- Roadside camera captures a vehicle with crushed front bumper beside the middle lane
+- A vehicle collision is visible near the bridge lane
+- RSU camera shows a rollover accident on the left lane
+- RSU camera shows a vehicle with crushed front bumper beside the intersection approach
+- CCTV shows a motorcycle crash on the roundabout entry
+- Roadside camera captures temporary crash barrier around damaged vehicles
+- Overhead camera sees a vehicle with shattered windshield after impact
+- Roadside camera captures a traffic accident near the outer lane
+- Traffic camera shows oil spill after collision across the outer lane
+- RSU camera shows a pile-up near the bridge lane
+- Overhead camera sees a fire truck near the vehicle collision
+- Roadside camera captures a vehicle impact on the turning lane
+- Camera sees a car with smashed hood beside the turning lane
+- RSU camera shows visible wreckage on the turning lane
+- CCTV shows a side-impact crash near the road shoulder
+- Overhead camera sees a head-on collision near the main road
+- Camera sees a vehicle impact near the left lane
+- Roadside camera captures a side-impact crash beside moving vehicles
+- CCTV shows a smashed vehicle on the tunnel approach
+- Overhead camera sees a truck with damaged side panel on the road shoulder
+- Roadside camera captures a wrecked car beside the outer lane
+- Roadside camera captures a motorcycle crash blocking the signalized junction
+- Camera sees detached bumper across the road shoulder
+- RSU camera shows a car with smashed hood beside the exit ramp
+- Roadside camera captures traffic diverted around wrecked car on the outer lane
+- A car crash is visible near the right lane
+- Roadside camera captures a bus crash near the straight lane
+- Roadside camera captures an ambulance near the roadside crash
+- Overhead camera sees a destroyed car on the left lane
+- Traffic camera shows a rear-end collision near the urban road
+- Camera sees scattered vehicle parts across the highway lane
+- Roadside camera captures a bus crash blocking the turning lane
+- Camera sees a motorcycle crash on the main road
+- Traffic camera shows a vehicle impact near the intersection approach
+- Overhead camera sees a car crash on the roundabout entry
+- Roadside camera captures scraped guardrail across the intersection approach
+- Roadside camera captures deployed airbags across the intersection approach
+- Traffic camera shows a car with smashed hood on the straight lane
+- RSU camera shows vehicles stopped around visible crash on the exit ramp
+- Roadside camera captures a vehicle impact on the arterial road
+- RSU camera shows a serious collision blocking the highway lane
+- CCTV shows a side-impact crash on the highway lane
+- Roadside camera captures a truck collision blocking the intersection approach
+- Roadside camera captures skid marks across the outer lane
+- RSU camera shows cars waiting behind crash scene on the middle lane
+- RSU camera shows a road crash blocking the tunnel approach
+- Camera sees a smashed vehicle on the bus lane
+- CCTV shows cars waiting behind crash scene on the roundabout entry
+- Traffic camera shows a road rescue operation near the pile-up
+- Camera sees first responders near the side-impact crash
+- Overhead camera sees deployed airbags across the middle lane
+- Roadside camera captures a road crash near the intersection approach
+- Camera sees a vehicle collision near the left lane
+- Roadside camera captures a two-car collision near the urban road
+- Traffic camera shows a bus crash blocking the intersection approach
+- Camera sees a roadside crash blocking the urban road
+- Overhead camera sees a rear-end collision near the intersection approach
+- RSU camera shows flashing emergency lights near the rear-end collision
+- Traffic camera shows broken headlight pieces across the bridge lane
+- Roadside camera captures a traffic accident on the highway lane
+- CCTV shows a car crash blocking the turning lane
+- Traffic camera shows first responders near the roadside crash
+- CCTV shows a truck collision blocking the middle lane
+- CCTV shows a road rescue operation near the traffic accident
+- Traffic camera shows a crushed car on the road shoulder
+- Roadside camera captures a serious collision near the left lane
+- Overhead camera sees a head-on collision blocking the main road
+- Traffic camera shows tire marks near crash across the outer lane
+- CCTV shows a hazard crew near collision at the serious collision
+- Camera sees a vehicle with broken rear bumper beside the turning lane
+- RSU camera shows a rear-end collision near the bridge lane
+- Overhead camera sees a destroyed car on the intersection approach
+- Camera sees a head-on collision blocking the tunnel approach
+- Overhead camera sees tire marks near crash across the road shoulder
+- Overhead camera sees a vehicle with shattered windshield on the road shoulder
+- Traffic camera shows a vehicle collision beside moving vehicles
+- RSU camera shows a mangled vehicle beside the toll approach
+- Camera sees skid marks across the turning lane
+- CCTV shows a wrecked car beside the outer lane
+- CCTV shows a roadside crash near the signalized junction
+- Overhead camera sees traffic disruption near damaged vehicles on the tunnel approach
+- Roadside camera captures a crash scene with scraped guardrail
+- RSU camera shows a pile-up blocking the middle lane
+- Overhead camera sees a vehicle with shattered windshield on the arterial road
+- CCTV shows an ambulance near the pile-up
+- Overhead camera sees scraped guardrail across the expressway ramp
+- Traffic camera shows smoke from vehicle across the straight lane
+- CCTV shows damaged roadside barrier across the expressway ramp
+- A rollover accident is visible near the highway lane
+- CCTV shows tire marks near crash across the toll approach
+- Roadside camera captures a rear-end collision blocking the highway lane
+- Overhead camera sees an ambulance near the multi-vehicle accident
+- RSU camera shows a motorcycle lying beside lane on the toll approach
+- CCTV shows vehicle parts on lane across the outer lane
+- Traffic camera shows a rollover accident blocking the tunnel approach
+- RSU camera shows hazard lights near damaged vehicles on the toll approach
+- Roadside camera captures a wrecked car beside the roundabout entry
+- A vehicle with crushed front bumper is visible on the arterial road
+- Overhead camera sees leaking fluid under car across the signalized junction
+- CCTV shows a minor crash on the toll approach
+- Camera sees a head-on collision near the outer lane
+- Roadside camera captures a vehicle collision near the right lane
+- Roadside camera captures oil spill after collision across the intersection approach
+- Roadside camera captures a serious collision on the outer lane
+- Roadside camera captures a fire truck near the roadside crash
+- Traffic camera shows a car crash near the exit ramp
+- RSU camera shows a side-impact crash on the intersection approach
+- Traffic camera shows a vehicle collision near the exit ramp
+- Traffic camera shows a truck with damaged side panel on the roundabout entry
+- Roadside camera captures a disabled vehicle after crash beside the road shoulder
+- Overhead camera sees a side-impact crash blocking the toll approach
+- Traffic camera shows a multi-vehicle accident near the highway lane
+- Traffic camera shows a motorcycle lying beside lane beside the exit ramp
+- CCTV shows a road crash on the toll approach
+- CCTV shows a motorcycle lying beside lane on the highway lane
+- Camera sees a side-impact crash near the straight lane
+- RSU camera shows a rescue team near the pile-up
+- RSU camera shows first responders near the rollover accident
+- Traffic camera shows a vehicle with crushed front bumper on the outer lane
+- Roadside camera captures a road crash on the left lane
+- Camera sees a rear-end collision blocking the roundabout entry
+- RSU camera shows a vehicle collision near the toll approach
+- Traffic camera shows a minor crash blocking the bridge lane
+- Traffic camera shows a head-on collision on the roundabout entry
+- Traffic camera shows a rollover accident on the urban road
+- RSU camera shows a police car near crash at the two-car collision
+- Overhead camera sees an overturned car beside the main road
+- Traffic camera shows a traffic accident blocking the expressway ramp
+- Traffic camera shows a head-on collision near the straight lane
+- A flipped vehicle is visible on the highway lane
+- Camera sees vehicles passing damaged cars slowly on the intersection approach
+- CCTV shows a multi-vehicle accident blocking the left lane
+- Overhead camera sees an ambulance near the traffic accident
+- A motorcycle crash is visible near the exit ramp
+- RSU camera shows a rear-end collision blocking the highway lane
+- Overhead camera sees a head-on collision near the signalized junction
+- Overhead camera sees a destroyed car on the road shoulder
+- RSU camera shows cars waiting behind crash scene on the urban road
+- A side-impact crash is visible near the middle lane
+- Camera sees leaking fluid under car across the road shoulder
+- CCTV shows cars waiting behind crash scene on the right lane
+- Overhead camera sees a motorcycle lying beside lane on the bus lane
+- Camera sees road hazard from crash debris on the bridge lane
+- Roadside camera captures emergency vehicles on scene near the serious collision
+- RSU camera shows a truck collision on the arterial road
+- Traffic camera shows a vehicle collision on the right lane
+- RSU camera shows a multi-vehicle accident near the bus lane
+- RSU camera shows traffic disruption near damaged vehicles on the road shoulder
+- Roadside camera captures a motorcycle lying beside lane on the highway lane
+- Roadside camera captures a rollover accident blocking the expressway ramp
+- Overhead camera sees a vehicle collision near the left lane
+- Overhead camera sees a serious collision on the main road
+- Roadside camera captures police directing traffic around crash near the vehicle collision
+- RSU camera shows a motorcycle lying beside lane beside the highway lane
+- Roadside camera captures a roadside crash blocking the bus lane
+- CCTV shows a destroyed car beside the signalized junction
+- RSU camera shows an overturned car on the arterial road
+- Traffic camera shows cars waiting behind crash scene on the turning lane
+- Camera sees flare on road beside the crash area
+- Roadside camera captures emergency detour around accident scene on the bus lane
+- CCTV shows a two-car collision near the straight lane
+- Camera sees a bus crash blocking the signalized junction
+- Camera sees emergency response around a vehicle with shattered windshield
+- RSU camera shows blocked lane caused by crash on the bridge lane
+- RSU camera shows a pile-up blocking the tunnel approach
+- A rear-end collision is visible near the bus lane
+- Traffic camera shows oil spill after collision across the bridge lane
+- Traffic camera shows a destroyed car on the expressway ramp
+- CCTV shows a side-impact crash near the middle lane
+- RSU camera shows a mangled vehicle beside the left lane
+- RSU camera shows fallen mirror on road near stopped vehicles
+
+## [SMOOTH FLOW] — 500 prompts
+
+- Roadside camera captures uninterrupted lane flow across open lanes
+- CCTV shows an unobstructed roundabout entry with few vehicles
+- RSU camera shows off-peak traffic on the bus lane
+- Traffic camera shows visible gaps in every lane on the toll approach
+- RSU camera shows open lanes ahead on the middle lane
+- CCTV shows buses moving smoothly on the highway lane
+- Roadside camera captures thin traffic stream on the left lane
+- Roadside camera captures uninterrupted traffic along the exit ramp
+- Camera sees cars travelling freely along the turning lane
+- Camera sees daylight road scene on the main road
+- CCTV shows wide spacing across lanes on the urban road
+- Overhead camera sees wide spacing across lanes on the left lane
+- Traffic camera shows few motorcycles on road on the left lane
+- RSU camera shows late morning clear traffic on the bridge lane
+- Camera sees nearly empty road on the bus lane
+- Overhead camera sees small number of cars on the roundabout entry
+- Overhead camera sees small number of cars on the turning lane
+- RSU camera shows delivery trucks moving smoothly on the outer lane
+- Overhead camera sees vehicles spread across road on the outer lane
+- Traffic camera shows clear road with visible lane markings
+- Traffic camera shows scattered vehicles on lanes on the turning lane
+- CCTV shows flowing traffic along the intersection approach
+- RSU camera shows regular road activity on the intersection approach
+- CCTV shows steady lane movement along the bridge lane
+- CCTV shows quiet highway traffic on the main road
+- Traffic camera shows cars travelling freely along the highway lane
+- Overhead camera sees motorcycles traveling freely through lanes
+- CCTV shows steady traffic along the left lane
+- Camera sees few cars on road on the main road
+- Overhead camera sees smooth road movement along the expressway ramp
+- Camera sees open road on the turning lane
+- Camera sees enough space between cars on the expressway ramp
+- Camera sees open expressway with visible lane markings
+- CCTV shows steady traffic along the bus lane
+- Roadside camera captures an unobstructed straight lane with few vehicles
+- RSU camera shows off-peak traffic on the straight lane
+- Camera sees non-rush-hour road on the roundabout entry
+- Overhead camera sees daytime light traffic on the right lane
+- RSU camera shows vehicles cruising normally along the left lane
+- CCTV shows pickup trucks moving smoothly on the middle lane
+- CCTV shows visible gaps in every lane on the expressway ramp
+- Overhead camera sees few motorcycles on road on the right lane
+- RSU camera shows mixed vehicles moving smoothly on the expressway ramp
+- Overhead camera sees uninterrupted traffic along the road shoulder
+- Traffic camera shows vans traveling freely through lanes
+- Roadside camera captures cars moving at regular pace along the arterial road
+- RSU camera shows late morning clear traffic on the main road
+- Roadside camera captures low vehicle density on the main road
+- RSU camera shows early evening steady traffic on the tunnel approach
+- CCTV shows sedans moving smoothly on the roundabout entry
+- Camera sees cars passing through normally along the road shoulder
+- CCTV shows clear ramp lane with visible lane markings
+- Roadside camera captures scattered vehicles on lanes on the arterial road
+- Camera sees flowing traffic along the middle lane
+- Traffic camera shows vehicles spread across road on the urban road
+- Camera sees smooth road movement along the tunnel approach
+- Overhead camera sees large gaps between vehicles on the main road
+- Camera sees moving smoothly along the straight lane
+- RSU camera shows vehicles cruising normally along the urban road
+- Roadside camera captures small number of cars on the urban road
+- Camera sees vehicles maintaining normal speed along the tunnel approach
+- Traffic camera shows cars travelling freely along the bridge lane
+- Camera sees few motorcycles on road on the left lane
+- RSU camera shows separated vehicles in daylight on the toll approach
+- Overhead camera sees vehicles maintaining normal speed along the arterial road
+- Overhead camera sees smooth road movement along the roundabout entry
+- CCTV shows normal weekday traffic on the exit ramp
+- Overhead camera sees enough space between cars on the exit ramp
+- Overhead camera sees vans moving smoothly on the tunnel approach
+- RSU camera shows cars with room ahead on the intersection approach
+- Camera sees cars separated by safe distance on the highway lane
+- Camera sees non-rush-hour road on the middle lane
+- Traffic camera shows light traffic on the expressway ramp
+- CCTV shows vehicles cruising normally along the bridge lane
+- RSU camera shows regular road activity on the left lane
+- Camera sees quiet highway traffic on the urban road
+- Overhead camera sees white cars moving smoothly on the middle lane
+- Roadside camera captures delivery trucks moving smoothly on the bus lane
+- CCTV shows wide spacing across lanes on the exit ramp
+- Overhead camera sees cars separated by safe distance on the exit ramp
+- CCTV shows continuous flow along the middle lane
+- Camera sees open lanes ahead on the intersection approach
+- RSU camera shows smooth road movement along the urban road
+- Camera sees uncrowded roadway on the straight lane
+- Overhead camera sees standard road conditions across open lanes
+- Camera sees morning commute with smooth flow on the roundabout entry
+- Overhead camera sees delivery trucks moving smoothly on the exit ramp
+- RSU camera shows daytime light traffic on the main road
+- Roadside camera captures clear distance between vehicles on the arterial road
+- RSU camera shows widely spaced vehicles on the bridge lane
+- Roadside camera captures vehicles spread across road on the straight lane
+- Camera sees an unobstructed road shoulder with few vehicles
+- Camera sees vehicles evenly spaced on the straight lane
+- Overhead camera sees clear lanes with visible lane markings
+- RSU camera shows vehicles evenly spaced on the outer lane
+- Camera sees open lanes ahead on the outer lane
+- Camera sees scattered vehicles on lanes on the road shoulder
+- CCTV shows open lanes ahead on the expressway ramp
+- CCTV shows visible gaps in every lane on the signalized junction
+- RSU camera shows normal weekday traffic on the right lane
+- Overhead camera sees mixed vehicles moving smoothly on the middle lane
+- Overhead camera sees motorcycles moving smoothly on the intersection approach
+- Roadside camera captures regular traffic across open lanes
+- Overhead camera sees dark vehicles moving smoothly on the expressway ramp
+- Overhead camera sees steady vehicles passing through open lanes
+- RSU camera shows flowing traffic along the tunnel approach
+- RSU camera shows non-rush-hour road on the straight lane
+- Roadside camera captures commuter vehicles moving smoothly on the highway lane
+- Overhead camera sees taxi and cars moving smoothly on the highway lane
+- Roadside camera captures daylight road scene on the signalized junction
+- RSU camera shows light road activity on the signalized junction
+- RSU camera shows thin traffic stream on the main road
+- Roadside camera captures sedans moving smoothly on the straight lane
+- Roadside camera captures cars moving smoothly on the straight lane
+- Roadside camera captures flowing traffic along the bridge lane
+- RSU camera shows clear intersection approach with visible lane markings
+- Overhead camera sees vans moving smoothly on the right lane
+- Roadside camera captures cars with room ahead on the main road
+- Roadside camera captures mixed vehicles traveling freely through lanes
+- Roadside camera captures clean road with visible lane markings
+- CCTV shows motorcycles moving smoothly on the arterial road
+- CCTV shows an unobstructed highway lane with few vehicles
+- CCTV shows taxi and cars moving smoothly on the straight lane
+- Camera sees motorcycles moving smoothly on the turning lane
+- Roadside camera captures morning commute with smooth flow on the intersection approach
+- Roadside camera captures enough space between cars on the right lane
+- CCTV shows stable traffic pattern across open lanes
+- Overhead camera sees flowing traffic along the straight lane
+- Overhead camera sees clear following distance between cars on the expressway ramp
+- RSU camera shows off-peak traffic on the outer lane
+- RSU camera shows daytime light traffic on the intersection approach
+- Camera sees vehicles spread across road on the expressway ramp
+- CCTV shows sparse vehicles on the highway lane
+- Cars remain evenly spaced along the road shoulder
+- Camera sees dark vehicles with large gaps ahead
+- CCTV shows few cars on road on the highway lane
+- CCTV shows cars travelling freely along the signalized junction
+- Overhead camera sees light road activity on the straight lane
+- Camera sees daylight road scene on the urban road
+- Overhead camera sees dark vehicles moving smoothly on the toll approach
+- Overhead camera sees separated vehicles in daylight on the road shoulder
+- Roadside camera captures taxi and cars moving smoothly on the bridge lane
+- Roadside camera captures vehicles cruising normally along the main road
+- Overhead camera sees clear distance between vehicles on the main road
+- Roadside camera captures low vehicle density on the arterial road
+- CCTV shows large gaps between vehicles on the bus lane
+- Roadside camera captures sedans moving smoothly on the expressway ramp
+- Overhead camera sees vehicles evenly spaced on the middle lane
+- CCTV shows uninterrupted traffic along the arterial road
+- Traffic camera shows clear following distance between cars on the main road
+- CCTV shows daylight road scene on the middle lane
+- RSU camera shows motorcycles moving smoothly on the turning lane
+- CCTV shows moving smoothly along the toll approach
+- Camera sees moving smoothly along the outer lane
+- Traffic camera shows uninterrupted traffic along the signalized junction
+- Traffic camera shows white cars with large gaps ahead
+- RSU camera shows late morning clear traffic on the intersection approach
+- Camera sees traffic moving without delay along the straight lane
+- CCTV shows dark vehicles moving smoothly on the exit ramp
+- Roadside camera captures taxi and cars moving smoothly on the main road
+- Overhead camera sees separated vehicles in daylight on the left lane
+- Camera sees well-maintained road with visible lane markings
+- Overhead camera sees wide spacing across lanes on the bridge lane
+- CCTV shows delivery trucks moving smoothly on the arterial road
+- Overhead camera sees vans moving smoothly on the turning lane
+- Overhead camera sees off-peak traffic on the middle lane
+- Overhead camera sees clear midday traffic on the arterial road
+- Traffic camera shows small number of cars on the turning lane
+- Traffic camera shows sparse vehicles on the turning lane
+- Camera sees regular road activity on the expressway ramp
+- Roadside camera captures afternoon smooth traffic on the bus lane
+- CCTV shows enough space between cars on the intersection approach
+- Roadside camera captures clear following distance between cars on the roundabout entry
+- CCTV shows well-maintained road with visible lane markings
+- Roadside camera captures orderly traffic across open lanes
+- Traffic camera shows normal weekday traffic on the arterial road
+- Traffic camera shows dark vehicles moving smoothly on the arterial road
+- CCTV shows visible gaps in every lane on the tunnel approach
+- CCTV shows late morning clear traffic on the exit ramp
+- RSU camera shows continuous flow along the expressway ramp
+- Traffic camera shows vans moving smoothly on the tunnel approach
+- Camera sees steady lane movement along the outer lane
+- Roadside camera captures dark vehicles moving smoothly on the highway lane
+- Camera sees cars separated by safe distance on the toll approach
+- Traffic camera shows moving smoothly along the bus lane
+- CCTV shows wide spacing across lanes on the straight lane
+- Overhead camera sees white cars moving smoothly on the straight lane
+- Roadside camera captures a clean road with normal traffic speed
+- Overhead camera sees normal weekday traffic on the tunnel approach
+- Roadside camera captures taxi and cars moving smoothly on the toll approach
+- Camera sees morning commute with smooth flow on the intersection approach
+- Camera sees afternoon smooth traffic on the outer lane
+- RSU camera shows normal weekday traffic on the outer lane
+- Overhead camera sees stable traffic pattern across open lanes
+- Traffic camera shows visible gaps in every lane on the signalized junction
+- CCTV shows steady lane movement along the turning lane
+- Traffic camera shows open lanes ahead on the left lane
+- Overhead camera sees large gaps between vehicles on the outer lane
+- Camera sees clear road with visible lane markings
+- RSU camera shows continuous flow along the outer lane
+- Overhead camera sees scattered vehicles on lanes on the tunnel approach
+- Traffic camera shows cars separated by safe distance on the tunnel approach
+- Traffic camera shows cars separated by safe distance on the bus lane
+- CCTV shows widely spaced vehicles on the urban road
+- CCTV shows pickup trucks moving smoothly on the left lane
+- Roadside camera captures white cars moving smoothly on the tunnel approach
+- CCTV shows non-rush-hour road on the tunnel approach
+- RSU camera shows few motorcycles on road on the exit ramp
+- Roadside camera captures large gaps between vehicles on the road shoulder
+- Overhead camera sees vehicles maintaining normal speed along the expressway ramp
+- Camera sees sparse vehicles on the straight lane
+- CCTV shows vehicles evenly spaced on the tunnel approach
+- RSU camera shows weekend light traffic on the straight lane
+- Roadside camera captures scattered vehicles on lanes on the tunnel approach
+- RSU camera shows open lanes ahead on the main road
+- RSU camera shows regular vehicle flow across open lanes
+- Camera sees steady traffic along the outer lane
+- Roadside camera captures non-rush-hour road on the middle lane
+- Roadside camera captures uncrowded roadway on the straight lane
+- Camera sees few motorcycles on road on the highway lane
+- Camera sees normal weekday traffic on the urban road
+- Overhead camera sees large gaps between vehicles on the expressway ramp
+- Camera sees small number of cars on the exit ramp
+- RSU camera shows uncrowded roadway on the bridge lane
+- Traffic camera shows open road on the right lane
+- CCTV shows daylight road scene on the expressway ramp
+- Camera sees sparse vehicles on the expressway ramp
+- CCTV shows cars with room ahead on the bus lane
+- RSU camera shows clean road with visible lane markings
+- CCTV shows free-flow traffic across open lanes
+- RSU camera shows traffic at normal speed across open lanes
+- Traffic camera shows steady traffic along the intersection approach
+- Camera sees light road activity on the main road
+- CCTV shows visible gaps in every lane on the exit ramp
+- CCTV shows clear midday traffic on the bridge lane
+- RSU camera shows separated vehicles in daylight on the roundabout entry
+- RSU camera shows wide spacing across lanes on the tunnel approach
+- Overhead camera sees wide spacing across lanes on the exit ramp
+- Overhead camera sees traffic moving without delay along the left lane
+- Roadside camera captures clear following distance between cars on the exit ramp
+- Traffic camera shows visible gaps in every lane on the highway lane
+- RSU camera shows white cars moving smoothly on the arterial road
+- CCTV shows cars with room ahead on the tunnel approach
+- Overhead camera sees taxi and cars moving smoothly on the tunnel approach
+- Camera sees cars with room ahead on the urban road
+- Camera sees open lanes ahead on the toll approach
+- Overhead camera sees visible gaps in every lane on the urban road
+- Overhead camera sees off-peak traffic on the right lane
+- Camera sees cars passing through normally along the expressway ramp
+- CCTV shows mixed vehicles moving smoothly on the signalized junction
+- Traffic camera shows few motorcycles on road on the exit ramp
+- CCTV shows sedans moving smoothly on the right lane
+- Camera sees off-peak traffic on the bus lane
+- RSU camera shows moving smoothly along the toll approach
+- Overhead camera sees open lanes ahead on the tunnel approach
+- CCTV shows low vehicle density on the bridge lane
+- Camera sees normal weekday traffic on the turning lane
+- CCTV shows daylight road scene on the roundabout entry
+- Roadside camera captures vehicles cruising normally along the arterial road
+- Overhead camera sees clear following distance between cars on the straight lane
+- Overhead camera sees vehicles evenly spaced on the bus lane
+- Overhead camera sees cars passing through normally along the middle lane
+- Roadside camera captures large gaps between vehicles on the outer lane
+- Traffic camera shows non-rush-hour road on the arterial road
+- Camera sees regular road activity on the urban road
+- Traffic camera shows off-peak traffic on the intersection approach
+- Traffic camera shows clear midday traffic on the middle lane
+- CCTV shows enough space between cars on the middle lane
+- Traffic camera shows commuter vehicles moving smoothly on the outer lane
+- Roadside camera captures continuous flow along the signalized junction
+- Overhead camera sees regular road activity on the expressway ramp
+- CCTV shows cars with room ahead on the toll approach
+- RSU camera shows vans moving smoothly on the toll approach
+- RSU camera shows sedans moving smoothly on the right lane
+- RSU camera shows vehicles in motion along the right lane
+- Overhead camera sees wide spacing between cars on the road
+- RSU camera shows pickup trucks moving smoothly on the highway lane
+- Traffic camera shows an unobstructed tunnel approach with few vehicles
+- Roadside camera captures vehicles in motion along the bridge lane
+- RSU camera shows nearly empty road on the tunnel approach
+- Camera sees pickup trucks moving smoothly on the turning lane
+- Overhead camera sees large gaps between vehicles on the straight lane
+- Camera sees steady lane movement along the main road
+- RSU camera shows calm road movement across open lanes
+- Traffic camera shows off-peak traffic on the main road
+- Camera sees few motorcycles on road on the right lane
+- CCTV shows small number of cars on the expressway ramp
+- Camera sees vehicles spread across road on the turning lane
+- CCTV shows moving smoothly along the intersection approach
+- Roadside camera captures daytime light traffic on the toll approach
+- RSU camera shows sedans moving smoothly on the middle lane
+- Traffic camera shows delivery trucks moving smoothly on the urban road
+- CCTV shows daylight road scene on the straight lane
+- Overhead camera sees clear midday traffic on the expressway ramp
+- CCTV shows cars passing through normally along the tunnel approach
+- RSU camera shows flowing traffic along the main road
+- Roadside camera captures weekend light traffic on the arterial road
+- Traffic camera shows cars with room ahead on the middle lane
+- Camera sees light traffic on the left lane
+- Traffic camera shows mixed vehicles moving smoothly on the urban road
+- Camera sees white cars moving smoothly on the tunnel approach
+- Camera sees morning commute with smooth flow on the tunnel approach
+- CCTV shows normal road operation across open lanes
+- Camera sees cars with room ahead on the toll approach
+- Roadside camera captures sedans moving smoothly on the outer lane
+- CCTV shows vehicles spread across road on the roundabout entry
+- RSU camera shows cars moving smoothly on the expressway ramp
+- Roadside camera captures cars with room ahead on the bus lane
+- Roadside camera captures cars moving smoothly on the tunnel approach
+- Traffic camera shows vehicles cruising normally along the toll approach
+- Roadside camera captures steady lane movement along the bus lane
+- Camera sees clear midday traffic on the highway lane
+- Roadside camera captures wide spacing across lanes on the bridge lane
+- RSU camera shows vehicles cruising normally along the tunnel approach
+- Roadside camera captures cars with room ahead on the straight lane
+- Traffic camera shows afternoon smooth traffic on the roundabout entry
+- Roadside camera captures delivery trucks moving smoothly on the straight lane
+- RSU camera shows early evening steady traffic on the bridge lane
+- Traffic camera shows vehicles maintaining normal speed along the urban road
+- Roadside camera captures uncrowded roadway on the left lane
+- Roadside camera captures motorcycles moving smoothly on the turning lane
+- CCTV shows white cars moving smoothly on the tunnel approach
+- Camera sees enough space between cars on the left lane
+- RSU camera shows normal weekday traffic on the turning lane
+- Camera sees vehicles maintaining normal speed along the arterial road
+- Roadside camera captures white cars moving smoothly on the straight lane
+- Traffic camera shows low vehicle density on the left lane
+- Traffic camera shows cars passing through normally along the signalized junction
+- Camera sees early evening steady traffic on the main road
+- RSU camera shows low vehicle density on the bridge lane
+- Traffic camera shows morning commute with smooth flow on the arterial road
+- Traffic camera shows nearly empty road on the left lane
+- Camera sees delivery trucks moving smoothly on the outer lane
+- RSU camera shows open turning lane with visible lane markings
+- CCTV shows cars moving smoothly on the arterial road
+- CCTV shows delivery trucks moving smoothly on the roundabout entry
+- CCTV shows large gaps between vehicles on the middle lane
+- Overhead camera sees taxi and cars moving smoothly on the exit ramp
+- Traffic camera shows open highway with visible lane markings
+- Camera sees clear distance between vehicles on the urban road
+- Roadside camera captures low vehicle density on the tunnel approach
+- Traffic camera shows light traffic on the exit ramp
+- CCTV shows sparse vehicles on the signalized junction
+- Traffic camera shows dark vehicles moving smoothly on the toll approach
+- Roadside camera captures morning commute with smooth flow on the outer lane
+- Traffic camera shows mixed vehicles moving smoothly on the toll approach
+- CCTV shows large gaps between vehicles on the left lane
+- CCTV shows nearly empty road on the left lane
+- Camera sees cars passing through normally along the left lane
+- RSU camera shows taxi and cars moving smoothly on the signalized junction
+- Roadside camera captures dry road surface with visible lane markings
+- Traffic camera shows steady weekday traffic across open lanes
+- CCTV shows moving smoothly along the outer lane
+- Vehicles cruise normally with wide following distance
+- Camera sees moving smoothly along the urban road
+- CCTV shows taxi and cars moving smoothly on the turning lane
+- Camera sees delivery trucks moving smoothly on the roundabout entry
+- Camera sees continuous flow along the main road
+- RSU camera shows afternoon smooth traffic on the signalized junction
+- Roadside camera captures thin traffic stream on the main road
+- Camera sees light road activity on the highway lane
+- Traffic camera shows visible gaps in every lane on the left lane
+- Camera sees separated vehicles in daylight on the turning lane
+- Traffic camera shows wide spacing between cars on the road
+- Few vehicles travel smoothly on the middle lane
+- RSU camera shows thin traffic stream on the middle lane
+- RSU camera shows visible road markings with visible lane markings
+- Camera sees quiet highway traffic on the expressway ramp
+- Overhead camera sees vehicles maintaining normal speed along the middle lane
+- Overhead camera sees non-rush-hour road on the expressway ramp
+- RSU camera shows normal weekday traffic on the exit ramp
+- Traffic camera shows widely spaced vehicles on the road shoulder
+- Roadside camera captures regular road activity on the outer lane
+- Camera sees weekend light traffic on the signalized junction
+- CCTV shows normal weekday traffic on the urban road
+- Traffic camera shows regular road activity on the bus lane
+- Camera sees scattered vehicles on lanes on the bus lane
+- Overhead camera sees visible gaps in every lane on the left lane
+- Traffic camera shows pickup trucks moving smoothly on the right lane
+- CCTV shows few cars on road on the left lane
+- CCTV shows off-peak traffic on the exit ramp
+- Roadside camera captures open lanes ahead on the tunnel approach
+- CCTV shows vehicles evenly spaced on the bus lane
+- Overhead camera sees normal weekday traffic on the outer lane
+- Roadside camera captures dark vehicles moving smoothly on the turning lane
+- CCTV shows normal road layout with visible lane markings
+- Overhead camera sees weekend light traffic on the expressway ramp
+- Roadside camera captures open road on the bus lane
+- Overhead camera sees normal road operation across open lanes
+- CCTV shows continuous flow along the intersection approach
+- Camera sees thin traffic stream on the outer lane
+- Roadside camera captures vehicles in motion along the main road
+- CCTV shows thin traffic stream on the highway lane
+- Roadside camera captures flowing traffic along the expressway ramp
+- Camera sees pickup trucks moving smoothly on the tunnel approach
+- Roadside camera captures daylight road scene on the highway lane
+- CCTV shows morning commute with smooth flow on the exit ramp
+- Camera sees traffic moving without delay along the middle lane
+- Overhead camera sees small number of cars on the straight lane
+- Traffic camera shows non-rush-hour road on the highway lane
+- Camera sees daytime light traffic on the expressway ramp
+- Traffic camera shows mixed vehicles moving smoothly on the outer lane
+- Camera sees visible gaps in every lane on the intersection approach
+- CCTV shows vehicles cruising normally along the left lane
+- Traffic camera shows uninterrupted traffic along the arterial road
+- Camera sees uninterrupted traffic along the highway lane
+- RSU camera shows vehicles in motion along the main road
+- Overhead camera sees daylight road scene on the left lane
+- Traffic camera shows steady vehicles passing through open lanes
+- Overhead camera sees flowing traffic along the exit ramp
+- CCTV shows open road on the straight lane
+- Roadside camera captures pickup trucks moving smoothly on the urban road
+- CCTV shows sparse vehicles on the roundabout entry
+- Traffic camera shows clear ramp lane with visible lane markings
+- Traffic camera shows visible gaps in every lane on the bridge lane
+- RSU camera shows flowing traffic along the toll approach
+- Traffic camera shows few cars on road on the turning lane
+- CCTV shows continuous flow along the left lane
+- Roadside camera captures vehicles evenly spaced on the signalized junction
+- Traffic camera shows traffic moving without delay along the main road
+- Overhead camera sees low vehicle density on the road shoulder
+- RSU camera shows late morning clear traffic on the expressway ramp
+- Traffic camera shows light road activity on the left lane
+- CCTV shows small number of cars on the intersection approach
+- Roadside camera captures cars travelling freely along the roundabout entry
+- CCTV shows vehicles spread across road on the middle lane
+- Camera sees dark vehicles moving smoothly on the outer lane
+- CCTV shows afternoon smooth traffic on the turning lane
+- Camera sees uninterrupted traffic along the left lane
+- CCTV shows low vehicle density on the turning lane
+- Camera sees commuter vehicles moving smoothly on the straight lane
+- Overhead camera sees cars separated by safe distance on the intersection approach
+- CCTV shows flowing traffic along the urban road
+- Overhead camera sees dry road surface with visible lane markings
+- Traffic camera shows empty road shoulder with visible lane markings
+- Traffic camera shows daytime light traffic on the signalized junction
+- RSU camera shows smooth road movement along the middle lane
+- Overhead camera sees widely spaced vehicles on the arterial road
+- RSU camera shows open road on the right lane
+- RSU camera shows early evening steady traffic on the intersection approach
+- Camera sees flowing traffic along the turning lane
+- Traffic camera shows morning commute with smooth flow on the toll approach
+- Roadside camera captures visible gaps in every lane on the exit ramp
+- RSU camera shows small number of cars on the middle lane
+- Roadside camera captures commuter vehicles moving smoothly on the middle lane
+- RSU camera shows moving smoothly along the highway lane
+- RSU camera shows vehicles maintaining normal speed along the toll approach
+- Traffic camera shows cars travelling freely along the roundabout entry
+- CCTV shows vehicles in motion along the arterial road
+- Roadside camera captures traffic moving without delay along the tunnel approach
+- Overhead camera sees visible gaps in every lane on the outer lane
+- Traffic camera shows weekend light traffic on the roundabout entry
+- CCTV shows sedans moving smoothly on the bus lane
+- Overhead camera sees uninterrupted traffic along the roundabout entry
+- CCTV shows uncrowded roadway on the signalized junction
+- RSU camera shows light traffic on the left lane
+- Camera sees scattered vehicles on lanes on the intersection approach
+- Roadside camera captures few cars on road on the bus lane
+- Overhead camera sees normal weekday traffic on the left lane
+- RSU camera shows quiet highway traffic on the right lane
+- Overhead camera sees continuous flow along the intersection approach
+- Overhead camera sees enough space between cars on the expressway ramp
+- Camera sees delivery trucks moving smoothly on the tunnel approach
+- Overhead camera sees an unobstructed road shoulder with few vehicles
+- RSU camera shows taxi and cars moving smoothly on the tunnel approach
+- Roadside camera captures traffic moving without delay along the right lane
+- CCTV shows a clean road with normal traffic speed
+- Camera sees daytime light traffic on the intersection approach
+- Roadside camera captures dark vehicles moving smoothly on the right lane
+- Overhead camera sees weekend light traffic on the outer lane
+- Roadside camera captures wide spacing across lanes on the exit ramp
+- Roadside camera captures daytime light traffic on the tunnel approach
+- Camera sees steady lane movement along the turning lane
+- Overhead camera sees wide spacing across lanes on the signalized junction
+- RSU camera shows cars moving smoothly on the left lane
+- Overhead camera sees cars moving at regular pace along the signalized junction
+- Traffic camera shows morning commute with smooth flow on the signalized junction
+- Traffic camera shows early evening steady traffic on the roundabout entry
+- RSU camera shows low vehicle density on the left lane
+- CCTV shows pickup trucks moving smoothly on the straight lane
+- CCTV shows cars separated by safe distance on the expressway ramp
+- CCTV shows uncrowded roadway on the arterial road
+- Traffic camera shows weekend light traffic on the exit ramp
+- Roadside camera captures balanced lane flow across open lanes
+- CCTV shows small number of cars on the signalized junction
+- Traffic camera shows open lanes ahead on the toll approach
+- Traffic camera shows an unobstructed toll approach with few vehicles
+- Roadside camera captures regular road activity on the roundabout entry
+- Camera sees smooth road movement along the exit ramp
+- Overhead camera sees flowing traffic along the road shoulder
+- CCTV shows widely spaced vehicles on the middle lane
+- Traffic camera shows off-peak traffic on the arterial road
+- Roadside camera captures taxi and cars with large gaps ahead
+- Camera sees a clean road with normal traffic speed
+- RSU camera shows clear midday traffic on the left lane
+- Traffic camera shows taxi and cars moving smoothly on the road shoulder
+- Overhead camera sees mixed vehicles moving smoothly on the signalized junction
+- CCTV shows open road on the right lane
+- Roadside camera captures low vehicle density on the exit ramp
+- Camera sees cars with room ahead on the highway lane
+
+## [CONGESTION] — 500 prompts
+
+- CCTV shows road full of cars on the bus lane
+- RSU camera shows cars lining up at signal along the tunnel approach
+- Traffic camera shows slow but moving traffic near the signalized junction
+- Traffic camera shows moderate queue at junction near the exit ramp
+- Camera sees congested road filling the right lane
+- Traffic camera shows queues filling the camera view on the middle lane
+- Traffic camera shows slow-moving vehicles across the turning lane
+- Roadside camera captures cars packed closely on the road shoulder
+- CCTV shows cars backed up along the signalized junction
+- Overhead camera sees pickup trucks packed closely on the toll approach
+- RSU camera shows motorcycles trapped between cars on the bridge lane
+- RSU camera shows closely packed traffic on the toll approach
+- Overhead camera sees complete road congestion filling the exit ramp
+- Traffic camera shows mixed vehicles packed closely on the straight lane
+- Overhead camera sees vehicles moving below normal speed near the roundabout entry
+- RSU camera shows wall-to-wall cars on the exit ramp
+- Traffic camera shows cars lining up at signal along the tunnel approach
+- Roadside camera captures ramp queue along the outer lane
+- Camera sees cars nose-to-tail on the exit ramp
+- CCTV shows heavily congested lanes filling the urban road
+- Overhead camera sees traffic at walking pace across the bus lane
+- Traffic camera shows cars nose-to-tail on the bridge lane
+- Traffic camera shows queues filling the camera view on the intersection approach
+- CCTV shows all lanes crowded on the right lane
+- Overhead camera sees little space between vehicles on the arterial road
+- Camera sees junction queue along the intersection approach
+- Roadside camera captures all lanes blocked by queued vehicles filling the signalized junction
+- RSU camera shows sedans packed closely on the urban road
+- Overhead camera sees short vehicle queue near the highway lane
+- Camera sees vehicles moving very slowly across the main road
+- RSU camera shows dark vehicles packed closely on the turning lane
+- CCTV shows brake lights visible on the right lane
+- Traffic camera shows cars waiting in line along the middle lane
+- A long traffic queue blocks the outer lane
+- Overhead camera sees a long line of vehicles at the exit ramp
+- Overhead camera sees stationary vehicles in a long queue on the straight lane
+- CCTV shows traffic jam filling the roundabout entry
+- CCTV shows overloaded road on the urban road
+- Overhead camera sees standstill traffic across the toll approach
+- Camera sees intersection queue along the arterial road
+- RSU camera shows limited lane spacing near the expressway ramp
+- Roadside camera captures motorcycles packed closely on the left lane
+- Camera sees rush-hour jam filling the outer lane
+- RSU camera shows rush-hour jam filling the expressway ramp
+- Roadside camera captures buses packed closely on the outer lane
+- Camera sees closely packed traffic on the expressway ramp
+- Traffic camera shows crawling traffic across the highway lane
+- CCTV shows cars backed up along the arterial road
+- Overhead camera sees cars waiting in line along the highway lane
+- CCTV shows road full of cars on the main road
+- CCTV shows packed road on the urban road
+- Roadside camera captures vehicles occupying all lanes on the road shoulder
+- Roadside camera captures buses stuck among cars on the tunnel approach
+- Overhead camera sees all lanes blocked by queued vehicles filling the bridge lane
+- Traffic camera shows rush-hour jam filling the roundabout entry
+- RSU camera shows limited lane spacing near the exit ramp
+- Camera sees overloaded road on the tunnel approach
+- RSU camera shows moderate queue at junction near the highway lane
+- Camera sees densely packed lanes on the arterial road
+- Traffic camera shows crowded road on the toll approach
+- CCTV shows crowded lanes under traffic lights on the road shoulder
+- CCTV shows many red taillights on the arterial road
+- Traffic camera shows many cars packed closely on the main road
+- CCTV shows vehicles barely moving across the tunnel approach
+- Overhead camera sees motorcycles trapped between cars on the road shoulder
+- Roadside camera captures cars creeping forward across the main road
+- RSU camera shows wall-to-wall cars on the bus lane
+- Roadside camera captures reduced traffic speed across the middle lane
+- Overhead camera sees cars backed up along the tunnel approach
+- RSU camera shows dense mixed vehicles on the intersection approach
+- Roadside camera captures limited lane spacing near the roundabout entry
+- Overhead camera sees slow approach to merge near the intersection approach
+- CCTV shows crowded lanes under traffic lights on the right lane
+- Camera sees motorcycles packed closely on the tunnel approach
+- Traffic camera shows dark vehicles packed closely on the exit ramp
+- Roadside camera captures dark vehicles packed closely on the signalized junction
+- Traffic camera shows reduced traffic speed across the tunnel approach
+- Camera sees packed road on the main road
+- Roadside camera captures taxi and cars packed closely on the bus lane
+- Overhead camera sees traffic inching along across the tunnel approach
+- RSU camera shows dense traffic on the signalized junction
+- RSU camera shows heavily congested lanes filling the highway lane
+- CCTV shows traffic inching along across the outer lane
+- RSU camera shows vehicle queue along the straight lane
+- Traffic camera shows all lanes crowded on the highway lane
+- Overhead camera sees many red taillights on the straight lane
+- Traffic camera shows crowded road on the signalized junction
+- Overhead camera sees mild bottleneck near the exit ramp
+- Overhead camera sees delivery trucks packed closely on the outer lane
+- Roadside camera captures brief traffic buildup near the toll approach
+- Traffic camera shows exit queue along the tunnel approach
+- Overhead camera sees ramp queue along the expressway ramp
+- CCTV shows crawling traffic across the left lane
+- Roadside camera captures slow but moving traffic near the tunnel approach
+- Traffic camera shows mixed vehicles packed closely on the arterial road
+- Traffic camera shows cars lining up at signal along the arterial road
+- Traffic camera shows buses stuck among cars on the expressway ramp
+- Camera sees stationary vehicles in a long queue on the toll approach
+- CCTV shows slow but moving traffic near the main road
+- Overhead camera sees cars moving with limited spacing near the bus lane
+- Roadside camera captures packed road on the bus lane
+- Camera sees vehicles barely moving across the signalized junction
+- CCTV shows mixed vehicles packed closely on the road shoulder
+- Camera sees commuter vehicles packed closely on the intersection approach
+- RSU camera shows cars lining up at signal along the road shoulder
+- Traffic camera shows cars packed closely on the outer lane
+- Camera sees many red taillights on the arterial road
+- Roadside camera captures all lanes crowded on the signalized junction
+- Roadside camera captures high vehicle density on the arterial road
+- RSU camera shows vehicles occupying all lanes on the urban road
+- Camera sees cars backed up along the arterial road
+- RSU camera shows reduced traffic speed across the exit ramp
+- CCTV shows stationary vehicles in a long queue on the main road
+- Camera sees ramp queue along the bridge lane
+- CCTV shows pickup trucks packed closely on the road shoulder
+- CCTV shows closely packed traffic on the turning lane
+- CCTV shows brake lights visible on the middle lane
+- Roadside camera captures high vehicle density on the bus lane
+- A long traffic queue blocks the straight lane
+- Traffic camera shows slow approach to merge near the outer lane
+- CCTV shows delayed traffic flow near the middle lane
+- Traffic camera shows traffic inching along across the tunnel approach
+- CCTV shows motorcycles trapped between cars on the road shoulder
+- RSU camera shows queue of cars along the signalized junction
+- Camera sees wall-to-wall cars on the main road
+- Roadside camera captures many red taillights on the roundabout entry
+- RSU camera shows short vehicle queue near the roundabout entry
+- Roadside camera captures vehicles moving below normal speed near the tunnel approach
+- Camera sees bumper-to-bumper traffic filling the road shoulder
+- Traffic camera shows heavy traffic on the signalized junction
+- Camera sees vehicles moving below normal speed near the outer lane
+- Camera sees vehicle queue along the middle lane
+- Roadside camera captures rush-hour jam filling the main road
+- CCTV shows traffic tailback along the right lane
+- RSU camera shows near-zero speed traffic across the bridge lane
+- Overhead camera sees crawling traffic across the left lane
+- CCTV shows vehicles moving below normal speed near the road shoulder
+- RSU camera shows junction queue along the arterial road
+- CCTV shows traffic slowing near intersection by the urban road
+- Camera sees many cars packed closely on the left lane
+- RSU camera shows many red taillights on the arterial road
+- Traffic camera shows wall-to-wall cars on the right lane
+- Overhead camera sees complete road congestion filling the roundabout entry
+- Overhead camera sees mild bottleneck near the middle lane
+- RSU camera shows traffic slowing near intersection by the urban road
+- Traffic camera shows mild bottleneck near the arterial road
+- Traffic camera shows commuter vehicles packed closely on the tunnel approach
+- RSU camera shows stationary traffic jam filling the intersection approach
+- Camera sees vehicles moving very slowly across the turning lane
+- Traffic camera shows traffic at walking pace across the signalized junction
+- RSU camera shows heavy traffic on the intersection approach
+- CCTV shows stationary traffic jam filling the exit ramp
+- Overhead camera sees delivery trucks packed closely on the right lane
+- RSU camera shows buses packed closely on the left lane
+- RSU camera shows congested road filling the roundabout entry
+- Traffic camera shows reduced traffic speed across the highway lane
+- Roadside camera captures brief traffic buildup near the middle lane
+- RSU camera shows sedans packed closely on the exit ramp
+- Roadside camera captures dark vehicles packed closely on the expressway ramp
+- CCTV shows complete road congestion filling the main road
+- CCTV shows stationary vehicles in a long queue on the bridge lane
+- Camera sees traffic inching along across the toll approach
+- Traffic camera shows wall-to-wall cars on the bridge lane
+- Traffic camera shows exit queue along the roundabout entry
+- RSU camera shows lanes filled with vehicles on the tunnel approach
+- CCTV shows cars lining up at signal along the signalized junction
+- Roadside camera captures severe bottleneck filling the toll approach
+- RSU camera shows standstill traffic across the toll approach
+- Roadside camera captures cars nose-to-tail on the bridge lane
+- RSU camera shows gridlock filling the toll approach
+- Camera sees near-zero speed traffic across the outer lane
+- CCTV shows brief traffic buildup near the middle lane
+- RSU camera shows vehicles moving below normal speed near the highway lane
+- Camera sees slow approach to merge near the tunnel approach
+- Camera sees heavy traffic on the middle lane
+- Camera sees line of vehicles along the exit ramp
+- CCTV shows moderate queue at junction near the middle lane
+- RSU camera shows dense mixed vehicles on the straight lane
+- Camera sees traffic tailback along the toll approach
+- Overhead camera sees crowded road on the straight lane
+- Roadside camera captures brief traffic buildup near the arterial road
+- Overhead camera sees traffic jam filling the expressway ramp
+- Traffic camera shows vans queued across multiple lanes
+- Overhead camera sees congested road filling the toll approach
+- RSU camera shows cars nose-to-tail on the toll approach
+- CCTV shows reduced traffic speed across the roundabout entry
+- Roadside camera captures cars waiting in line along the left lane
+- Traffic camera shows heavy traffic on the bus lane
+- Camera sees toll booth queue along the straight lane
+- Roadside camera captures lanes filled with vehicles on the straight lane
+- RSU camera shows dense traffic on the intersection approach
+- Traffic camera shows road full of cars on the signalized junction
+- Overhead camera sees traffic inching along across the urban road
+- Traffic camera shows queue of cars along the toll approach
+- RSU camera shows vehicles occupying all lanes on the right lane
+- Overhead camera sees vehicle queue along the roundabout entry
+- Traffic camera shows vehicles moving very slowly across the straight lane
+- RSU camera shows taxi and cars packed closely on the bridge lane
+- Traffic camera shows vehicles occupying all lanes on the exit ramp
+- CCTV shows traffic inching along across the straight lane
+- Camera sees brief traffic buildup near the turning lane
+- Camera sees traffic tailback along the main road
+- RSU camera shows slow but moving traffic near the urban road
+- Roadside camera captures cars packed closely on the urban road
+- Traffic camera shows a long line of vehicles at the straight lane
+- CCTV shows motorcycles packed closely on the bus lane
+- Roadside camera captures stationary vehicles in a long queue on the main road
+- Roadside camera captures ramp queue along the middle lane
+- Overhead camera sees complete road congestion filling the middle lane
+- Roadside camera captures slow but moving traffic near the middle lane
+- Overhead camera sees stop-and-go traffic across the middle lane
+- Camera sees vans packed closely on the right lane
+- Roadside camera captures traffic tailback along the straight lane
+- Camera sees short vehicle queue near the expressway ramp
+- Roadside camera captures long traffic queue along the highway lane
+- Traffic camera shows closely packed traffic on the expressway ramp
+- Camera sees dense mixed vehicles on the outer lane
+- RSU camera shows cars nose-to-tail on the arterial road
+- CCTV shows closely packed traffic on the toll approach
+- CCTV shows ramp bottleneck with many waiting vehicles
+- Overhead camera sees densely packed lanes on the toll approach
+- CCTV shows mixed vehicles packed closely on the highway lane
+- Overhead camera sees packed road on the roundabout entry
+- Overhead camera sees traffic at walking pace across the turning lane
+- Traffic camera shows buses stuck among cars on the bridge lane
+- CCTV shows slow but moving traffic near the middle lane
+- Camera sees vehicles occupying all lanes on the toll approach
+- CCTV shows motorcycles trapped between cars on the straight lane
+- Roadside camera captures slow-moving vehicles across the right lane
+- Overhead camera sees little space between vehicles on the straight lane
+- RSU camera shows lanes filled with vehicles on the exit ramp
+- Traffic camera shows roundabout congestion with many waiting vehicles
+- Roadside camera captures limited lane spacing near the road shoulder
+- CCTV shows heavily congested lanes filling the exit ramp
+- RSU camera shows little space between vehicles on the bridge lane
+- CCTV shows pickup trucks packed closely on the intersection approach
+- Roadside camera captures exit queue along the intersection approach
+- Overhead camera sees bumper-to-bumper traffic filling the outer lane
+- Camera sees packed road on the straight lane
+- Traffic camera shows little space between vehicles on the straight lane
+- Overhead camera sees all lanes blocked by queued vehicles filling the highway lane
+- CCTV shows cars repeatedly braking across the intersection approach
+- Traffic camera shows cars repeatedly braking across the roundabout entry
+- Overhead camera sees stationary traffic jam filling the roundabout entry
+- Overhead camera sees road filled with queued vehicles on the urban road
+- Roadside camera captures stationary vehicles in a long queue on the expressway ramp
+- Roadside camera captures bridge approach slowdown with many waiting vehicles
+- Overhead camera sees brake lights visible on the main road
+- Roadside camera captures dense mixed vehicles on the tunnel approach
+- Traffic camera shows taxi and cars packed closely on the toll approach
+- CCTV shows traffic tailback along the signalized junction
+- CCTV shows intersection overflow with many waiting vehicles
+- CCTV shows severe bottleneck filling the left lane
+- Traffic camera shows slow approach to merge near the signalized junction
+- Roadside camera captures vehicles moving very slowly across the expressway ramp
+- RSU camera shows dark vehicles packed closely on the roundabout entry
+- Camera sees long line of stopped cars along the exit ramp
+- Overhead camera sees red taillights across road on the outer lane
+- CCTV shows a long line of vehicles at the bus lane
+- Traffic camera shows reduced traffic speed across the outer lane
+- Overhead camera sees cars moving with limited spacing near the turning lane
+- Roadside camera captures vehicles occupying all lanes on the tunnel approach
+- Camera sees crawling traffic across the straight lane
+- Roadside camera captures motorcycles trapped between cars on the outer lane
+- RSU camera shows vehicles barely moving across the main road
+- RSU camera shows reduced traffic speed across the toll approach
+- Camera sees many cars packed closely on the bridge lane
+- Camera sees line of vehicles along the bus lane
+- CCTV shows reduced traffic speed across the main road
+- Overhead camera sees gridlock filling the right lane
+- Traffic camera shows severe bottleneck filling the arterial road
+- Traffic camera shows traffic slowing near intersection by the tunnel approach
+- RSU camera shows mixed vehicles packed closely on the highway lane
+- Overhead camera sees dense traffic on the turning lane
+- Overhead camera sees closely packed traffic on the intersection approach
+- Traffic camera shows road full of cars on the main road
+- Camera sees heavily congested lanes filling the roundabout entry
+- Traffic camera shows buses stuck among cars on the turning lane
+- Camera sees near-zero speed traffic across the expressway ramp
+- RSU camera shows white cars packed closely on the outer lane
+- Traffic camera shows stationary vehicles in a long queue on the arterial road
+- CCTV shows traffic jam filling the arterial road
+- Traffic camera shows stationary traffic jam filling the expressway ramp
+- Camera sees congested road filling the turning lane
+- Traffic camera shows cars moving with limited spacing near the right lane
+- Camera sees lanes filled with vehicles on the turning lane
+- Camera sees cars backed up along the bus lane
+- Overhead camera sees severe bottleneck filling the bridge lane
+- Roadside camera captures wall-to-wall cars on the arterial road
+- Overhead camera sees brief traffic buildup near the expressway ramp
+- Traffic camera shows motorcycles packed closely on the exit ramp
+- Roadside camera captures vehicles packed across lanes on the signalized junction
+- CCTV shows traffic slowing near intersection by the toll approach
+- Overhead camera sees vehicles moving very slowly across the main road
+- Camera sees slow-moving vehicles across the turning lane
+- Traffic camera shows packed intersection gridlock filling the signalized junction
+- RSU camera shows vehicles moving very slowly across the roundabout entry
+- Roadside camera captures dense mixed vehicles on the right lane
+- RSU camera shows slow but moving traffic near the straight lane
+- Camera sees all lanes blocked by queued vehicles filling the intersection approach
+- Overhead camera sees slow-moving vehicles across the toll approach
+- Roadside camera captures dense mixed vehicles on the main road
+- Roadside camera captures vehicles bunching near signal near the road shoulder
+- RSU camera shows toll booth queue along the urban road
+- Roadside camera captures intersection queue along the tunnel approach
+- Traffic camera shows all lanes crowded on the turning lane
+- Camera sees cars lining up at signal along the turning lane
+- RSU camera shows vehicles bunching near signal near the urban road
+- Traffic camera shows dark vehicles packed closely on the right lane
+- Overhead camera sees sedans packed closely on the road shoulder
+- Camera sees near-zero speed traffic across the right lane
+- RSU camera shows cars repeatedly braking across the straight lane
+- Overhead camera sees motorcycles packed closely on the roundabout entry
+- Roadside camera captures dense traffic on the roundabout entry
+- Overhead camera sees little space between vehicles on the bus lane
+- Camera sees school zone queue with many waiting vehicles
+- Overhead camera sees bumper-to-bumper traffic filling the bridge lane
+- CCTV shows bridge queue along the right lane
+- Traffic camera shows densely packed lanes on the intersection approach
+- Roadside camera captures a long line of vehicles at the bridge lane
+- Roadside camera captures bus stop bottleneck with many waiting vehicles
+- Traffic camera shows red taillights across road on the arterial road
+- Overhead camera sees slow approach to merge near the turning lane
+- Traffic camera shows stop-and-go traffic across the arterial road
+- Overhead camera sees high vehicle density on the bus lane
+- Traffic camera shows slow-moving vehicles across the arterial road
+- Overhead camera sees junction queue along the middle lane
+- RSU camera shows road filled with queued vehicles on the right lane
+- Overhead camera sees brake lights visible on the turning lane
+- Traffic camera shows cars repeatedly braking across the left lane
+- Traffic camera shows traffic slowing near intersection by the bridge lane
+- Camera sees ramp queue along the turning lane
+- Overhead camera sees motorcycles packed closely on the middle lane
+- RSU camera shows a long line of vehicles at the tunnel approach
+- RSU camera shows traffic inching along across the urban road
+- Traffic camera shows cars repeatedly braking across the road shoulder
+- Camera sees vehicles packed across lanes on the right lane
+- Camera sees many red taillights on the middle lane
+- RSU camera shows market area traffic buildup with many waiting vehicles
+- Roadside camera captures commuter vehicles packed closely on the straight lane
+- Overhead camera sees reduced traffic speed across the urban road
+- Roadside camera captures delivery trucks packed closely on the right lane
+- CCTV shows stationary vehicles in a long queue on the turning lane
+- RSU camera shows vehicles bunching near signal near the turning lane
+- Camera sees stationary vehicles in a long queue on the exit ramp
+- CCTV shows motorcycles trapped between cars on the arterial road
+- Overhead camera sees buses packed closely on the expressway ramp
+- Camera sees many red taillights on the outer lane
+- Traffic camera shows cars creeping forward across the expressway ramp
+- Overhead camera sees intersection queue along the exit ramp
+- RSU camera shows cars lining up at signal along the left lane
+- CCTV shows lanes filled with vehicles on the turning lane
+- Camera sees slow lane movement across the left lane
+- Traffic camera shows commuter vehicles packed closely on the urban road
+- CCTV shows lanes filled with vehicles on the expressway ramp
+- Overhead camera sees vehicle queue along the straight lane
+- Overhead camera sees vehicles barely moving across the right lane
+- CCTV shows severe bottleneck filling the bridge lane
+- Camera sees ramp bottleneck with many waiting vehicles
+- Roadside camera captures stationary traffic jam filling the turning lane
+- CCTV shows pickup trucks packed closely on the expressway ramp
+- RSU camera shows rush-hour jam filling the right lane
+- Roadside camera captures exit queue along the main road
+- Overhead camera sees cars backed up along the expressway ramp
+- Overhead camera sees cars moving with limited spacing near the main road
+- RSU camera shows cars packed closely on the roundabout entry
+- Camera sees standstill traffic across the arterial road
+- RSU camera shows moderate queue at junction near the urban road
+- Traffic camera shows commuter vehicles packed closely on the exit ramp
+- Overhead camera sees traffic at walking pace across the bridge lane
+- Traffic camera shows slow but moving traffic near the right lane
+- Traffic camera shows severe bottleneck filling the signalized junction
+- Roadside camera captures bridge queue along the roundabout entry
+- CCTV shows vehicles bunching near signal near the urban road
+- Camera sees mixed vehicles packed closely on the urban road
+- Roadside camera captures vehicles moving very slowly across the left lane
+- CCTV shows sedans packed closely on the outer lane
+- Overhead camera sees traffic tailback along the signalized junction
+- Roadside camera captures many red taillights on the main road
+- Camera sees dense traffic on the highway lane
+- Overhead camera sees dark vehicles packed closely on the toll approach
+- Overhead camera sees dense traffic on the middle lane
+- Roadside camera captures toll booth queue along the middle lane
+- RSU camera shows overloaded road on the bus lane
+- Camera sees vehicles packed across lanes on the bus lane
+- CCTV shows delayed traffic flow near the outer lane
+- RSU camera shows road filled with queued vehicles on the bridge lane
+- CCTV shows vehicles occupying all lanes on the urban road
+- Overhead camera sees congested road filling the outer lane
+- CCTV shows vehicles bunching near signal near the intersection approach
+- RSU camera shows stationary traffic jam filling the urban road
+- RSU camera shows cars creeping forward across the exit ramp
+- Camera sees intersection queue along the signalized junction
+- Overhead camera sees stationary traffic jam filling the signalized junction
+- Roadside camera captures toll booth queue along the roundabout entry
+- Camera sees cars packed closely on the toll approach
+- Roadside camera captures gridlock filling the straight lane
+- Overhead camera sees traffic at walking pace across the toll approach
+- Camera sees gridlock filling the outer lane
+- Roadside camera captures slow but moving traffic near the toll approach
+- Traffic camera shows many cars packed closely on the left lane
+- CCTV shows line of vehicles along the intersection approach
+- CCTV shows traffic inching along across the tunnel approach
+- RSU camera shows dense mixed vehicles on the middle lane
+- RSU camera shows delayed traffic flow near the signalized junction
+- RSU camera shows dense mixed vehicles on the road shoulder
+- RSU camera shows cars waiting in line along the outer lane
+- CCTV shows vehicles occupying all lanes on the intersection approach
+- Traffic camera shows mixed vehicles packed closely on the tunnel approach
+- CCTV shows standstill traffic across the middle lane
+- CCTV shows traffic jam filling the main road
+- Overhead camera sees lanes filled with vehicles on the turning lane
+- RSU camera shows dark vehicles packed closely on the outer lane
+- Roadside camera captures long line of stopped cars along the highway lane
+- CCTV shows mixed vehicles packed closely on the left lane
+- Camera sees mild bottleneck near the intersection approach
+- Roadside camera captures vehicles waiting at junction with many waiting vehicles
+- Camera sees heavily congested lanes filling the toll approach
+- Camera sees traffic tailback along the roundabout entry
+- Roadside camera captures stationary vehicles in a long queue on the straight lane
+- RSU camera shows lanes filled with vehicles on the straight lane
+- CCTV shows buses stuck among cars on the intersection approach
+- Roadside camera captures lanes filled with vehicles on the outer lane
+- CCTV shows stationary traffic jam filling the toll approach
+- Roadside camera captures queues filling the camera view on the middle lane
+- Overhead camera sees short vehicle queue near the straight lane
+- Camera sees mild bottleneck near the signalized junction
+- Traffic camera shows cars nose-to-tail on the expressway ramp
+- Roadside camera captures cars backed up along the arterial road
+- Camera sees queue of cars along the turning lane
+- RSU camera shows crawling traffic across the middle lane
+- CCTV shows slow-moving vehicles across the tunnel approach
+- Traffic camera shows taxi and cars packed closely on the main road
+- Traffic camera shows vehicles barely moving across the road shoulder
+- Overhead camera sees sedans packed closely on the toll approach
+- CCTV shows stop-and-go traffic across the roundabout entry
+- CCTV shows lane merge slowdown with many waiting vehicles
+- Roadside camera captures toll booth queue along the outer lane
+- Overhead camera sees delayed traffic flow near the road shoulder
+- RSU camera shows taxi and cars packed closely on the outer lane
+- Camera sees all lanes crowded on the arterial road
+- Camera sees sedans packed closely on the intersection approach
+- RSU camera shows cars lining up at signal along the expressway ramp
+- Overhead camera sees lanes filled with vehicles on the tunnel approach
+- Traffic camera shows taxi and cars packed closely on the bridge lane
+- Traffic camera shows taxi and cars packed closely on the expressway ramp
+- CCTV shows queues filling the camera view on the main road
+- Overhead camera sees cars packed closely on the exit ramp
+- CCTV shows stationary traffic jam filling the turning lane
+- CCTV shows vehicles packed across lanes on the urban road
+- RSU camera shows signal queue with many waiting vehicles
+- RSU camera shows short vehicle queue near the toll approach
+- Overhead camera sees many red taillights on the outer lane
+- Camera sees heavy traffic on the left lane
+- CCTV shows short vehicle queue near the main road
+- RSU camera shows slow lane movement across the road shoulder
+- Overhead camera sees vehicles occupying all lanes on the right lane
+- Camera sees junction queue along the exit ramp
+- Overhead camera sees a long line of vehicles at the bus lane
+- Overhead camera sees long traffic queue along the arterial road
+- Camera sees short vehicle queue near the middle lane
+- CCTV shows exit queue along the toll approach
+- RSU camera shows cars nose-to-tail on the tunnel approach
+- Roadside camera captures toll booth queue along the left lane
+- Overhead camera sees dense mixed vehicles on the turning lane
+- Roadside camera captures vans packed closely on the tunnel approach
+- CCTV shows vehicles occupying all lanes on the road shoulder
+- Camera sees cars lining up at signal along the bus lane
+- CCTV shows crowded road on the exit ramp
+- Camera sees toll booth queue along the tunnel approach
+- Overhead camera sees traffic buildup near exit with many waiting vehicles
+- CCTV shows cars nose-to-tail on the right lane
+- RSU camera shows slow-moving vehicles across the bus lane
+- RSU camera shows long traffic queue along the turning lane
+- Overhead camera sees severe bottleneck filling the tunnel approach
+- RSU camera shows delayed traffic flow near the highway lane
+- Roadside camera captures bumper-to-bumper traffic filling the exit ramp
+- CCTV shows slow but moving traffic near the highway lane
+- Traffic camera shows sedans packed closely on the toll approach
+- Traffic camera shows cars backed up along the turning lane
+- RSU camera shows vehicle queue along the right lane
+- Traffic camera shows short vehicle queue near the urban road
+- Camera sees wall-to-wall cars on the tunnel approach
+- Overhead camera sees cars lining up at signal along the road shoulder
+- Camera sees heavy traffic on the arterial road
+- Traffic camera shows delayed traffic flow near the exit ramp
+- Camera sees line of vehicles along the roundabout entry
+- CCTV shows toll booth queue along the highway lane
+- Camera sees traffic inching along across the left lane
+- Camera sees white cars packed closely on the expressway ramp
+- Camera sees vehicle queue along the tunnel approach
+- CCTV shows stationary traffic jam filling the road shoulder
+- CCTV shows road narrowing with queue with many waiting vehicles
+- Overhead camera sees all lanes crowded on the tunnel approach
+- CCTV shows standstill traffic across the arterial road
+- Roadside camera captures heavily congested lanes filling the intersection approach
+- CCTV shows long line of stopped cars along the signalized junction
+- Camera sees dense mixed vehicles on the main road
+- Camera sees many cars packed closely on the road shoulder
+- Camera sees red taillights across road on the straight lane
+
+## [INVALID SCENE] — 500 prompts
+
+- RSU camera shows camera disconnected with no usable road detail
+- RSU camera shows camera malfunction hides the road area
+- Camera sees dense fog hiding road across the road view
+- CCTV shows unclear traffic condition instead of active road traffic
+- Roadside camera captures a washed-out camera feed with unclear vehicles
+- Overhead camera sees a white frame with no usable road detail
+- Overhead camera sees a misaligned camera view away from road
+- Camera sees a color-banded video frame preventing traffic reading
+- Roadside camera captures a severely blurred image with unclear vehicles
+- RSU camera shows a frozen frame with no usable road detail
+- RSU camera shows a non-road scene from the camera
+- CCTV shows roadside grass only instead of active road traffic
+- RSU camera shows sidewalk view with no traffic instead of active road traffic
+- Camera sees sky-only frame in the CCTV frame
+- Roadside camera captures unrecognizable image instead of active road traffic
+- Overhead camera sees tree branch covering road view and lanes
+- Camera sees no visible road area instead of active road traffic
+- Roadside camera captures a color-banded video frame preventing traffic reading
+- Camera sees building entrance without roadway instead of active road traffic
+- Camera sees cropped lane edge only in the CCTV frame
+- Traffic camera shows tree branch covering road view and lanes
+- Camera sees a severely blurred image with unclear vehicles
+- RSU camera shows construction site with no vehicles instead of active road traffic
+- Roadside camera captures partial obstruction hiding the road
+- Overhead camera sees camera malfunction hides the road area
+- Traffic camera shows irrelevant scene instead of active road traffic
+- Traffic camera shows a corrupted CCTV frame with no usable road detail
+- Traffic camera shows covered lens hiding the road area
+- RSU camera shows a misaligned camera view away from road
+- Roadside camera captures a non-road scene from the camera
+- Roadside camera captures camera aimed at trees in the CCTV frame
+- Roadside camera captures dashboard interior only in the CCTV frame
+- RSU camera shows empty sky frame instead of active road traffic
+- CCTV shows camera disconnected with no usable road detail
+- Camera sees vehicles cut off by frame in the CCTV frame
+- Traffic camera shows static noise with no usable road detail
+- Overhead camera sees nighttime frame hiding vehicles across the road view
+- RSU camera shows pole covering most road in the CCTV frame
+- Roadside camera captures completely dark frame across the road view
+- Traffic camera shows a blurry photo hiding vehicles with unclear vehicles
+- RSU camera shows camera pointed away from road in the CCTV frame
+- Overhead camera sees a distorted image preventing traffic reading
+- Overhead camera sees a pixelated image with unclear vehicles
+- Traffic camera shows building wall only in the CCTV frame
+- Roadside camera captures an underexposed image with unclear vehicles
+- Roadside camera captures headlight glare blocking lanes across the road view
+- Camera sees dashboard interior only in the CCTV frame
+- Overhead camera sees small road corner visible in the CCTV frame
+- Overhead camera sees cropped lane edge only in the CCTV frame
+- Traffic camera shows blank wall beside camera instead of active road traffic
+- Camera sees unclear traffic condition instead of active road traffic
+- Roadside camera captures an overexposed image preventing traffic reading
+- Overhead camera sees mist covering most vehicles across the road view
+- Camera sees a severely blurred image preventing traffic reading
+- Roadside camera captures spider web across lens hides road area
+- Overhead camera sees a non-road scene from the camera
+- Roadside camera captures object in front of camera blocks the road
+- RSU camera shows signal lost with no usable road detail
+- Traffic camera shows a broken camera feed with no usable road detail
+- Traffic camera shows shadowed frame hiding road markings across the road view
+- CCTV shows a blank or corrupted traffic frame
+- RSU camera shows no image data with no usable road detail
+- Traffic camera shows an underexposed image with unclear vehicles
+- CCTV shows camera fully blocked from the road view
+- Overhead camera sees a low-resolution CCTV frame preventing traffic reading
+- RSU camera shows unclear traffic condition instead of active road traffic
+- Roadside camera captures unclear traffic condition instead of active road traffic
+- Roadside camera captures severe weather hiding road and vehicles
+- Overhead camera sees an overexposed image preventing traffic reading
+- Traffic camera shows empty frame instead of active road traffic
+- CCTV shows a white frame with no usable road detail
+- Overhead camera sees rain streaks covering camera view
+- Roadside camera captures sidewalk-only scene in the CCTV frame
+- Traffic camera shows an overexposed image with unclear vehicles
+- Overhead camera sees an underexposed image with unclear vehicles
+- Overhead camera sees indoor scene instead of active road traffic
+- Traffic camera shows a low-resolution CCTV frame preventing traffic reading
+- A white frame contains no road detail
+- Roadside camera captures camera fully blocked from the road view
+- RSU camera shows a color-banded video frame preventing traffic reading
+- Camera sees camera pointed away from road in the CCTV frame
+- Traffic camera shows a gray screen from camera with no usable road detail
+- Roadside camera captures mist covering most vehicles across the road view
+- Overhead camera sees a timestamp-only blank frame with no usable road detail
+- RSU camera shows spider web across lens hides road area
+- Roadside camera captures a blank or corrupted traffic frame
+- Traffic camera shows sky-only frame in the CCTV frame
+- Traffic camera shows object in front of camera blocks the road
+- Overhead camera sees non-traffic scene instead of active road traffic
+- Roadside camera captures a pixelated image with unclear vehicles
+- CCTV shows rain streaks covering camera view
+- RSU camera shows no recognizable vehicles or roadway
+- Roadside camera captures camera disconnected with no usable road detail
+- Overhead camera sees irrelevant scene instead of active road traffic
+- Traffic camera shows road hidden by obstruction in camera view
+- Roadside camera captures a corrupted frame preventing traffic reading
+- CCTV shows building wall only in the CCTV frame
+- Traffic camera shows no image data with no usable road detail
+- Camera sees small road corner visible in the CCTV frame
+- Traffic camera shows a pixelated image with unclear vehicles
+- Traffic camera shows camera aimed at trees in the CCTV frame
+- Roadside camera captures a distorted image with unclear vehicles
+- CCTV shows empty sky frame instead of active road traffic
+- RSU camera shows small road corner visible in the CCTV frame
+- Roadside camera captures heavy rain obscuring road across the road view
+- Overhead camera sees camera aimed at trees in the CCTV frame
+- Traffic camera shows vehicles cut off by frame in the CCTV frame
+- Camera sees static noise with no usable road detail
+- Overhead camera sees a duplicated frozen frame with no usable road detail
+- Overhead camera sees an out-of-focus image with unclear vehicles
+- CCTV shows dense fog hiding road across the road view
+- RSU camera shows an out-of-focus image preventing traffic reading
+- Traffic camera shows a severely blurred image preventing traffic reading
+- Overhead camera sees camera fully blocked from the road view
+- Camera sees non-traffic scene instead of active road traffic
+- Traffic camera shows camera pointed away from road in the CCTV frame
+- Camera sees camera aimed at trees in the CCTV frame
+- RSU camera shows a washed-out camera feed with unclear vehicles
+- Overhead camera sees a black frame with no usable road detail
+- Camera sees camera disconnected with no usable road detail
+- Traffic camera shows roadside grass only instead of active road traffic
+- Traffic camera shows lens covered by dirt hiding the road area
+- CCTV shows a corrupted frame with unclear vehicles
+- Traffic camera shows dirty lens obscuring the road area
+- Traffic camera shows an out-of-focus image preventing traffic reading
+- Camera sees camera view blocked by a nearby object
+- Traffic camera shows vehicle roof close-up only in the CCTV frame
+- Roadside camera captures scene too dark across the road view
+- Traffic camera shows a video feed error with no usable road detail
+- Camera sees a washed-out camera feed preventing traffic reading
+- RSU camera shows a corrupted frame preventing traffic reading
+- Camera sees blank wall beside camera instead of active road traffic
+- CCTV shows severe glare blocking road view
+- Traffic camera shows a non-road scene from the camera
+- Roadside camera captures pole covering most road in the CCTV frame
+- Camera sees a distorted image preventing traffic reading
+- Traffic camera shows a misaligned camera view away from road
+- RSU camera shows a video feed error with no usable road detail
+- Roadside camera captures a distorted image preventing traffic reading
+- RSU camera shows sky-only frame in the CCTV frame
+- Overhead camera sees motion blur obscuring vehicle movement with unclear vehicles
+- Roadside camera captures obstructed view hiding the road area
+- CCTV shows an overexposed image preventing traffic reading
+- RSU camera shows a timestamp-only blank frame with no usable road detail
+- Overhead camera sees no image data with no usable road detail
+- CCTV shows building entrance without roadway instead of active road traffic
+- RSU camera shows vehicles cut off by frame in the CCTV frame
+- Traffic camera shows obstructed view hiding the road area
+- RSU camera shows a severely blurred image preventing traffic reading
+- Overhead camera sees a distorted image with unclear vehicles
+- Roadside camera captures severe glare blocking road view
+- Camera sees spider web across lens hides road area
+- Overhead camera sees a frozen frame with no usable road detail
+- Overhead camera sees a washed-out camera feed with unclear vehicles
+- RSU camera shows a pixelated image preventing traffic reading
+- Camera sees roadside grass only instead of active road traffic
+- Overhead camera sees vehicles cut off by frame in the CCTV frame
+- Covered lens hides the entire road scene
+- RSU camera shows blank wall beside camera instead of active road traffic
+- RSU camera shows camera fully blocked from the road view
+- RSU camera shows camera off with no usable road detail
+- Roadside camera captures building entrance without roadway instead of active road traffic
+- Overhead camera sees empty sky frame instead of active road traffic
+- Roadside camera captures signal lost with no usable road detail
+- RSU camera shows an underexposed image with unclear vehicles
+- Overhead camera sees camera pointed away from road in the CCTV frame
+- Traffic camera shows a blank or corrupted traffic frame
+- CCTV shows a black frame with no usable road detail
+- RSU camera shows a pixelated image with unclear vehicles
+- Traffic camera shows a shaking camera image preventing traffic reading
+- RSU camera shows non-traffic scene instead of active road traffic
+- Roadside camera captures a shaking camera image with unclear vehicles
+- Camera sees empty frame instead of active road traffic
+- Overhead camera sees empty frame instead of active road traffic
+- Static noise fills the CCTV camera view
+- Camera sees a washed-out camera feed with unclear vehicles
+- RSU camera shows building wall only in the CCTV frame
+- CCTV shows a severely blurred image preventing traffic reading
+- CCTV shows camera aimed at trees in the CCTV frame
+- Overhead camera sees a severely blurred image preventing traffic reading
+- RSU camera shows a blurry photo hiding vehicles preventing traffic reading
+- Overhead camera sees lens covered by dirt hiding the road area
+- Overhead camera sees a gray screen from camera with no usable road detail
+- Roadside camera captures a low-resolution CCTV frame preventing traffic reading
+- Overhead camera sees blank wall beside camera instead of active road traffic
+- Overhead camera sees motion blur obscuring vehicle movement preventing traffic reading
+- CCTV shows a non-road scene from the camera
+- Roadside camera captures cropped lane edge only in the CCTV frame
+- Camera sees an out-of-focus image with unclear vehicles
+- Camera sees a blank or corrupted traffic frame
+- CCTV shows a washed-out camera feed preventing traffic reading
+- Overhead camera sees a color-banded video frame preventing traffic reading
+- CCTV shows a lens issue hiding all road lanes
+- Overhead camera sees headlight glare blocking lanes across the road view
+- Roadside camera captures dense fog hiding road across the road view
+- Camera sees heavy rain obscuring road across the road view
+- Overhead camera sees raindrops covering lens and hiding the road
+- CCTV shows spider web across lens hides road area
+- Overhead camera sees no visible road area instead of active road traffic
+- Camera sees signboard blocking camera view and road area
+- Traffic camera shows pole covering most road in the CCTV frame
+- Overhead camera sees a corrupted CCTV frame with no usable road detail
+- RSU camera shows blocked camera hides the road area
+- Overhead camera sees an out-of-focus image preventing traffic reading
+- RSU camera shows a shaking camera image with unclear vehicles
+- RSU camera shows a blurry photo hiding vehicles with unclear vehicles
+- Roadside camera captures construction site with no vehicles instead of active road traffic
+- Roadside camera captures a pixelated image preventing traffic reading
+- RSU camera shows an overexposed image preventing traffic reading
+- RSU camera shows a white frame with no usable road detail
+- Overhead camera sees camera off with no usable road detail
+- Roadside camera captures nighttime frame hiding vehicles across the road view
+- Overhead camera sees a blurry photo hiding vehicles preventing traffic reading
+- Traffic camera shows a lens issue hiding all road lanes
+- Overhead camera sees spider web across lens hides road area
+- Camera sees motion blur obscuring vehicle movement preventing traffic reading
+- RSU camera shows severe glare blocking road view
+- Overhead camera sees unclear traffic condition instead of active road traffic
+- Traffic camera shows a severely blurred image with unclear vehicles
+- RSU camera shows partial obstruction hiding the road
+- CCTV shows a corrupted frame preventing traffic reading
+- CCTV shows completely dark frame across the road view
+- CCTV shows heavy rain obscuring road across the road view
+- Overhead camera sees obstructed view hiding the road area
+- Camera sees a distorted image with unclear vehicles
+- Roadside camera captures a lens issue hiding all road lanes
+- Camera sees mist covering most vehicles across the road view
+- CCTV shows irrelevant scene instead of active road traffic
+- Overhead camera sees heavy rain obscuring road across the road view
+- Roadside camera captures camera malfunction hides the road area
+- Camera sees a frozen frame with no usable road detail
+- CCTV shows dirty lens obscuring the road area
+- RSU camera shows severe weather hiding road and vehicles
+- Overhead camera sees blocked camera hides the road area
+- CCTV shows sidewalk view with no traffic instead of active road traffic
+- RSU camera shows a blank or corrupted traffic frame
+- Camera sees vehicle roof close-up only in the CCTV frame
+- Roadside camera captures no visible road area instead of active road traffic
+- RSU camera shows raindrops covering lens and hiding the road
+- CCTV shows poor visibility across the road view
+- Overhead camera sees signboard blocking camera view and road area
+- RSU camera shows building entrance without roadway instead of active road traffic
+- Overhead camera sees a corrupted frame with unclear vehicles
+- Camera sees no recognizable vehicles or roadway
+- CCTV shows signboard blocking camera view and road area
+- Overhead camera sees partial obstruction hiding the road
+- Overhead camera sees road hidden by obstruction in camera view
+- Traffic camera shows unclear traffic condition instead of active road traffic
+- CCTV shows a distorted image with unclear vehicles
+- Roadside camera captures static noise with no usable road detail
+- RSU camera shows indoor scene instead of active road traffic
+- CCTV shows a pixelated image with unclear vehicles
+- CCTV shows a severely blurred image with unclear vehicles
+- RSU camera shows a severely blurred image with unclear vehicles
+- Overhead camera sees camera view blocked by a nearby object
+- CCTV shows tree branch covering road view and lanes
+- CCTV shows a low-resolution CCTV frame with unclear vehicles
+- RSU camera shows sidewalk-only scene in the CCTV frame
+- Roadside camera captures a gray screen from camera with no usable road detail
+- Camera sees severe weather hiding road and vehicles
+- Overhead camera sees a shaking camera image preventing traffic reading
+- Overhead camera sees a video feed error with no usable road detail
+- Camera sees an overexposed image with unclear vehicles
+- RSU camera shows an out-of-focus image with unclear vehicles
+- CCTV shows dashboard interior only in the CCTV frame
+- Camera sees obstructed view hiding the road area
+- CCTV shows severe weather hiding road and vehicles
+- RSU camera shows motion blur obscuring vehicle movement with unclear vehicles
+- Roadside camera captures building wall only in the CCTV frame
+- The road is hidden behind a close obstruction
+- Camera sees tree branch covering road view and lanes
+- Traffic camera shows a frozen frame with no usable road detail
+- Roadside camera captures sky-only frame in the CCTV frame
+- Camera sees a misaligned camera view away from road
+- RSU camera shows a corrupted frame with unclear vehicles
+- Traffic camera shows an overexposed image preventing traffic reading
+- CCTV shows sun glare covering traffic area
+- Camera sees pole covering most road in the CCTV frame
+- Camera sees a non-road scene from the camera
+- Overhead camera sees static noise with no usable road detail
+- Roadside camera captures vehicles cut off by frame in the CCTV frame
+- CCTV shows camera off with no usable road detail
+- CCTV shows unrecognizable image instead of active road traffic
+- Traffic camera shows a washed-out camera feed with unclear vehicles
+- Traffic camera shows dense fog hiding road across the road view
+- Camera sees dirty lens obscuring the road area
+- RSU camera shows lens covered by dirt hiding the road area
+- Overhead camera sees roadside grass only instead of active road traffic
+- Roadside camera captures a corrupted CCTV frame with no usable road detail
+- Traffic camera shows raindrops covering lens and hiding the road
+- Overhead camera sees vehicle roof close-up only in the CCTV frame
+- RSU camera shows camera aimed at trees in the CCTV frame
+- Roadside camera captures an out-of-focus image with unclear vehicles
+- Roadside camera captures tree branch covering road view and lanes
+- CCTV shows camera pointed away from road in the CCTV frame
+- Traffic camera shows a corrupted frame with unclear vehicles
+- Traffic camera shows sun glare covering traffic area
+- Traffic camera shows no visible road area instead of active road traffic
+- CCTV shows empty frame instead of active road traffic
+- Traffic camera shows scene too dark across the road view
+- Overhead camera sees a corrupted frame preventing traffic reading
+- RSU camera shows a lens issue hiding all road lanes
+- CCTV shows a shaking camera image preventing traffic reading
+- CCTV shows an out-of-focus image preventing traffic reading
+- CCTV shows obstructed view hiding the road area
+- Roadside camera captures a color-banded video frame with unclear vehicles
+- Camera sees nighttime frame hiding vehicles across the road view
+- Overhead camera sees a color-banded video frame with unclear vehicles
+- CCTV shows road hidden by obstruction in camera view
+- Camera sees camera off with no usable road detail
+- RSU camera shows a corrupted CCTV frame with no usable road detail
+- RSU camera shows a distorted image with unclear vehicles
+- RSU camera shows irrelevant scene instead of active road traffic
+- Camera sees a corrupted frame with unclear vehicles
+- CCTV shows a distorted image preventing traffic reading
+- Traffic camera shows cropped lane edge only in the CCTV frame
+- CCTV shows static noise with no usable road detail
+- Roadside camera captures camera pointed away from road in the CCTV frame
+- Roadside camera captures indoor scene instead of active road traffic
+- Camera sees unrecognizable image instead of active road traffic
+- Camera sees a broken camera feed with no usable road detail
+- Camera sees a black frame with no usable road detail
+- Camera sees a color-banded video frame with unclear vehicles
+- Camera sees raindrops covering lens and hiding the road
+- Roadside camera captures motion blur obscuring vehicle movement with unclear vehicles
+- Traffic camera shows an out-of-focus image with unclear vehicles
+- Roadside camera captures a severely blurred image preventing traffic reading
+- Traffic camera shows unrecognizable image instead of active road traffic
+- Camera sees completely dark frame across the road view
+- Overhead camera sees a washed-out camera feed preventing traffic reading
+- Camera sees indoor scene instead of active road traffic
+- Overhead camera sees a lens issue hiding all road lanes
+- Camera sees an overexposed image preventing traffic reading
+- Traffic camera shows a corrupted frame preventing traffic reading
+- RSU camera shows tree branch covering road view and lanes
+- Roadside camera captures signboard blocking camera view and road area
+- Overhead camera sees severe glare blocking road view
+- Overhead camera sees scene too dark across the road view
+- Roadside camera captures a low-resolution CCTV frame with unclear vehicles
+- Roadside camera captures small road corner visible in the CCTV frame
+- RSU camera shows a shaking camera image preventing traffic reading
+- Camera sees sidewalk view with no traffic instead of active road traffic
+- Overhead camera sees no recognizable vehicles or roadway
+- CCTV shows road mostly outside frame in the CCTV frame
+- RSU camera shows object in front of camera blocks the road
+- CCTV shows mist covering most vehicles across the road view
+- CCTV shows a duplicated frozen frame with no usable road detail
+- RSU camera shows dashboard interior only in the CCTV frame
+- CCTV shows a color-banded video frame with unclear vehicles
+- CCTV shows shadowed frame hiding road markings across the road view
+- The image is too blurred to identify vehicles
+- Roadside camera captures a white frame with no usable road detail
+- Roadside camera captures rain streaks covering camera view
+- Overhead camera sees pole covering most road in the CCTV frame
+- CCTV shows nighttime frame hiding vehicles across the road view
+- CCTV shows a blurry photo hiding vehicles with unclear vehicles
+- A black frame contains no traffic information
+- Traffic camera shows mist covering most vehicles across the road view
+- Traffic camera shows severe weather hiding road and vehicles
+- Camera sees a white frame with no usable road detail
+- CCTV shows a corrupted CCTV frame with no usable road detail
+- RSU camera shows a duplicated frozen frame with no usable road detail
+- Camera sees a blurry photo hiding vehicles preventing traffic reading
+- Roadside camera captures empty frame instead of active road traffic
+- Camera sees signal lost with no usable road detail
+- CCTV shows an unusable frame without traffic detail
+- RSU camera shows covered lens hiding the road area
+- Camera sees a video feed error with no usable road detail
+- RSU camera shows completely dark frame across the road view
+- RSU camera shows vehicle roof close-up only in the CCTV frame
+- Traffic camera shows a black frame with no usable road detail
+- CCTV shows blocked camera hides the road area
+- Camera sees no image data with no usable road detail
+- Traffic camera shows camera view blocked by a nearby object
+- Overhead camera sees a blurry photo hiding vehicles with unclear vehicles
+- CCTV shows partial obstruction hiding the road
+- Traffic camera shows indoor scene instead of active road traffic
+- CCTV shows small road corner visible in the CCTV frame
+- Roadside camera captures a misaligned camera view away from road
+- CCTV shows an out-of-focus image with unclear vehicles
+- CCTV shows a pixelated image preventing traffic reading
+- Roadside camera captures parking lot only with no active traffic instead of active road traffic
+- Traffic camera shows building entrance without roadway instead of active road traffic
+- Camera sees an out-of-focus image preventing traffic reading
+- Traffic camera shows motion blur obscuring vehicle movement with unclear vehicles
+- Overhead camera sees building entrance without roadway instead of active road traffic
+- Only a building wall appears in the frame
+- CCTV shows headlight glare blocking lanes across the road view
+- Roadside camera captures camera view blocked by a nearby object
+- Camera sees road hidden by obstruction in camera view
+- Roadside camera captures sun glare covering traffic area
+- CCTV shows camera view blocked by a nearby object
+- Overhead camera sees camera disconnected with no usable road detail
+- RSU camera shows an overexposed image with unclear vehicles
+- Overhead camera sees completely dark frame across the road view
+- Roadside camera captures raindrops covering lens and hiding the road
+- The road corner is too small to classify
+- Overhead camera sees dense fog hiding road across the road view
+- Traffic camera shows signal lost with no usable road detail
+- Overhead camera sees sun glare covering traffic area
+- RSU camera shows cropped lane edge only in the CCTV frame
+- Camera sees scene too dark across the road view
+- CCTV shows a frozen frame with no usable road detail
+- CCTV shows covered lens hiding the road area
+- Camera sees a lens issue hiding all road lanes
+- RSU camera shows empty frame instead of active road traffic
+- CCTV shows sidewalk-only scene in the CCTV frame
+- The frame is too dark to see traffic
+- Overhead camera sees signal lost with no usable road detail
+- Traffic camera shows completely dark frame across the road view
+- CCTV shows a low-resolution CCTV frame preventing traffic reading
+- Roadside camera captures non-traffic scene instead of active road traffic
+- Overhead camera sees an underexposed image preventing traffic reading
+- Camera sees rain streaks covering camera view
+- Camera sees parking lot only with no active traffic instead of active road traffic
+- CCTV shows an underexposed image with unclear vehicles
+- CCTV shows motion blur obscuring vehicle movement with unclear vehicles
+- Camera sees sidewalk-only scene in the CCTV frame
+- Overhead camera sees a blank or corrupted traffic frame
+- Camera sees covered lens hiding the road area
+- Camera sees a pixelated image with unclear vehicles
+- Roadside camera captures a timestamp-only blank frame with no usable road detail
+- Traffic camera shows an underexposed image preventing traffic reading
+- Camera sees a shaking camera image preventing traffic reading
+- Roadside camera captures a blurry photo hiding vehicles with unclear vehicles
+- Roadside camera captures sidewalk view with no traffic instead of active road traffic
+- Roadside camera captures motion blur obscuring vehicle movement preventing traffic reading
+- Roadside camera captures empty sky frame instead of active road traffic
+- Traffic camera shows camera malfunction hides the road area
+- CCTV shows lens covered by dirt hiding the road area
+- Traffic camera shows poor visibility across the road view
+- Roadside camera captures a video feed error with no usable road detail
+- CCTV shows a blurry photo hiding vehicles preventing traffic reading
+- Camera sees blocked camera hides the road area
+- Traffic camera shows no recognizable vehicles or roadway
+- RSU camera shows static noise with no usable road detail
+- Camera sees a gray screen from camera with no usable road detail
+- CCTV shows construction site with no vehicles instead of active road traffic
+- Overhead camera sees dirty lens obscuring the road area
+- Traffic camera shows small road corner visible in the CCTV frame
+- Overhead camera sees construction site with no vehicles instead of active road traffic
+- RSU camera shows camera view blocked by a nearby object
+- Camera sees an unusable frame without traffic detail
+- Camera sees a corrupted frame preventing traffic reading
+- RSU camera shows obstructed view hiding the road area
+- A frozen CCTV frame shows no movement information
+- Traffic camera shows headlight glare blocking lanes across the road view
+- Traffic camera shows dashboard interior only in the CCTV frame
+- Overhead camera sees severe weather hiding road and vehicles
+- Traffic camera shows a shaking camera image with unclear vehicles
+- Traffic camera shows spider web across lens hides road area
+- CCTV shows no visible road area instead of active road traffic
+- Roadside camera captures an overexposed image with unclear vehicles
+- Traffic camera shows empty sky frame instead of active road traffic
+- Camera sees camera fully blocked from the road view
+- Overhead camera sees road mostly outside frame in the CCTV frame
+- CCTV shows blank wall beside camera instead of active road traffic
+- RSU camera shows sun glare covering traffic area
+- Camera sees construction site with no vehicles instead of active road traffic
+- RSU camera shows heavy rain obscuring road across the road view
+- Camera sees poor visibility across the road view
+- Camera sees road mostly outside frame in the CCTV frame
+- Camera sees a low-resolution CCTV frame with unclear vehicles
+- CCTV shows no image data with no usable road detail
+- Traffic camera shows severe glare blocking road view
+- Traffic camera shows an unusable frame without traffic detail
+- Overhead camera sees a broken camera feed with no usable road detail
+- Roadside camera captures blank wall beside camera instead of active road traffic
+- CCTV shows no recognizable vehicles or roadway
+- Traffic camera shows sidewalk-only scene in the CCTV frame
+- Traffic camera shows heavy rain obscuring road across the road view
+- RSU camera shows motion blur obscuring vehicle movement preventing traffic reading
+- Overhead camera sees shadowed frame hiding road markings across the road view
+- RSU camera shows an underexposed image preventing traffic reading
+- Camera sees a blurry photo hiding vehicles with unclear vehicles
+- CCTV shows object in front of camera blocks the road
+- Overhead camera sees a low-resolution CCTV frame with unclear vehicles
+- Overhead camera sees parking lot only with no active traffic instead of active road traffic
+- RSU camera shows roadside grass only instead of active road traffic
+- RSU camera shows dirty lens obscuring the road area
+- Camera sees a corrupted CCTV frame with no usable road detail
+- RSU camera shows signboard blocking camera view and road area
+- RSU camera shows a gray screen from camera with no usable road detail
+- Traffic camera shows a distorted image preventing traffic reading
+- Overhead camera sees a pixelated image preventing traffic reading
+- Roadside camera captures camera off with no usable road detail
+- Roadside camera captures no recognizable vehicles or roadway
+- Traffic camera shows rain streaks covering camera view
+- RSU camera shows rain streaks covering camera view
+- Roadside camera captures poor visibility across the road view
+- Overhead camera sees dashboard interior only in the CCTV frame
+- RSU camera shows road hidden by obstruction in camera view
+- Traffic camera shows camera fully blocked from the road view
+- Roadside camera captures a corrupted frame with unclear vehicles
+- Overhead camera sees sidewalk-only scene in the CCTV frame
+- Roadside camera captures covered lens hiding the road area
+- CCTV shows raindrops covering lens and hiding the road
+- RSU camera shows nighttime frame hiding vehicles across the road view
+- Overhead camera sees an overexposed image with unclear vehicles
+- Camera sees camera malfunction hides the road area
