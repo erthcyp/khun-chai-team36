@@ -1,33 +1,28 @@
-# TODO: Product name — Semantic Traffic Intelligence at the Roadside
+# RoadSense — edge AI traffic monitoring
 
 > Sea x OpenAI Regional Codex Hackathon (Thailand) — 21 Nov 2026
-> Team: **khun-chai (TEAM36)**
-> Tracks: Deep Domain AI · Autonomous & Adaptive AI
+> Team: **khun-chai (TEAM36)** · Tracks: Deep Domain AI · Autonomous & Adaptive AI
 
-## Problem
-Traffic CCTV streams raw video to control centers: heavy bandwidth, high latency, privacy risk, and operators drowning in feeds. Incidents are noticed late.
+RoadSense analyzes CCTV at a simulated roadside unit with a vision-language model + Adaptive Prompt Ensemble,
+samples each camera every 2 s and speeds up to 1 s only when it needs to verify an event, and sends compact
+semantic results (plus selected snapshots) to a Traffic Control Center dashboard.
 
-## Solution
-Each roadside unit understands the scene itself with vision-language models (APE prompts + CPV self-verification), sends only a **16-byte** meaning vector, and the control center's OpenAI agent drafts the response plan — with a human approving anything risky.
+- Plan & context: [docs/master-plan.md](docs/master-plan.md)
+- Contracts: [docs/api-contract.md](docs/api-contract.md)
+- Team workflow: [CONTRIBUTING.md](CONTRIBUTING.md) · Codex rules: [AGENTS.md](AGENTS.md)
 
-Built on our research (APE + CPV, ICOIN 2027 submission): 84.39% mean accuracy across 9 VLMs (best 94.30%), 40.65% lower latency than raw images.
+## Provenance
+- **Pre-event baseline (reused):** our research code for VLM + APE traffic-state inference (ICOIN 2027 submission). TODO: link baseline repo/commit.
+- **Built during the event (from 10:00):** everything under `rsu/`, `tcc/`, `shared/`, `evaluation/`, `tests/`.
+- An early scaffold made before hacking started is kept only in tag `pre-event-scaffold` and is **not** part of the submission.
 
-## Quick start
-```bash
-cp .env.example .env      # OPENAI_API_KEY optional — rule-based fallback without it
-make install
-make dev                  # TCC + 2 mock RSUs → http://localhost:8000
-make check                # lint + tests
-```
-Real VLMs at the RSU: `make install-clip`, put images in `data/samples/`, `make rsu-clip`.
-
-## Docs
-- [Architecture](docs/architecture.md) · [Contracts](docs/api.md) · [Pitch](docs/pitch.md) · [Codex log](docs/codex-log.md)
+## Run
+TODO (fill in as modules land).
 
 ## Team — khun-chai (TEAM36)
 | Name | GitHub | Role |
 |---|---|---|
-| Chaiyapat Anantarasuchart | [@erthcyp](https://github.com/erthcyp) | Lead · integration + pitch |
+| Chaiyapat Anantarasuchart | [@erthcyp](https://github.com/erthcyp) | TODO |
 | Chaitawat Boonkitticharoen | [@fongctw](https://github.com/fongctw) | TODO |
 | Kanteeded Limkangwalmongkol | [@kantheedeth](https://github.com/kantheedeth) | TODO |
 | Bhuchi Kumprakob | [@Bhuchi](https://github.com/Bhuchi) | TODO |

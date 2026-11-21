@@ -23,3 +23,9 @@ coverage/
 data/
 .ruff_cache/
 .pytest_cache/
+
+# media
+assets/demo_clips/
+*.mp4
+*.mov
+*.avi

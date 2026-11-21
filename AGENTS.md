@@ -1,37 +1,32 @@
-# AGENTS.md — instructions for Codex (and any coding agent)
+# AGENTS.md — RoadSense (team khun-chai, TEAM36)
 
-Codex reads this file automatically. Sub-folders have their own AGENTS.md; the closest one wins.
+Codex reads this file automatically. Full context: `docs/master-plan.md` (read it before architecture or demo decisions).
+This repo started EMPTY of application code at hacking start (10:00, 21 Nov 2026). Do not assume a module exists — inspect first.
 
-## Project
-- **Team:** khun-chai (TEAM36), 4 members
-- **What:** RSU-edge traffic-state inference with VLMs → 16-byte semantic vector → Traffic Control Center (TCC) → OpenAI agent that drafts an incident response plan → live dashboard.
-- **Based on:** our paper "Adaptive Prompt Ensemble for VLM-Based Traffic State Inference in RSU Semantic Communication Systems" (APE + CPV). The hackathon adds the TCC response agent (paper's future work) and the product demo.
-- **Tracks:** Deep Domain AI (ITS / traffic) + Autonomous & Adaptive AI (CPV self-checks uncertain predictions; agent escalates to humans when unsure).
-- **Classes (fixed order, never change):** `normal_flow, congestion, accident, invalid_scene`.
+## What we are building
+RoadSense: edge traffic monitoring. **Mac 1 = simulated RSU** reads 2–3 traffic videos, samples frames per camera
+(every 2 s normally, 1 s when verifying), classifies them with an existing VLM + APE, keeps a temporal decision state
+per camera, and sends **semantic JSON** (plus optional async JPEG previews) to **Mac 2 = simulated TCC**, which shows
+a live dashboard with alerts, camera priority, sampling interval, and measured AI-call reduction vs fixed 1 s sampling.
 
-## Repo layout
-- `semcom/` — shared: `payload.py` (16-byte codec), `cpv.py` (Algorithm 1). Pure numpy. **Contract code — change only with team agreement.**
-- `apps/rsu/` — edge sender. `engine.py` has `MockEngine` (no ML) and `ClipEngine` (open_clip, APE Eq. 5–6, CPV partners).
-- `apps/tcc/` — FastAPI receiver (`main.py`) + response agent (`agent.py`, OpenAI Responses API with JSON schema + rule fallback).
-- `apps/web/` — single-file dashboard served by the TCC at `/` (no build step).
-- `prompts/ape_prompts.json` — APE prompts per class.
-- `tests/` — pytest.
+## Fixed conventions (never change without the whole team)
+- Class order everywhere: `["normal_flow", "congestion", "accident", "invalid_scene"]`
+- Payload / endpoints: `docs/api-contract.md` (single source of truth; `shared/schemas.py` implements it)
+- Camera ids `CAM_01`, `CAM_02`, `CAM_03`. Timestamps: `video_timestamp_sec` (playback) + ISO wall-clock fields.
+- The adaptive feedback loop (decision → sampler) runs on Mac 1 only.
 
-## Commands
-- Install: `make install` (light) / `make install-clip` (real VLMs)
-- Run demo: `make dev` → TCC + 2 mock RSUs, open http://localhost:8000
-- Lint + test: `make check` ← must pass before finishing any task
+## Layout (create as you go; owner in brackets)
+- `rsu/` [Mac 1] `frame_automation.py` (P1), `vlm.py` (P1), `decision_engine.py` (P2), `semantic_sender.py` + `frame_sender.py` (P3), `main.py`
+- `tcc/` [Mac 2] `pc2_receiver.py`, `camera_state.py` (P3), `dashboard/` (P4)
+- `shared/schemas.py` (P3, contract) · `evaluation/` (fixed-rate baseline, metrics) · `tests/`
+- `assets/demo_clips/` local only, never commit videos
 
 ## Rules for agents
-1. **Stay in your lane.** Only edit files in the area named in the task. Shared files (`semcom/`, `AGENTS.md`, `Makefile`, `docs/api.md`, `.env.example`) → call it out in the PR description.
-2. **The payload stays 16 bytes.** Metadata goes in HTTP headers, never into the payload. This is the paper's core claim.
-3. **Small diffs**, one feature per PR, no drive-by refactors.
-4. **Never commit secrets.** Keys from env only; add new vars to `.env.example`.
-5. **The demo must never crash.** Every external call (OpenAI, model download, network) needs a timeout and a fallback. Mock mode must keep working.
-6. **Agent safety:** `dispatch_rescue` always requires human approval; low confidence or CPV-changed labels → `needs_human_approval=true`.
-7. Add/adjust a test in `tests/` for logic changes. Run `make check`.
-8. PR description: what changed, how to test, screenshot if UI.
-
-## Conventions
-- Python 3.11+, type hints, `ruff` (config in `ruff.toml`).
-- Branches `<name>/<feature>`; imperative commit messages; English in code.
+1. **Stay in your lane:** edit only the module named in the task. Touching `shared/`, `docs/api-contract.md`, or this file → say so in the PR.
+2. **No fake intelligence:** never hardcode labels, use filenames/ground truth to drive classification or sampling, or invent metrics. Mocks are allowed only behind an explicit `--mock` flag and must be labeled as mock in the UI.
+3. **Reuse the existing paper code** (CLIP/OpenCLIP/SigLIP + APE) via a thin wrapper in `rsu/vlm.py`; map its class order explicitly. Do not re-derive APE.
+4. **Never block inference** on the network: bounded queues, timeouts, drop stale JPEG previews, retry semantic messages with limits.
+5. **Per-camera state is independent** (history, interval, state, priority, last alert). Add hysteresis/cooldown so rates don't flap.
+6. Thresholds (0.60, 3 stable frames) are starting heuristics — keep them in one config, not scattered.
+7. Small diffs, one feature per branch (`feature/<area>` or `<name>/<feature>`), PR into `main`. Add or update tests for logic.
+8. Secrets only from env vars. Stack: Python 3.11+, OpenCV, FastAPI/uvicorn; dashboard per team choice.
