@@ -56,3 +56,8 @@ body.wall-open .operator-layout{display:none}
 body.wall-open .camera-wall{display:flex}
 body.wall-open #wall-open{background:var(--surface);border-color:var(--border);color:var(--text)}
 @media(max-width:680px){.wall-grid{grid-template-columns:1fr;grid-auto-rows:auto}.wall-camera-card{min-height:0}.wall-camera-card .camera-preview{height:205px}}
+.camera-select-wrap{position:relative;width:100%}
+.camera-select{appearance:none;-webkit-appearance:none;padding-right:42px}
+.camera-select-wrap::after{content:"";position:absolute;right:17px;top:15px;width:8px;height:8px;border-right:1.7px solid var(--muted);border-bottom:1.7px solid var(--muted);transform:rotate(45deg);pointer-events:none}
+.camera-select:focus{box-shadow:none}
+.camera-select:focus-visible{outline:3px solid color-mix(in srgb,var(--accent) 24%,transparent);outline-offset:2px}

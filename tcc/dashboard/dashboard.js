@@ -207,17 +207,11 @@
 
   function renderCameras() {
     const cameras = normalizeCameras(state.cameras);
-    const primary = cameras.find((camera) => cameraIndex(camera) === 1);
+    const camera01 = cameras.find((camera) => cameraIndex(camera) === 1);
     const additional = cameras.filter((camera) => {
       const index = cameraIndex(camera);
       return index !== null && index >= 2 && index <= 6;
     });
-    const primaryRoot = $("primary-camera");
-    primaryRoot.replaceChildren(primary ? makeCamera(primary, "primary-camera-card") : Object.assign(document.createElement("div"), {
-      className: "empty-camera primary-empty",
-      textContent: state.connected ? "รอข้อมูลจาก CAM_01" : "ยังไม่ได้รับข้อมูลจาก TCC"
-    }));
-
     const picker = $("camera-select");
     const priorSelection = state.selectedCameraId;
     picker.replaceChildren();
@@ -240,8 +234,19 @@
       state.selectedCameraId = additional.some((camera) => camera.camera_id === priorSelection) ? priorSelection : additional[0].camera_id;
       picker.value = state.selectedCameraId;
       const selected = additional.find((camera) => camera.camera_id === state.selectedCameraId);
-      $("secondary-camera").replaceChildren(makeCamera(selected, "secondary-camera-card"));
+      $("secondary-camera").replaceChildren(camera01
+        ? makeCamera(camera01, "secondary-camera-card")
+        : Object.assign(document.createElement("div"), { className: "empty-camera", textContent: "ยังไม่ได้รับข้อมูลจาก CAM_01" }));
     }
+
+    const selected = additional.find((camera) => camera.camera_id === state.selectedCameraId);
+    const primary = selected || camera01;
+    $("primary-camera-title").textContent = primary ? primary.camera_id.replace("_", " ") : "CAM_01";
+    const primaryRoot = $("primary-camera");
+    primaryRoot.replaceChildren(primary ? makeCamera(primary, "primary-camera-card") : Object.assign(document.createElement("div"), {
+      className: "empty-camera primary-empty",
+      textContent: state.connected ? "รอข้อมูลจาก CAM_01" : "ยังไม่ได้รับข้อมูลจาก TCC"
+    }));
 
     const activeCount = cameras.filter(isOnline).length;
     $("online-count").textContent = `${activeCount} กล้องออนไลน์`;

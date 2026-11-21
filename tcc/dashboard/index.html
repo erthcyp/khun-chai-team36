@@ -43,13 +43,13 @@
 
         <section class="operator-layout" aria-label="ภาพกล้องหลัก กล้องเพิ่มเติม และการแจ้งเตือน">
           <section class="primary-camera-section">
-            <div class="operator-section-heading"><div><span class="eyebrow">กล้องหลัก</span><h2>CAM_01</h2></div><button class="fullscreen-button" id="wall-open" type="button"><span aria-hidden="true">▦</span> แสดงกล้องทั้งหมด</button></div>
+            <div class="operator-section-heading"><div><span class="eyebrow">กล้องหลัก</span><h2 id="primary-camera-title">CAM_01</h2></div><button class="fullscreen-button" id="wall-open" type="button"><span aria-hidden="true">▦</span> แสดงกล้องทั้งหมด</button></div>
             <div id="primary-camera" aria-live="polite"><div class="loading-state"><span class="spinner"></span><strong>กำลังเชื่อมต่อกล้อง</strong></div></div>
           </section>
           <section class="secondary-camera-section">
             <div class="operator-section-heading"><div><span class="eyebrow">กล้องเพิ่มเติม</span><h2>เลือกกล้อง 02–06</h2></div></div>
             <label class="camera-select-label" for="camera-select">เลือกกล้อง</label>
-            <select class="camera-select" id="camera-select" aria-label="เลือกกล้อง CAM_02 ถึง CAM_06"></select>
+            <div class="camera-select-wrap"><select class="camera-select" id="camera-select" aria-label="เลือกกล้อง CAM_02 ถึง CAM_06"></select></div>
             <div id="secondary-camera" aria-live="polite"><div class="empty-camera">เลือกกล้องที่ต้องการดู</div></div>
           </section>
           <aside class="alert-panel" id="alerts">
