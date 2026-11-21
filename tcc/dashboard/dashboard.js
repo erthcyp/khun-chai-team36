@@ -3,6 +3,7 @@
 
   const REFRESH_MS = 3000;
   const STALE_AFTER_MS = 12000;
+  const CAMERA_IDS = Array.from({ length: 6 }, (_, index) => `CAM_0${index + 1}`);
   const params = new URLSearchParams(location.search);
   const mockMode = params.get("mock") === "1";
   const apiBase = (params.get("api") || "").replace(/\/$/, "");
@@ -70,6 +71,7 @@
     return at ? Date.now() - new Date(at).getTime() <= STALE_AFTER_MS : false;
   }
   function cameraLocation(camera) {
+    if (camera.placeholder) return "รอตำแหน่งกล้อง";
     const value = camera.location || {};
     return String(first(value, ["label", "name"]) || camera.location_label || "ไม่ระบุตำแหน่ง");
   }
@@ -111,6 +113,10 @@
     }
     return [...byIndex.entries()].sort(([a], [b]) => a - b).map(([, camera]) => camera);
   }
+  function displayCameras(cameras) {
+    const byId = new Map(cameras.map((camera) => [camera.camera_id, camera]));
+    return CAMERA_IDS.map((cameraId) => byId.get(cameraId) || { camera_id: cameraId, placeholder: true });
+  }
   async function json(path) {
     const response = await fetch(`${apiBase}${path}`, { cache: "no-store", headers: { Accept: "application/json" } });
     if (!response.ok) throw new Error(`${path}: ${response.status}`);
@@ -135,19 +141,20 @@
 
   function makeCamera(camera, variant = "") {
     const cameraId = String(camera.camera_id || camera.id || "กล้องไม่ทราบรหัส");
+    const waiting = Boolean(camera.placeholder);
     const status = cameraState(camera);
     const online = isOnline(camera);
     const className = normalizeClass(prediction(camera));
     const isAlert = status === "alert" || className === "accident";
-    const isInvalid = status === "invalid" || className === "invalid_scene" || !online;
+    const isInvalid = !waiting && (status === "invalid" || className === "invalid_scene" || !online);
     const isVerify = status === "verifying" || status === "pending";
-    const trafficKind = isInvalid ? "invalid_scene" : isAlert ? "accident" : className;
-    const trafficLabel = online ? thaiClass(trafficKind) : "กล้องออฟไลน์";
+    const trafficKind = waiting ? "waiting" : isInvalid ? "invalid_scene" : isAlert ? "accident" : className;
+    const trafficLabel = waiting ? "รอข้อมูล" : online ? thaiClass(trafficKind) : "กล้องออฟไลน์";
     const interval = number(camera.sampling_interval_sec);
     const timestamp = capturedAt(camera);
     const snapshot = first(camera, ["latest_snapshot_url", "snapshot_url", "preview_url", "image_url"]);
     const wrapper = document.createElement("article");
-    wrapper.className = `camera-card ${variant}`.trim();
+    wrapper.className = `camera-card ${variant} ${waiting ? "is-placeholder" : ""}`.trim();
 
     const head = document.createElement("div");
     head.className = "camera-card-head";
@@ -194,8 +201,8 @@
     const foot = document.createElement("div");
     foot.className = "camera-card-foot";
     const stateLabel = document.createElement("span");
-    stateLabel.className = `camera-state-label ${isVerify ? "verify" : isAlert || isInvalid ? "alert" : ""}`;
-    stateLabel.innerHTML = `<span class="badge-dot"></span>${escapeHtml(!online ? stateNames.offline : stateNames[status] || stateNames.normal)}`;
+    stateLabel.className = `camera-state-label ${waiting ? "waiting" : isVerify ? "verify" : isAlert || isInvalid ? "alert" : ""}`;
+    stateLabel.innerHTML = `<span class="badge-dot"></span>${escapeHtml(waiting ? "รอข้อมูลจาก RSU" : !online ? stateNames.offline : stateNames[status] || stateNames.normal)}`;
     const updated = document.createElement("span");
     updated.textContent = timestamp ? `อัปเดต ${thaiTime(timestamp)}` : "ยังไม่ได้รับข้อมูล";
     foot.append(stateLabel, updated);
@@ -230,15 +237,15 @@
     return wrapper;
   }
 
-  function renderCameraWall(cameras) {
+  function renderCameraWall(cameras, receivedCount) {
     const root = $("wall-grid");
     root.replaceChildren(...cameras.map((camera) => makeCamera(camera, "wall-camera-card")));
-    $("wall-count").textContent = `${cameras.length} จาก 6 กล้อง`;
-    if (!cameras.length) root.innerHTML = '<div class="empty-camera">ยังไม่ได้รับข้อมูลกล้องจาก TCC</div>';
+    $("wall-count").textContent = `${receivedCount} จาก 6 กล้องที่มีข้อมูล`;
   }
 
   function renderCameras() {
-    const cameras = normalizeCameras(state.cameras);
+    const received = normalizeCameras(state.cameras);
+    const cameras = displayCameras(received);
     const camera01 = cameras.find((camera) => cameraIndex(camera) === 1);
     const picker = $("camera-select");
     const priorSelection = state.selectedCameraId;
@@ -277,12 +284,14 @@
       textContent: state.connected ? "รอข้อมูลจาก CAM_01" : "ยังไม่ได้รับข้อมูลจาก TCC"
     }));
 
-    const activeCount = cameras.filter(isOnline).length;
+    const activeCount = received.filter(isOnline).length;
     $("online-count").textContent = `${activeCount} กล้องออนไลน์`;
     const hasAlert = state.alerts.some(openAlert);
-    $("overall-state").textContent = hasAlert ? "มีเหตุการณ์ที่ต้องตรวจสอบ" : cameras.length ? "เฝ้าระวังตามปกติ" : state.connected ? "รอข้อมูลกล้อง" : "TCC ออฟไลน์";
-    $("metric-context").textContent = cameras.length ? `รอบจำลอง · ${cameras.length} กล้อง` : "รอบจำลอง · รอข้อมูล";
-    renderCameraWall(cameras);
+    $("overall-state").textContent = hasAlert ? "มีเหตุการณ์ที่ต้องตรวจสอบ" : received.length ? "เฝ้าระวังตามปกติ" : "รอข้อมูลจาก RSU";
+    $("metric-context").textContent = received.length
+      ? `${mockMode ? "รอบจำลอง" : "ข้อมูลจริง"} · ${received.length} กล้อง`
+      : `${mockMode ? "รอบจำลอง" : "ข้อมูลจริง"} · รอข้อมูล`;
+    renderCameraWall(cameras, received.length);
   }
 
   function openCameraWall() {
@@ -290,7 +299,8 @@
     state.wallView = true;
     wall.hidden = false;
     document.body.classList.add("wall-open");
-    renderCameraWall(normalizeCameras(state.cameras));
+    const received = normalizeCameras(state.cameras);
+    renderCameraWall(displayCameras(received), received.length);
     $("wall-open").innerHTML = '<span aria-hidden="true">←</span> กลับมุมมองหลัก';
     $("wall-close").focus();
   }
@@ -395,6 +405,7 @@
   function render() {
     const connected = state.connected;
     $("connection-dot").classList.toggle("offline", !connected);
+    document.querySelector(".small-live-dot").classList.toggle("offline", !connected);
     $("connection-text").textContent = connected ? "RSU เชื่อมต่อ" : "ไม่พบการเชื่อมต่อ RSU";
     $("data-mode").textContent = mockMode ? "ข้อมูลจำลอง" : "ข้อมูลจริง";
     $("updated-at").textContent = state.updatedAt ? `อัปเดต ${thaiTime(state.updatedAt)}` : "ยังไม่ได้รับข้อมูล";

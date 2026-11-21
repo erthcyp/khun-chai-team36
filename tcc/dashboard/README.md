@@ -34,7 +34,7 @@ The receiver must allow the dashboard origin through CORS when the static site a
 - `GET /api/v1/alerts`
 - `GET /api/v1/metrics`
 
-Camera records for `CAM_01` through `CAM_06` are discovered from `GET /api/v1/cameras` and rendered as they appear; the dashboard polls every three seconds, sorts them by camera number, and de-duplicates repeated IDs. No missing cameras are fabricated. If offline cameras should remain visible, the receiver must return their registry records with an offline state. Records may include `latest_snapshot_url`, `snapshot_url`, `preview_url`, or `image_url` for the newest sampled JPEG. If none is present, the card shows a road-scene placeholder. Camera location labels come from the receiver payload; coordinates are shown when supplied.
+The layout always shows CAM_01 through CAM_06 as empty camera slots. Real records from `GET /api/v1/cameras` replace their matching slots by `camera_id`; the dashboard polls every three seconds, sorts them by camera number, and de-duplicates repeated IDs. Empty slots say "รอข้อมูล" and do not invent classifications, metrics, or descriptions. Records may include `latest_snapshot_url`, `snapshot_url`, `preview_url`, or `image_url` for the newest sampled JPEG. If none is present, the card shows a road-scene placeholder. Camera location labels come from the receiver payload; coordinates are shown when supplied.
 
 ## Mock preview
 
