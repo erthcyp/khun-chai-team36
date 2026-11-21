@@ -57,41 +57,62 @@ class MeaningProcessorTests(unittest.IsolatedAsyncioTestCase):
         async with httpx.AsyncClient(transport=httpx.MockTransport(send)) as client:
             with patch.dict(os.environ, {"OPENAI_API_KEY": "test-key"}):
                 processor = MeaningProcessor(client=client)
-            event = dict(FRAME, event_id="evt-1", verification_state="verifying")
-            self.assertEqual((await processor.on_semantic(event))["source"], "json")
+            event = dict(FRAME, event_id="evt-1", verification_state="verifying",
+                         location={"label": "Junction A"})
+            task = asyncio.create_task(processor.on_semantic(event))
+            await asyncio.sleep(0)
+            self.assertEqual(len(calls), 0)
             self.assertIsNone(await processor.on_semantic(dict(event, frame_id="later")))
             self.assertIsNone(await processor.on_snapshot(
                 dict(camera_id="CAM_01", frame_id=FRAME["frame_id"], event_id="wrong"), b"jpeg"))
+            await processor.on_snapshot(
+                dict(camera_id="CAM_01", frame_id="other", event_id="evt-1"), b"wrong frame")
+            await asyncio.sleep(0)
             meta = dict(camera_id="CAM_01", frame_id=FRAME["frame_id"], event_id="evt-1")
-            self.assertEqual((await processor.on_snapshot(meta, b"jpeg"))["source"], "json+image")
-            self.assertIsNone(await processor.on_snapshot(meta, b"jpeg"))
-            self.assertIsNotNone(await processor.on_semantic(dict(event, event_id="evt-2")))
-            self.assertIsNotNone(await processor.on_semantic(dict(
-                event, event_id="evt-2", alert={"level": "preliminary"})))
+            self.assertEqual(len(calls), 0)
+            await processor.on_snapshot(meta, b"jpeg")
+            self.assertEqual((await task)["source"], "json+image")
+            await processor.on_snapshot(meta, b"jpeg")
+            next_event = dict(event, frame_id="next", event_id="evt-2")
+            await processor.on_snapshot(
+                dict(camera_id="CAM_01", frame_id="next", event_id="evt-2"), b"early")
+            self.assertEqual((await processor.on_semantic(next_event))["source"], "json+image")
 
-        self.assertEqual(len(calls), 4)
+        self.assertEqual(len(calls), 2)
         self.assertIn("primary operator summary in natural Thai",
                       calls[0]["messages"][0]["content"])
         self.assertIn("โมเดลทำนายจากเฟรมเดียวว่า", calls[0]["messages"][0]["content"])
         self.assertIn("The model predicts from a single frame that",
                       calls[0]["messages"][0]["content"])
         content = calls[0]["messages"][1]["content"]
-        self.assertEqual(json.loads(content[0]["text"])["predicted_class"], "normal_flow")
+        facts = json.loads(content[0]["text"])
+        self.assertEqual(facts["predicted_class"], "normal_flow")
+        self.assertEqual(facts["location"], "Junction A")
+        self.assertEqual(facts["captured_at"], FRAME["captured_at"])
         self.assertNotIn("image_path", content[0]["text"])
-        self.assertEqual(calls[1]["messages"][1]["content"][1]["type"], "image_url")
+        self.assertEqual(calls[0]["messages"][1]["content"][1]["type"], "image_url")
 
-    async def test_timeout_and_bad_response_use_template(self):
+    async def test_missing_image_skips_api_and_api_timeout_uses_template(self):
+        calls = []
+
         async def send(request):
-            if json.loads(request.content)["messages"][1]["content"][0]["text"].find("CAM_01") >= 0:
-                await asyncio.sleep(60)
-            return httpx.Response(200, json={"choices": []})
+            calls.append(request)
+            await asyncio.sleep(60)
 
         async with httpx.AsyncClient(transport=httpx.MockTransport(send)) as client:
             with patch.dict(os.environ, {"OPENAI_API_KEY": "test-key"}):
-                processor = MeaningProcessor(client=client, timeout=0.01)
-            self.assertEqual((await processor.on_semantic(FRAME))["source"], "fallback")
-            self.assertEqual((await processor.on_semantic(
-                dict(FRAME, camera_id="CAM_02")))["source"], "fallback")
+                processor = MeaningProcessor(client=client, timeout=0.01, image_timeout=0.01)
+            self.assertEqual(
+                (await processor.on_semantic(FRAME))["fallback_reason"], "image_timeout",
+            )
+            await processor.on_snapshot(FRAME, b"late")
+            self.assertEqual(len(calls), 0)
+            camera_two = dict(FRAME, camera_id="CAM_02")
+            await processor.on_snapshot(camera_two, b"early")
+            self.assertEqual(
+                (await processor.on_semantic(camera_two))["fallback_reason"], "api_error",
+            )
+            self.assertEqual(len(calls), 1)
 
     async def test_stale_in_flight_summary_is_discarded(self):
         first_started = asyncio.Event()
@@ -106,9 +127,12 @@ class MeaningProcessorTests(unittest.IsolatedAsyncioTestCase):
         async with httpx.AsyncClient(transport=httpx.MockTransport(send)) as client:
             with patch.dict(os.environ, {"OPENAI_API_KEY": "test-key"}):
                 processor = MeaningProcessor(client=client)
+            await processor.on_snapshot(FRAME, b"first")
             first = asyncio.create_task(processor.on_semantic(FRAME))
             await first_started.wait()
             self.assertIsNone(await processor.on_semantic(FRAME))
-            self.assertIsNotNone(await processor.on_semantic(dict(FRAME, prediction="congestion")))
+            changed = dict(FRAME, frame_id="next", prediction="congestion")
+            await processor.on_snapshot(changed, b"second")
+            self.assertIsNotNone(await processor.on_semantic(changed))
             release_first.set()
             self.assertIsNone(await first)
