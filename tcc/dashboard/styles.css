@@ -61,3 +61,11 @@ body.wall-open #wall-open{background:var(--surface);border-color:var(--border);c
 .camera-select-wrap::after{content:"";position:absolute;right:17px;top:15px;width:8px;height:8px;border-right:1.7px solid var(--muted);border-bottom:1.7px solid var(--muted);transform:rotate(45deg);pointer-events:none}
 .camera-select:focus{box-shadow:none}
 .camera-select:focus-visible{outline:3px solid color-mix(in srgb,var(--accent) 24%,transparent);outline-offset:2px}
+.ai-description-panel{border:1px solid var(--border);border-radius:16px;padding:15px 17px;background:var(--surface);color:var(--text)}
+.ai-description-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px}
+.ai-description-heading .eyebrow{display:block;margin:0 0 2px;font-size:9px}
+.ai-description-heading h3{margin:0;font-size:15px;font-weight:600;line-height:1.4}
+.description-source{flex:none;border-radius:999px;padding:4px 9px;background:var(--surface-2);color:var(--muted);font-size:10px;font-weight:600}
+.ai-description-panel p{margin:0;color:var(--text);font-size:13px;line-height:1.8;white-space:pre-wrap;overflow-wrap:anywhere}
+.ai-description-panel.is-waiting p{color:var(--muted)}
+@media(max-width:680px){.ai-description-panel{padding:13px 14px}.ai-description-heading h3{font-size:14px}.ai-description-panel p{font-size:12px}}

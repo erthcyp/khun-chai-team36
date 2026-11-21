@@ -76,6 +76,15 @@
   function prediction(camera) {
     return first(camera, ["predicted_class", "prediction", "final_class", "classification"]);
   }
+  function naturalLanguage(camera) {
+    const value = first(camera, [
+      "natural_language_description", "natural_language", "description_th",
+      "explanation_th", "human_readable_text", "description", "explanation", "summary"
+    ]);
+    if (typeof value === "string") return value.trim();
+    if (value && typeof value === "object") return String(first(value, ["th", "text", "content"]) || "").trim();
+    return "";
+  }
   function cameraState(camera) {
     return String(camera.verification_state || camera.state || "normal").toLowerCase();
   }
@@ -247,6 +256,14 @@
       className: "empty-camera primary-empty",
       textContent: state.connected ? "รอข้อมูลจาก CAM_01" : "ยังไม่ได้รับข้อมูลจาก TCC"
     }));
+    const explanation = naturalLanguage(primary);
+    $("ai-description-text").textContent = explanation || (mockMode
+      ? "กำลังรอข้อความคำอธิบายภาษาธรรมชาติจาก RSU"
+      : "ยังไม่มีคำอธิบายจาก RSU");
+    $("description-source").textContent = explanation
+      ? `${mockMode ? "ตัวอย่างจำลอง · " : "จาก "}${primary.camera_id.replace("_", " ")}`
+      : mockMode ? "ตัวอย่างจำลอง" : "รอข้อมูล";
+    $("ai-description-text").closest(".ai-description-panel").classList.toggle("is-waiting", !explanation);
 
     const activeCount = cameras.filter(isOnline).length;
     $("online-count").textContent = `${activeCount} กล้องออนไลน์`;
@@ -335,12 +352,12 @@
     if (mockMode) {
       state.connected = true;
       state.cameras = normalizeCameras([
-        { camera_id: "CAM_01", location: { label: "ถนนสายหลัก", latitude: 13.7563, longitude: 100.5018 }, predicted_class: "normal_flow", verification_state: "normal", sampling_interval_sec: 2, priority: "low", captured_at: new Date(Date.now() - 1400).toISOString(), online: true },
-        { camera_id: "CAM_02", location: { label: "ทางขึ้นสะพาน", latitude: 13.7591, longitude: 100.5056 }, predicted_class: "normal_flow", verification_state: "normal", sampling_interval_sec: 2, priority: "low", captured_at: new Date(Date.now() - 2100).toISOString(), online: true },
-        { camera_id: "CAM_03", location: { label: "พื้นที่จำลอง CAM_03" }, predicted_class: "normal_flow", verification_state: "normal", sampling_interval_sec: 2, priority: "low", captured_at: new Date(Date.now() - 2700).toISOString(), online: true },
-        { camera_id: "CAM_04", location: { label: "พื้นที่จำลอง CAM_04" }, predicted_class: "normal_flow", verification_state: "normal", sampling_interval_sec: 2, priority: "low", captured_at: new Date(Date.now() - 3200).toISOString(), online: true },
-        { camera_id: "CAM_05", location: { label: "พื้นที่จำลอง CAM_05" }, predicted_class: "normal_flow", verification_state: "normal", sampling_interval_sec: 2, priority: "low", captured_at: new Date(Date.now() - 3800).toISOString(), online: true },
-        { camera_id: "CAM_06", location: { label: "พื้นที่จำลอง CAM_06" }, predicted_class: "normal_flow", verification_state: "normal", sampling_interval_sec: 2, priority: "low", captured_at: new Date(Date.now() - 4300).toISOString(), online: true }
+        { camera_id: "CAM_01", location: { label: "ถนนสายหลัก", latitude: 13.7563, longitude: 100.5018 }, predicted_class: "normal_flow", natural_language_description: "ตัวอย่างจำลอง: จากภาพล่าสุด รถบนถนนสายหลักเคลื่อนตัวต่อเนื่อง ยังไม่พบสัญญาณการจราจรติดขัด", verification_state: "normal", sampling_interval_sec: 2, priority: "low", captured_at: new Date(Date.now() - 1400).toISOString(), online: true },
+        { camera_id: "CAM_02", location: { label: "ทางขึ้นสะพาน", latitude: 13.7591, longitude: 100.5056 }, predicted_class: "normal_flow", natural_language_description: "ตัวอย่างจำลอง: รถบนทางขึ้นสะพานเคลื่อนตัวได้ตามปกติ ไม่พบเหตุผิดปกติในภาพล่าสุด", verification_state: "normal", sampling_interval_sec: 2, priority: "low", captured_at: new Date(Date.now() - 2100).toISOString(), online: true },
+        { camera_id: "CAM_03", location: { label: "พื้นที่จำลอง CAM_03" }, predicted_class: "normal_flow", natural_language_description: "ตัวอย่างจำลอง: ภาพจาก CAM 03 อยู่ในสถานะปกติ ยังไม่พบเหตุที่ต้องแจ้งเตือน", verification_state: "normal", sampling_interval_sec: 2, priority: "low", captured_at: new Date(Date.now() - 2700).toISOString(), online: true },
+        { camera_id: "CAM_04", location: { label: "พื้นที่จำลอง CAM_04" }, predicted_class: "normal_flow", natural_language_description: "ตัวอย่างจำลอง: ภาพจาก CAM 04 อยู่ในสถานะปกติ ยังไม่พบเหตุที่ต้องแจ้งเตือน", verification_state: "normal", sampling_interval_sec: 2, priority: "low", captured_at: new Date(Date.now() - 3200).toISOString(), online: true },
+        { camera_id: "CAM_05", location: { label: "พื้นที่จำลอง CAM_05" }, predicted_class: "normal_flow", natural_language_description: "ตัวอย่างจำลอง: ภาพจาก CAM 05 อยู่ในสถานะปกติ ยังไม่พบเหตุที่ต้องแจ้งเตือน", verification_state: "normal", sampling_interval_sec: 2, priority: "low", captured_at: new Date(Date.now() - 3800).toISOString(), online: true },
+        { camera_id: "CAM_06", location: { label: "พื้นที่จำลอง CAM_06" }, predicted_class: "normal_flow", natural_language_description: "ตัวอย่างจำลอง: ภาพจาก CAM 06 อยู่ในสถานะปกติ ยังไม่พบเหตุที่ต้องแจ้งเตือน", verification_state: "normal", sampling_interval_sec: 2, priority: "low", captured_at: new Date(Date.now() - 4300).toISOString(), online: true }
       ]);
       state.alerts = [];
       state.metrics = { local_inference_count: 40, baseline_inference_count: 80, reduction_pct: 50 };
